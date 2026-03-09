@@ -1,4 +1,5 @@
 import { ChildProps } from '@/types'
+import Header from "@/components/header";
 import "./globals.css";
 
 import type { Metadata } from "next";
@@ -16,8 +17,8 @@ export const metadata: Metadata = {
 const RootLayout: FC<ChildProps> = ({children}) => {
   return (
     <html lang='en'>
-      <body className='antialised flex justify-center items-center'>
-        <Navbar />
+      <body className='antialised flex flex-col justify-center items-center'>
+        <Header />
         <main className="container max-w-6xl">{children}</main>
         <Toaster />
       </body>
