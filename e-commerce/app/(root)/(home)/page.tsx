@@ -1,9 +1,13 @@
-import {FlashSalesSection} from "./_components/flash-sales"
+import CategoryWithSlider from "./_components/categoryWithSlider"
+import FlashSalesSection from "./_components/flash-sales"
 
 const HomePage = () => {
     return (
         <>
-            <FlashSalesSection />
+            <div className="mb-20">
+                <CategoryWithSlider />
+            </div>
+                <FlashSalesSection />
         </>
     )
 }

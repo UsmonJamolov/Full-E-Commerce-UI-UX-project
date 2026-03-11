@@ -17,9 +17,13 @@ export const metadata: Metadata = {
 const RootLayout: FC<ChildProps> = ({children}) => {
   return (
     <html lang='en'>
-      <body className='antialised flex flex-col justify-center items-center'>
-        <Header />
-        <main className="container max-w-6xl">{children}</main>
+      <body className='antialised'>
+        <div className='sticky top-0'>
+          <Header />
+        </div>
+        <div className="flex flex-col justify-center items-center">
+          <main className="container max-w-6xl">{children}</main>
+        </div>
         <Toaster />
       </body>
     </html>

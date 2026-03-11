@@ -29,12 +29,7 @@ import {
   User,
 } from "lucide-react";
 
-const nav = [
-  { label: "Home", href: "/" },
-  { label: "Contact", href: "/contact" },
-  { label: "About", href: "/about" },
-  { label: "Sign Up", href: "/signup" },
-];
+import { nav } from "@/components/constants";
 
 type HeaderProps = {
   cartCount?: number;
@@ -51,16 +46,15 @@ export default function Header({
     <>
       {/* Top promo bar */}
       <div className="bg-black text-white">
-        <div className="mx-auto flex h-10 max-w-6xl items-center justify-between px-4 text-xs">
+        <div className="mx-auto flex h-10 max-w-6xl items-center justify-between px-2 sm:px-4 text-[11px] sm:text-xs">
           <p className="truncate">
             Summer Sale For All Swim Suits And Free Express Delivery — OFF 50%!{" "}
             <Link href="/sale" className="underline ml-2">
               ShopNow
             </Link>
           </p>
-
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1">
+            <DropdownMenuTrigger className="inline-flex items-center gap-1 text-xs sm:text-sm">
               English <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -74,9 +68,10 @@ export default function Header({
 
       {/* Main header */}
       <div className="border-b bg-white">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between px-2 sm:px-4">
           {/* Left: mobile menu + logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Mobile menu toggle */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -88,11 +83,12 @@ export default function Header({
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-80">
+              {/* Mobile Menu Drawer */}
+              <SheetContent side="left" className="w-[85vw] max-w-xs p-0 pt-2">
                 <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
+                  <SheetTitle className="px-4 pb-3">Menu</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4 flex flex-col gap-2">
+                <div className="flex flex-col gap-2 px-4">
                   {nav.map((i) => {
                     const active = pathname === i.href;
                     return (
@@ -100,7 +96,7 @@ export default function Header({
                         key={i.href}
                         href={i.href}
                         className={cn(
-                          "hover:underline",
+                          "py-2 hover:underline",
                           active ? "font-bold text-primary" : ""
                         )}
                       >
@@ -118,10 +114,11 @@ export default function Header({
                 </div>
               </SheetContent>
             </Sheet>
-            <Link href="/" className="font-bold text-lg">Exclusive</Link>
+            <Link href="/" className="font-bold text-lg sm:text-xl">Exclusive</Link>
           </div>
-          {/* Center: nav */}
-          <nav className="hidden items-center gap-6 text-sm md:flex">
+
+          {/* Center: nav (desktop only) */}
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[13px] lg:text-sm">
             {nav.map((i) => {
               const active = pathname === i.href;
               return (
@@ -129,7 +126,7 @@ export default function Header({
                   key={i.href}
                   href={i.href}
                   className={cn(
-                    "hover:underline",
+                    "hover:underline py-1",
                     active ? "font-bold text-primary" : ""
                   )}
                 >
@@ -138,12 +135,13 @@ export default function Header({
               );
             })}
           </nav>
+
           {/* Right: search + icons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Desktop search */}
             <div className="relative hidden sm:block">
               <Input
-                className="h-9 w-64 bg-muted pr-9"
+                className="h-9 w-36 sm:w-48 md:w-64 bg-muted pr-9 text-xs md:text-sm"
                 placeholder="What are you looking for?"
               />
               <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -157,7 +155,7 @@ export default function Header({
             >
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
-                <Badge className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1 text-[10px]">
+                <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center rounded-full px-1 text-[9px]">
                   {wishlistCount}
                 </Badge>
               )}
@@ -171,7 +169,7 @@ export default function Header({
             >
               <ShoppingCart className="h-5 w-5" />
               {cartCount > 0 && (
-                <Badge className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1 text-[10px]">
+                <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center rounded-full px-1 text-[9px]">
                   {cartCount}
                 </Badge>
               )}
