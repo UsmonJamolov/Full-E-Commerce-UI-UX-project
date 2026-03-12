@@ -1,36 +1,39 @@
 "use client";
-import * as React from "react"; 
-import Image from "next/image"; 
-import { Button } from "@/components/ui/button"; 
-import { Card } from "@/components/ui/card"; 
-import { Badge } from "@/components/ui/badge"; 
-import { Heart, Eye, ArrowLeft, ArrowRight, Star } from "lucide-react"; 
+import * as React from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Heart, Eye, ArrowLeft, ArrowRight, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { products } from "@/components/constants";
 
-type Product = { 
-  id: string; title: string; image: string; discountPercent: number; 
-  price: number; oldPrice: number;  rating: number; reviews: number; cta?: boolean;
+type Product = {
+  id: string; title: string; image: string; discountPercent: number;
+  price: number; oldPrice: number; rating: number; reviews: number; cta?: boolean;
 };
 
 function format2(n: number) { return String(n).padStart(2, "0"); }
 
-function useCountdown(target: Date) { 
+function useCountdown(target: Date) {
   const [ms, setMs] = React.useState(() => Math.max(0, target.getTime() - Date.now()));
-  React.useEffect(() => { 
-    const t = setInterval(() => { setMs(Math.max(0, target.getTime() - Date.now())); }, 1000); 
-    return () => clearInterval(t); 
+  React.useEffect(() => {
+    const t = setInterval(() => { setMs(Math.max(0, target.getTime() - Date.now())); }, 1000);
+    return () => clearInterval(t);
   }, [target]);
-  const totalSeconds = Math.floor(ms / 1000); 
-  const days = Math.floor(totalSeconds / 86400); 
-  const hours = Math.floor((totalSeconds % 86400) / 3600); 
-  const minutes = Math.floor((totalSeconds % 3600) / 60); 
+  const totalSeconds = Math.floor(ms / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  return { days, hours, minutes, seconds }; 
+  return { days, hours, minutes, seconds };
 }
 
-function Stars({ value }: { value: number }) { 
-  const full = Math.floor(value); 
-  const half = value - full >= 0.5; 
+
+function Stars({ value }: { value: number }) {
+  const full = Math.floor(value);
+  const half = value - full >= 0.5;
   const total = 5;
   return (
     <div className="flex items-center gap-1">
@@ -44,19 +47,12 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-function FlashSalesSection() { 
+function FlashSalesSection() {
   const target = React.useMemo(
     () => new Date(Date.now() + (3 * 86400 + 23 * 3600 + 19 * 60 + 56) * 1000),
     []
   );
-  const { days, hours, minutes, seconds } = useCountdown(target); 
-  const products: Product[] = [ 
-    { id: "1", title: "HAVIT HV-G92 Gamepad", image: "/images/gamepad.png", discountPercent: 40, price: 120, oldPrice: 160, rating: 5, reviews: 88, }, 
-    { id: "2", title: "AK-900 Wired Keyboard", image: "/images/keyboard.png", discountPercent: 35, price: 960, oldPrice: 1160, rating: 4, reviews: 75, cta: true, },
-    { id: "3", title: "IPS LCD Gaming Monitor", image: "/images/monitor.png", discountPercent: 30, price: 370, oldPrice: 400, rating: 5, reviews: 99, },
-    { id: "4", title: "S-Series Comfort Chair", image: "/images/chair.png", discountPercent: 25, price: 375, oldPrice: 400, rating: 4.5, reviews: 99, },
-    { id: "5", title: "S-Series Comfort Chair", image: "/images/chair.png", discountPercent: 25, price: 375, oldPrice: 400, rating: 4.5, reviews: 99, },
-  ];
+  const { days, hours, minutes, seconds } = useCountdown(target);
   const scrollerRef = React.useRef<HTMLDivElement>(null);
 
   const scrollByCards = (dir: "prev" | "next") => {
@@ -73,7 +69,10 @@ function FlashSalesSection() {
           <div className="flex gap-3 items-start md:gap-4">
             <div className="hidden xs:block mt-0.5 h-8 w-1 rounded bg-red-500 md:h-10 md:w-2" />
             <div>
-              <p className="text-xs font-medium text-red-500 md:text-sm">Today’s</p>
+              <div className="flex gap-2 items-center">
+                <div className="h-7 w-4 rounded bg-red-500" />
+                <p className="text-xs font-medium text-red-500 md:text-sm">Today’s</p>
+              </div>
               <h2 className="text-2xl font-semibold tracking-tight md:text-4xl">Flash Sales</h2>
               <div className="mt-3 flex items-end gap-3 sm:gap-4 md:gap-6">
                 <TimeBlock label="Days" value={format2(days)} />
@@ -129,10 +128,11 @@ function TimeBlock({ label, value }: { label: string; value: string }) {
   );
 }
 
+// === SHU YERdagi kodlarni yangiladik:
 function ProductCard({ p }: { p: Product }) {
   return (
-    <div className="w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px] shrink-0">
-      <Card className="border-0 shadow-none">
+    <div className="relative -z-50 w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px] shrink-0">
+      <Card className="border-0 shadow-none group">
         <div className="relative rounded-lg bg-muted/30 p-3 sm:p-4">
           <Badge className="absolute left-2 top-2 bg-red-500 text-white hover:bg-red-500 z-50 text-[11px] px-2 py-1 sm:left-3 sm:top-3">
             -{p.discountPercent}%
@@ -149,12 +149,24 @@ function ProductCard({ p }: { p: Product }) {
             <Image src={p.image} alt={p.title} fill className="object-contain" unoptimized />
           </div>
           {p.cta && (
-            <button className="mt-4 w-full rounded-md bg-black py-2 text-xs font-medium text-white sm:py-3 sm:text-sm">
-              Add To Cart
-            </button>
+            <Button
+              asChild
+              className="
+                mt-4 w-full bg-black py-2 text-xs font-medium text-white
+                rounded-none
+                sm:py-3 sm:text-sm
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                pointer-events-none group-hover:pointer-events-auto
+                h-[6vh]
+              "
+            >
+              <Link href={'/'}>
+                Add To Cart
+              </Link>
+            </Button>
           )}
         </div>
-        <div className="mt-3 sm:mt-4 space-y-1 sm:space-y-2">
+        <div className="space-y-1 sm:space-y-2">
           <p className="line-clamp-2 text-xs font-medium sm:text-sm">{p.title}</p>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-sm font-semibold text-red-500">${p.price}</span>
@@ -185,7 +197,7 @@ function IconBubble({ children, ariaLabel, }: { children: React.ReactNode; ariaL
 export default FlashSalesSection
 
 /* ADD TO YOUR CSS (for complete scrollbar hiding in all browsers) */
-{/* 
+/* 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-*/}
+*/
