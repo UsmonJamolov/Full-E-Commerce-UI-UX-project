@@ -62,7 +62,7 @@ export default function MusicBannerSection() {
         {/* PRODUCT IMAGE */}
         <div className="flex-1 flex items-center justify-center relative px-2 md:px-8 select-none">
           <Image 
-            src="/images/jbl-large.png" 
+            src="/images/krosovkalar1.png" 
             alt="JBL Music Speaker"
             width={500}
             height={330}
@@ -72,7 +72,7 @@ export default function MusicBannerSection() {
           />
         </div>
         {/* FON EFFEKTI */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/70 to-gray-900 z-0" />
+        {/* <div className="absolute inset-0 bg-gradient-to-br from-black/70 to-gray-900 z-0" /> */}
       </div>
     </section>
   );

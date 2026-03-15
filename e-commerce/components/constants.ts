@@ -20,35 +20,35 @@ export const categories = [
 // Slider bannerlar ma'lumoti
 export const slides = [
   {
-    title: "iPhone 14 Series",
-    text: "Up to 10% off Voucher",
+    title: "Кроссовки, лоферы, ботинки",
+    text: "Мужская и женская обувь от 900 рублей.",
     image:
-      "/images/iphone-promo.png",
-    alt: "iPhone 14",
+      "/images/kv banner.png",
+    alt: "Кроссовки, лоферы, ботинки",
     link: "#",
   },
   {
-    title: "Macbook Air M3",
-    text: "Hot discount for new laptops",
+    title: "Автоматические и полуавтоматические зонты",
+    text: "От 700 рублей.",
     image:
-      "/images/iphone-promo.png",
-    alt: "Macbook Air",
+      "/images/zontik banner.png",
+    alt: "Автоматические и полуавтоматические зонты",
     link: "#",
   },
   {
-    title: "Samsung S23 Ultra",
-    text: "Best price only today",
+    title: "Детская обувь",
+    text: "От 600 рублей.",
     image:
-      "/images/iphone-promo.png",
-    alt: "Samsung S23 Ultra",
+      "/images/dets-kros banner.png",
+    alt: "Детская обувь",
     link: "#",
   },
   {
-    title: "Sony PlayStation 5",
-    text: "Summer Sale up to 30%",
+    title: "Сумки и рюкзаки",
+    text: "Сумки и рюкзаки по 800 рублей.",
     image:
-      "/images/iphone-promo.png",
-    alt: "Sony PlayStation 5",
+      "/images/sumka, ryukzaklar.png",
+    alt: "Сумки и рюкзаки по 800 рублей.",
     link: "#",
   },
 ];

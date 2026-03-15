@@ -82,7 +82,7 @@ export default function CategoryWithSlider() {
               href={slides[current].link}
               className="inline-flex items-center gap-2 text-sm md:text-base font-normal text-white underline underline-offset-8"
             >
-              Shop Now <ChevronRight className="h-5 w-5" />
+              Купить сейчас <ChevronRight className="h-5 w-5" />
             </a>
           </div>
           {/* Banner image */}
