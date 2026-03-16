@@ -4,6 +4,8 @@ import CategoryWithSlider from "./_components/categoryWithSlider"
 import FlashSalesSection from "./_components/flash-sales"
 import BestSellingProductsSection from "./_components/BestSellingProductsSection"
 import MusicBannerSection from "./_components/buyNowSection"
+import ExploreProductsSection from "./_components/exploreProductsSection"
+import NewArrivalSection from "./_components/newArrivalSection"
 
 const HomePage = () => {
     return (
@@ -19,6 +21,8 @@ const HomePage = () => {
                 <Separator className="my-5" />
                 <BestSellingProductsSection />
                 <MusicBannerSection />
+                <ExploreProductsSection />
+                <NewArrivalSection />
         </>
     )
 }
