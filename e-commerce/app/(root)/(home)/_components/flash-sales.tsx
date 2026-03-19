@@ -17,11 +17,12 @@ type Product = {
 function format2(n: number) { return String(n).padStart(2, "0"); }
 
 function useCountdown(target: Date) {
-  const [ms, setMs] = React.useState(() => Math.max(0, target.getTime() - Date.now()));
+  const [ms, setMs] = React.useState(0);
   React.useEffect(() => {
-    const t = setInterval(() => { setMs(Math.max(0, target.getTime() - Date.now())); }, 1000);
-    return () => clearInterval(t);
-  }, [target]);
+   setMs(Math.max(0, target.getTime() - Date.now())); // BOSHLANG'ICH QIYMAT
+   const t = setInterval(() => { setMs(Math.max(0, target.getTime() - Date.now())); }, 1000);
+   return () => clearInterval(t);
+ }, [target]);
   let totalSeconds = Math.floor(ms / 1000);
   let days = Math.floor(totalSeconds / 86400);
   let hours = Math.floor((totalSeconds % 86400) / 3600);

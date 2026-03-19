@@ -1,84 +1,107 @@
-'use client'
+"use client";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { registerSchema } from '@/lib/validation'
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
-import { useForm } from "react-hook-form"
-import z from "zod"
+import { useState } from "react";
 
+export default function SignUpMain() {
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
 
-const SingUpPage = () => {
-    const form = useForm<z.infer<typeof registerSchema>>({
-        resolver: zodResolver(registerSchema),
-        defaultValues: {username: '', email: '', password: ''}
-    })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    function onSubmit(values: z.infer<typeof registerSchema>) {
-        console.log(values);
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert("Account created!");
+  };
 
-    return (
-        <Card className='w-1/2 p-4'>
-            <h2 className="text-xl font-bold">Create an account</h2>
-            <p>Enter your details below</p>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-                    <FormField 
-                        control={form.control}
-                        name="username"
-                        render={({field}) => (
-                            <FormItem className="space-y-0">
-                                <FormControl>
-                                    <Input placeholder="Name" {...field} />
-                                </FormControl>
-                                <FormMessage className="text-xs text-red-500" />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField 
-                        control={form.control}
-                        name='email'
-                        render={({field}) => (
-                            <FormItem className="space-y-0">
-                                <FormControl>
-                                    <Input placeholder="Email" {...field} />
-                                </FormControl>
-                                <FormMessage className="text-xs text-red-500" />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField 
-                        control={form.control}
-                        name='email'
-                        render={({field}) => (
-                            <FormItem className="space-y-0">
-                                <FormControl>
-                                    <Input placeholder="Password" type='password' {...field} />
-                                </FormControl>
-                                <FormMessage className="text-xs text-red-500" />
-                            </FormItem>
-                        )}
-                    />
-                    <Separator className="my-3" />
-                    <Button type='submit' className="w-full">Create Account</Button>
-                </form>
-            </Form>
+  return (
+    <main className="min-h-screen w-full bg-white flex items-center justify-center">
+      <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 bg-white overflow-hidden">
+        {/* CHAPDA BANNER RASMI */}
+        <div className="hidden md:flex items-center justify-center bg-[#EAF4FA]">
+          <Image
+            src="/images/signup-banner.png"
+            alt="Register visual"
+            width={420}
+            height={420}
+            priority
+            unoptimized
+            className="object-contain w-full h-full"
+          />
+        </div>
 
-            <div className="mt-4">
-                <div className="text-sm text-muted-foreground">
-                    Already have account?{' '}
-                    <Button asChild variant={'link'} className="p-0">
-                        <Link href='/sign-up'>Log in</Link>
-                    </Button>
-                </div>
+        {/* O‘NGDA FORMA BLOK */}
+        <div className="flex items-center justify-center py-10">
+          <div className="w-full max-w-[370px]">
+            <h2 className="text-2xl font-bold mb-2">Create an account</h2>
+            <p className="text-sm text-gray-700 mb-5">Enter your details below</p>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              <Input
+                name="name"
+                placeholder="Name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                autoComplete="off"
+                className="rounded-none border-x-0 border-t-0 border-b border-gray-300 px-0 focus:ring-0 focus:border-blue-400"
+              />
+              <Input
+                name="email"
+                placeholder="Email or Phone Number"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                autoComplete="off"
+                className="rounded-none border-x-0 border-t-0 border-b border-gray-300 px-0 focus:ring-0 focus:border-blue-400"
+              />
+              <Input
+                name="password"
+                placeholder="Password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+                className="rounded-none border-x-0 border-t-0 border-b border-gray-300 px-0 focus:ring-0 focus:border-blue-400"
+              />
+              <Button
+                type="submit"
+                className="mt-4 bg-red-500 hover:bg-red-600 text-white rounded-none h-10 w-full"
+              >
+                Create Account
+              </Button>
+            </form>
+            {/* Google Sign up */}
+            <Button
+              variant="outline"
+              className="mt-3 flex items-center justify-center gap-2 w-full border-gray-300 hover:bg-gray-50 rounded-none"
+              type="button"
+            >
+              <Image
+                src="/images/google-icon.png"
+                alt="Google"
+                width={22}
+                height={22}
+                className="inline"
+                unoptimized
+              />
+              <span className="text-sm font-medium text-gray-700">Sign up with Google</span>
+            </Button>
+            {/* Log in link */}
+            <div className="mt-5 text-xs text-gray-700 text-center">
+              Already have account?{" "}
+              <Link href="/login" className="font-medium text-blue-500 hover:underline ml-1">
+                Log in
+              </Link>
             </div>
-        </Card>
-    )
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
-
-export default SingUpPage
