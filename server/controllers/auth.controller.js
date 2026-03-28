@@ -1,77 +1,56 @@
-const User = require('../models/user.model');
-const { sendSMS } = require('../utils/sms');
-const jwt = require('jsonwebtoken');
+const User = require("../models/user.model");
+const jwt = require("jsonwebtoken");
+const axios = require("axios");
 
-// Vaqtinchalik OTP saqlash (ishlab chiqarishda Redis ishlatish tavsiya etiladi)
+// vaqtinchalik OTP storage
 const otpStore = new Map();
 
-// const sendOTP = async (req, res) => {
-//   try {
-//     let { phone } = req.body;
-
-//     if (!phone) {
-//       return res.status(400).json({ success: false, message: "Telefon raqam kiritilmagan" });
-//     }
-
-//     // Raqamni tozalash
-//     phone = phone.replace(/\D/g, '');
-//     if (phone.startsWith('8')) phone = '7' + phone.slice(1);
-//     if (!phone.startsWith('7')) {
-//       return res.status(400).json({ success: false, message: "Faqat Rossiya raqamlari (+7) qabul qilinadi" });
-//     }
-
-//     const fullPhone = '+' + phone;
-//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-//     console.log("OTP:", otp);
-
-//     const message = `Sizning tasdiqlash kodingiz: ${otp}. Kod 10 daqiqa ichida amal qiladi.`;
-
-//     const success = await sendSMS(fullPhone, message);
-
-//     if (!success) {
-//       return res.status(500).json({ success: false, message: "SMS yuborib bo‘lmadi" });
-//     }
-
-//     await sendSMS(fullPhone, message); // faqat chaqiramiz, lekin tekshirmaymiz
-
-//     // OTP ni saqlash (10 daqiqa)
-//     otpStore.set(fullPhone, {
-//       otp,
-//       expires: Date.now() + 10 * 60 * 1000
-//     });
-
-//     res.json({ success: true, message: "SMS kod muvaffaqiyatli yuborildi" });
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, message: "Server xatosi" });
-//   }
-// };
-
-const sendOTP = async (phone) => {
+const sendOTP = async (req, res) => {
   try {
-    // 📱 telefonni tozalash
-    const cleaned = phone.replace(/\D/g, "");
+    let { phone } = req.body;
 
-    if (cleaned.length < 11) {
-      throw new Error("Telefon noto‘g‘ri");
+    if (!phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Telefon raqam kiritilmagan",
+      });
     }
 
+    // 📱 Telefonni tozalash
+    phone = phone.toString().replace(/\D/g, "");
+
+    // 🇷🇺 Rossiya format (+7)
+    if (phone.startsWith("8")) {
+      phone = "7" + phone.slice(1);
+    }
+
+    if (!phone.startsWith("7") || phone.length < 11) {
+      return res.status(400).json({
+        success: false,
+        message: "Faqat Rossiya raqami (+7) qabul qilinadi",
+      });
+    }
+
+    const fullPhone = "+" + phone;
+
     // 🔢 OTP generatsiya
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // 🔐 Basic Auth
     const auth = Buffer.from(
       `${process.env.SMSAERO_EMAIL}:${process.env.SMSAERO_API_KEY}`
     ).toString("base64");
 
+    // 📩 SMS matni (MUHIM: kirill + app nomi)
+    const message = `Код подтверждения: ${otp}. Exclusive`;
+
+    // 🚀 SMS yuborish
     const response = await axios.post(
       "https://gate.smsaero.ru/v2/sms/send",
       {
-        number: cleaned,
-        text: `Sizning tasdiqlash kodingiz: ${otp}`,
-        sign: "SMS Aero", // yoki o‘zing
+        number: phone, // + belgisisiz yuboriladi
+        text: message,
+        sign: "SMS Aero",
       },
       {
         headers: {
@@ -83,20 +62,41 @@ const sendOTP = async (phone) => {
 
     console.log("SMS Aero response:", response.data);
 
-    return {
-      success: true,
+    // ❌ agar API error qaytarsa
+    if (!response.data.success) {
+      return res.status(500).json({
+        success: false,
+        message: "SMS yuborilmadi",
+        error: response.data,
+      });
+    }
+
+    // 💾 OTP saqlash (5 min)
+    otpStore.set(fullPhone, {
       otp,
-    };
+      expires: Date.now() + 5 * 60 * 1000,
+    });
+
+    // ✅ OK
+    return res.json({
+      success: true,
+      message: "SMS yuborildi",
+    });
+
   } catch (error) {
     console.error("SMS Aero error:", error.response?.data || error.message);
 
-    return {
+    return res.status(500).json({
       success: false,
-      message: "SMS yuborishda xatolik",
-    };
+      message: "Server xatosi",
+    });
   }
 };
 
+module.exports = { sendOTP, otpStore };
+
+
+// ✅ OTP TEKSHIRISH
 const verifyOTP = async (req, res) => {
   try {
     let { phone, otp } = req.body;
@@ -104,76 +104,85 @@ const verifyOTP = async (req, res) => {
     if (!phone || !otp) {
       return res.status(400).json({
         success: false,
-        message: "Telefon va kod majburiy"
+        message: "Telefon va kod majburiy",
       });
     }
 
-    // 🔹 Telefonni tozalash
-    phone = phone.replace(/\D/g, '');
-    if (phone.startsWith('8')) phone = '7' + phone.slice(1);
-    const fullPhone = '+' + phone;
+    phone = String(phone);
+
+    let cleaned = phone.replace(/\D/g, "");
+
+    if (cleaned.startsWith("8")) {
+      cleaned = "7" + cleaned.slice(1);
+    }
+
+    const fullPhone = "+" + cleaned;
 
     const stored = otpStore.get(fullPhone);
 
     if (!stored || Date.now() > stored.expires) {
       otpStore.delete(fullPhone);
+
       return res.status(400).json({
         success: false,
-        message: "Kod muddati tugagan yoki topilmadi"
+        message: "Kod eskirgan yoki topilmadi",
       });
     }
 
     if (stored.otp !== otp) {
       return res.status(400).json({
         success: false,
-        message: "Noto‘g‘ri SMS kod"
+        message: "Noto‘g‘ri kod",
       });
     }
 
-    // 🔹 USER TOPISH/YARATISH
+    // 👤 USER TOPISH yoki YARATISH
     let user = await User.findOne({ phone: fullPhone });
 
     if (!user) {
       user = await User.create({ phone: fullPhone });
-      console.log(`🆕 Yangi foydalanuvchi: ${fullPhone}`);
+      console.log("Yangi user:", fullPhone);
     }
 
-    // 🔹 OTP o‘chirish
+    // 🗑 OTP o‘chirish
     otpStore.delete(fullPhone);
 
-    // 🔐 TOKENNI SHU YERDA YARATAMIZ
+    // 🔐 JWT token
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET || "secret123",
       { expiresIn: "7d" }
     );
 
-    // 🍪 COOKIE GA SAQLASH
+    // 🍪 cookie
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false // productionda true
+      secure: false, // prod: true
     });
 
-    // ✅ RESPONSE
-    res.json({
+    return res.json({
       success: true,
       message: "Muvaffaqiyatli",
       user: {
         id: user._id,
-        phone: user.phone
-      }
+        phone: user.phone,
+      },
+      token,
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
-      message: "Server xatosi"
+      message: "Server xatosi",
     });
   }
 };
 
-// module.exports = new AuthController()
 
-module.exports = { sendOTP, verifyOTP };
+module.exports = {
+  sendOTP,
+  verifyOTP,
+};
