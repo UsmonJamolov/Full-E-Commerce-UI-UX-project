@@ -1,23 +1,12 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 
 import {
@@ -30,156 +19,173 @@ import {
 } from "lucide-react";
 
 import { nav } from "@/components/constants";
+import { getCurrentUser } from "@/actions/auth.action";
+// import { getServerSession } from 'next-auth'
+import { useSession } from "next-auth/react";
+import { authOptions } from '@/lib/auth-options'
+import UserBox from "./shared/user-box";
 
-type HeaderProps = {
-  cartCount?: number;
-  wishlistCount?: number;
-};
-
-export default function Header({
-  cartCount = 2,
-  wishlistCount = 1,
-}: HeaderProps) {
+export default function Header({ cartCount = 2, wishlistCount = 1 }) {
   const pathname = usePathname();
+  const [user, setUser] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const { data: session } = useSession();
+
+  // ✅ USERNI BACKENDDAN OLISH
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getCurrentUser();
+        console.log('user kelishi kerak', res);
+        
+        setUser(res?.user || null);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // ✅ LOGOUT
+  const handleLogout = async () => {
+    await fetch("http://localhost:8080/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    setUser(null);
+    window.location.reload();
+  };
 
   return (
     <>
-      {/* Top promo bar */}
+      {/* TOP BAR */}
       <div className="bg-black text-white">
-        <div className="mx-auto flex h-10 max-w-6xl items-center justify-between px-2 sm:px-4 text-[11px] sm:text-xs">
-          <p className="truncate">
-            Summer Sale For All Swim Suits And Free Express Delivery — OFF 50%!{" "}
+        <div className="mx-auto flex h-10 max-w-6xl items-center justify-between px-4 text-xs">
+          <p>
+            Summer Sale — OFF 50%!{" "}
             <Link href="/sale" className="underline ml-2">
               ShopNow
             </Link>
           </p>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1 text-xs sm:text-sm">
-              English <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>English</DropdownMenuItem>
-              <DropdownMenuItem>O‘zbek</DropdownMenuItem>
-              <DropdownMenuItem>Русский</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+          <div className="flex items-center gap-1 cursor-pointer">
+            English <ChevronDown className="h-4 w-4" />
+          </div>
         </div>
       </div>
 
-      {/* Main header */}
+      {/* MAIN HEADER */}
       <div className="border-b bg-white">
-        <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between px-2 sm:px-4">
-          {/* Left: mobile menu + logo */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            {/* Mobile menu toggle */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="Open menu"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              {/* Mobile Menu Drawer */}
-              <SheetContent side="left" className="w-[85vw] max-w-xs p-0 pt-2">
-                <SheetHeader>
-                  <SheetTitle className="px-4 pb-3">Menu</SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-2 px-4">
-                  {nav.map((i) => {
-                    const active = pathname === i.href;
-                    return (
-                      <Link
-                        key={i.href}
-                        href={i.href}
-                        className={cn(
-                          "py-2 hover:underline",
-                          active ? "font-bold text-primary" : ""
-                        )}
-                      >
-                        {i.label}
-                      </Link>
-                    );
-                  })}
-                  {/* Mobile search */}
-                  <div className="mt-2">
-                    <div className="relative">
-                      <Input className="h-9 pr-9" placeholder="Search..." />
-                      <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    </div>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-            <Link href="/" className="font-bold text-lg sm:text-xl">Exclusive</Link>
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+
+          {/* LEFT */}
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Menu className="h-5 w-5" />
+            </Button>
+
+            <Link href="/" className="font-bold text-xl">
+              Exclusive
+            </Link>
           </div>
 
-          {/* Center: nav (desktop only) */}
-          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[13px] lg:text-sm">
-            {nav.map((i) => {
-              const active = pathname === i.href;
-              return (
-                <Link
-                  key={i.href}
-                  href={i.href}
-                  className={cn(
-                    "hover:underline py-1",
-                    active ? "font-bold text-primary" : ""
-                  )}
-                >
-                  {i.label}
-                </Link>
-              );
-            })}
+          {/* CENTER */}
+          <nav className="hidden md:flex gap-6">
+            {nav.map((i) => (
+              <Link
+                key={i.href}
+                href={i.href}
+                className={cn(
+                  "hover:underline",
+                  pathname === i.href && "font-bold text-primary"
+                )}
+              >
+                {i.label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Right: search + icons */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {/* Desktop search */}
+          {/* RIGHT */}
+          <div className="flex items-center gap-3">
+
+            {/* SEARCH */}
             <div className="relative hidden sm:block">
-              <Input
-                className="h-9 w-36 sm:w-48 md:w-64 bg-muted pr-9 text-xs md:text-sm"
-                placeholder="What are you looking for?"
-              />
-              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input className="h-9 w-56 pr-9" placeholder="Search..." />
+              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2" />
             </div>
-            {/* Wishlist */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              aria-label="Wishlist"
-            >
+
+            {/* WISHLIST */}
+            <Button variant="ghost" size="icon" className="relative">
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
-                <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center rounded-full px-1 text-[9px]">
+                <Badge className="absolute -top-1 -right-1 text-[10px]">
                   {wishlistCount}
                 </Badge>
               )}
             </Button>
-            {/* Cart */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              aria-label="Cart"
-            >
+
+            {/* CART */}
+            <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
               {cartCount > 0 && (
-                <Badge className="absolute -right-1 -top-1 h-4 min-w-4 justify-center rounded-full px-1 text-[9px]">
+                <Badge className="absolute -top-1 -right-1 text-[10px]">
                   {cartCount}
                 </Badge>
               )}
             </Button>
-            {/* User */}
-            <Button variant="ghost" size="icon" aria-label="Account">
-              <Link href={'/sign-in'}>
-                <User className="h-5 w-5" />
+
+            {/* 🔥 USER BLOCK */}
+            {/* {user ? (
+              <div className="relative group">
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+            
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white border rounded-xl shadow-lg p-2 z-50 
+                                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
+                                transition-all duration-200">
+                                
+                  <Link
+                    href="/profile"
+                    className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
+                  >
+                    Profile
+                  </Link>
+            
+                  <Link
+                    href="/dashboard"
+                    className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
+                  >
+                    Dashboard
+                  </Link>
+            
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-red-100 text-red-500 rounded"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link href="/sign-in">
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
               </Link>
-            </Button>
+            )} */}
+            {session?.currentUser?._id ? (
+              <UserBox user={session.currentUser} />
+            ) : (
+              <Button asChild size="icon">
+                <Link href="/sign-in">
+                  <User />
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

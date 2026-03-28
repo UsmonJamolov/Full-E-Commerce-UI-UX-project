@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from "zod";
 
 export const loginSchema = z.object({
 	email: z.string().email(),
@@ -15,10 +15,10 @@ export const otpSchema = z.object({
 })
 
 export const registerSchema = z.object({
-	fullName: z.string().min(3, { message: 'Full name must be at least 3 characters' }),
-	email: z.string().email({ message: 'Invalid email' }),
-	password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-})
+  name: z.string().min(2, "Ism kamida 2 ta harf bo‘lishi kerak"),
+  phone: z.string().min(9, "Telefon raqam noto‘g‘ri"),
+  password: z.string().min(6, "Parol kamida 6 ta bo‘lishi kerak"),
+});
 
 export const fullNameSchema = z.object({
 	fullName: z.string().min(3, { message: 'Full name must be at least 3 characters' }),

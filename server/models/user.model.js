@@ -1,41 +1,86 @@
-// const { Schema, model } = require('mongoose')
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-// const userSchema = new Schema(
-// 	{
-// 		email: { type: String, required: true, unique: true },
-// 		fullName: { type: String, required: true },
-// 		password: { type: String, required: true },
-// 		role: { type: String, required: true, default: 'user' },
-// 		avatar: { type: String },
-// 		avatarKey: { type: String },
-// 		isDeleted: { type: Boolean, default: false },
-// 		deletedAt: { type: Date },
-// 		favorites: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
-// 		customerId: { type: String },
-// 	},
-// 	{ timestamps: true }
-// )
+const userSchema = new Schema(
+  {
+    // 📧 Email login uchun
+    email: {
+      type: String,
+      unique: true,
+      sparse: true, // ❗ email bo‘lmasa ham saqlash mumkin
+      trim: true,
+      lowercase: true,
+    },
 
-// module.exports = model('User', userSchema)
+    // 🔐 Parol (email login bo‘lsa)
+    password: {
+      type: String,
+      select: false, // xavfsizlik uchun
+    },
 
-// models/User.js
-const mongoose = require('mongoose');
+    // 📱 Telefon (OTP login uchun)
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true, // ❗ phone bo‘lmasa ham saqlanadi
+      index: true,
+    },
 
-const UserSchema = new mongoose.Schema({
-  phone: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true
+    // 👤 Ism
+    fullName: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+
+    // 👤 Qo‘shimcha name (optional)
+    name: {
+      type: String,
+      default: null,
+    },
+
+    // 🎭 Role
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    // 🖼 Avatar
+    avatar: {
+      type: String,
+    },
+
+    avatarKey: {
+      type: String,
+    },
+
+    // ❤️ Favorites
+    favorites: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+
+    // 💳 Stripe yoki boshqa payment
+    customerId: {
+      type: String,
+    },
+
+    // ❌ Soft delete
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    deletedAt: {
+      type: Date,
+    },
   },
-  name: {
-    type: String,
-    default: null
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  {
+    timestamps: true, // createdAt, updatedAt avtomatik
   }
-});
+);
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", userSchema);

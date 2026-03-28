@@ -103,6 +103,20 @@ export interface QueryProps {
 // Har bir Server Action uchun aniq qaytarish tiplari
 // ----------------------------------------------------
 
+export interface ReturnActionType {
+	user: IUser
+	failure: string
+	checkoutUrl: string
+	status: number
+	isNext: boolean
+	products: IProduct[]
+	product: IProduct
+	customers: IUser[]
+	orders: IOrder[]
+	transactions: ITransaction[]
+	statistics: { totalOrders: number; totalTransactions: number; totalFavourites: number }
+}
+
 // getProducts action uchun qaytarish tipi
 export interface GetProductsActionReturnType {
   data: IProduct[];

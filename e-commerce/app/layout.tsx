@@ -7,6 +7,8 @@ import { FC } from 'react';
 import Header from "@/components/header";
 import { Toaster } from '@/components/ui/sonner';
 import Footer from '@/components/footer';
+import { SessionProvider } from "next-auth/react";
+import Providers from '@/components/providers/providers';
 
 
 export const metadata: Metadata = {
@@ -19,15 +21,19 @@ const RootLayout: FC<ChildProps> = ({children}) => {
   return (
     <html lang='en'>
       <body className='antialised'>
-        <div className='relative z-50 sticky top-0'>
-          <Header />
-        </div>
-        <div className="flex flex-col justify-center items-center">
-          <main className="container max-w-6xl">{children}</main>
-        </div>
-        <div className="">
-          <Footer />
-        </div>
+            <Providers>
+              <div className='relative z-50 sticky top-0'>
+                <Header />
+              </div>
+              <div className="flex flex-col justify-center items-center">
+                <main className="container max-w-6xl">
+                    {children}
+                </main>
+              </div>
+            </Providers>
+            <div className="">
+              <Footer />
+            </div>
         <Toaster />
       </body>
     </html>

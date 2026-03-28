@@ -6,5 +6,6 @@ const router = require('express').Router();
 // 🔒 Protected routes
 router.get('/products', authMiddleware, userController.getProducts);
 router.get('/product/:id', authMiddleware, userController.getProduct);
+// router.get("/me", authMiddleware, userController.getMe);
 
 module.exports = router;
