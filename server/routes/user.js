@@ -1,8 +1,10 @@
-const userController = require('../controllers/user.controller')
+const userController = require('../controllers/user.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 
-const router = require('express').Router()
+const router = require('express').Router();
 
-router.get('/products', userController.getProducts)
-router.get('/product/:id', userController.getProduct)
+// 🔒 Protected routes
+router.get('/products', authMiddleware, userController.getProducts);
+router.get('/product/:id', authMiddleware, userController.getProduct);
 
-module.exports = router
+module.exports = router;

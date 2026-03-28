@@ -176,7 +176,9 @@ export default function Header({
             </Button>
             {/* User */}
             <Button variant="ghost" size="icon" aria-label="Account">
-              <User className="h-5 w-5" />
+              <Link href={'/sign-in'}>
+                <User className="h-5 w-5" />
+              </Link>
             </Button>
           </div>
         </div>

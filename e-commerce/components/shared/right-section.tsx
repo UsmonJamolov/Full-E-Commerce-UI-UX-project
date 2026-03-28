@@ -1,15 +1,10 @@
-import { Input } from "../ui/input"
 import { Button } from "../ui/button"
-import { Form } from "../ui/form"
+import Filter from "./filter"
 
 const RightSectionPage = () => {
     return (
         <div className="flex justify-between gap-1">
-            <Form>
-                <form>
-                    <Input placeholder="What are looking for?" />
-                </form>
-            </Form>
+            <Filter />
             <div className="flex justify-between gap-1">
                 <Button variant={'link'}>Favorite</Button>
                 <Button variant={'link'}>Korzina</Button>

@@ -1,107 +1,254 @@
-"use client";
+// 'use client';
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+// import { useState } from 'react';
 
-export default function SignUpMain() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+// export default function SignUp() {
+//   const [phone, setPhone] = useState('+7');
+//   const [loading, setLoading] = useState(false);
+//   const [message, setMessage] = useState('');
+//   const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+//   const handleSendOTP = async () => {
+//     if (!phone || phone.length < 10) {
+//       setError("Telefon raqamni to'liq kiriting");
+//       return;
+//     }
+
+//     setLoading(true);
+//     setError('');
+//     setMessage('');
+
+//     try {
+//       const response = await fetch('http://localhost:8080/api/auth/send-otp', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ phone }),
+//       });
+
+//       const data = await response.json();
+
+//       if (data.success) {
+//         setMessage("SMS kod muvaffaqiyatli yuborildi!");
+//         // Keyingi bosqichga o'tish (masalan, OTP kiritish sahifasiga)
+//         // setStep('otp'); // agar ikki bosqichli qilmoqchi bo'lsangiz
+//       } else {
+//         setError(data.message || "Xatolik yuz berdi");
+//       }
+//     } catch (err) {
+//       setError("Server bilan bog'lanishda xatolik. Internetni tekshiring.");
+//       console.error(err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+//       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+//         <h2 className="text-2xl font-bold text-center mb-6">Telefon raqam orqali kirish</h2>
+
+//         <div className="mb-6">
+//           <label className="block text-sm font-medium text-gray-700 mb-2">
+//             Telefon raqamingiz
+//           </label>
+//           <input
+//             type="tel"
+//             value={phone}
+//             onChange={(e) => setPhone(e.target.value)}
+//             placeholder="+7 (___) ___-__-__"
+//             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+//           />
+//         </div>
+
+//         <button
+//           onClick={handleSendOTP}
+//           disabled={loading}
+//           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3.5 rounded-lg transition disabled:opacity-70 disabled:cursor-not-allowed"
+//         >
+//           {loading ? "Yuborilmoqda..." : "SMS kod yuborish"}
+//         </button>
+
+//         {message && (
+//           <p className="mt-4 text-center text-green-600 font-medium">{message}</p>
+//         )}
+
+//         {error && (
+//           <p className="mt-4 text-center text-red-600 font-medium">{error}</p>
+//         )}
+
+//         <p className="text-xs text-gray-500 text-center mt-6">
+//           Rossiya raqami (+7 bilan boshlanishi kerak)
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+'use client';
+
+import { useState } from 'react';
+
+export default function SignUp() {
+  const [phone, setPhone] = useState('+7');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1); // 1 = phone, 2 = otp
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  // 🔹 OTP yuborish
+  const handleSendOTP = async () => {
+    if (!phone || phone.length < 10) {
+      setError("Telefon raqamni to'liq kiriting");
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage("SMS kod yuborildi (console’dan oling)");
+        setStep(2); // 👉 OTP input chiqadi
+      } else {
+        setError(data.message || "Xatolik yuz berdi");
+      }
+    } catch (err) {
+      setError("Server bilan bog'lanishda xatolik");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Account created!");
-  };
+  // 🔹 OTP tekshirish
 
+  const handleVerifyOTP = async () => {
+  if (!otp) {
+    setError("OTP kodni kiriting");
+    return;
+  }
+
+  setLoading(true);
+  setError('');
+  setMessage('');
+
+  try {
+    const response = await fetch('http://localhost:8080/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, otp }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message || "Xatolik yuz berdi");
+      return;
+    }
+
+    if (data.success) {
+      localStorage.setItem("token", data.token); // 🔥 ENG MUHIM
+      setMessage("Login muvaffaqiyatli ✅");
+
+      // redirect
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+    } else {
+      setError(data.message || "OTP noto‘g‘ri");
+    }
+
+  } catch (err) {
+    setError("Server bilan bog'lanishda xatolik");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
-    <main className="min-h-screen w-full bg-white flex items-center justify-center">
-      <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 bg-white overflow-hidden">
-        {/* CHAPDA BANNER RASMI */}
-        <div className="hidden md:flex items-center justify-center bg-[#EAF4FA]">
-          <Image
-            src="/images/signup-banner.png"
-            alt="Register visual"
-            width={420}
-            height={420}
-            priority
-            unoptimized
-            className="object-contain w-full h-full"
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Telefon raqam orqali kirish
+        </h2>
 
-        {/* O‘NGDA FORMA BLOK */}
-        <div className="flex items-center justify-center py-10">
-          <div className="w-full max-w-[370px]">
-            <h2 className="text-2xl font-bold mb-2">Create an account</h2>
-            <p className="text-sm text-gray-700 mb-5">Enter your details below</p>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              <Input
-                name="name"
-                placeholder="Name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                autoComplete="off"
-                className="rounded-none border-x-0 border-t-0 border-b border-gray-300 px-0 focus:ring-0 focus:border-blue-400"
+        {/* 🔹 STEP 1: PHONE */}
+        {step === 1 && (
+          <>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Telefon raqamingiz
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+7 (___) ___-__-__"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
               />
-              <Input
-                name="email"
-                placeholder="Email or Phone Number"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                autoComplete="off"
-                className="rounded-none border-x-0 border-t-0 border-b border-gray-300 px-0 focus:ring-0 focus:border-blue-400"
-              />
-              <Input
-                name="password"
-                placeholder="Password"
-                type="password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                autoComplete="new-password"
-                className="rounded-none border-x-0 border-t-0 border-b border-gray-300 px-0 focus:ring-0 focus:border-blue-400"
-              />
-              <Button
-                type="submit"
-                className="mt-4 bg-red-500 hover:bg-red-600 text-white rounded-none h-10 w-full"
-              >
-                Create Account
-              </Button>
-            </form>
-            {/* Google Sign up */}
-            <Button
-              variant="outline"
-              className="mt-3 flex items-center justify-center gap-2 w-full border-gray-300 hover:bg-gray-50 rounded-none"
-              type="button"
-            >
-              <Image
-                src="/images/google-icon.png"
-                alt="Google"
-                width={22}
-                height={22}
-                className="inline"
-                unoptimized
-              />
-              <span className="text-sm font-medium text-gray-700">Sign up with Google</span>
-            </Button>
-            {/* Log in link */}
-            <div className="mt-5 text-xs text-gray-700 text-center">
-              Already have account?{" "}
-              <Link href="/login" className="font-medium text-blue-500 hover:underline ml-1">
-                Log in
-              </Link>
             </div>
-          </div>
-        </div>
+
+            <button
+              onClick={handleSendOTP}
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-lg"
+            >
+              {loading ? "Yuborilmoqda..." : "SMS kod yuborish"}
+            </button>
+          </>
+        )}
+
+        {/* 🔹 STEP 2: OTP */}
+        {step === 2 && (
+          <>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                OTP kod
+              </label>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="123456"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-lg"
+              />
+            </div>
+
+            <button
+              onClick={handleVerifyOTP}
+              disabled={loading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-lg"
+            >
+              {loading ? "Tekshirilmoqda..." : "Tasdiqlash"}
+            </button>
+          </>
+        )}
+
+        {/* 🔹 MESSAGE */}
+        {message && (
+          <p className="mt-4 text-center text-green-600 font-medium">{message}</p>
+        )}
+
+        {error && (
+          <p className="mt-4 text-center text-red-600 font-medium">{error}</p>
+        )}
+
+        <p className="text-xs text-gray-500 text-center mt-6">
+          Rossiya raqami (+7 bilan boshlanishi kerak)
+        </p>
       </div>
-    </main>
+    </div>
   );
 }

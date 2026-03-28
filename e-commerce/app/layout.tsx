@@ -1,10 +1,10 @@
 import { ChildProps } from '@/types'
-import Header from "@/components/header";
 import "./globals.css";
 
 import type { Metadata } from "next";
 import { FC } from 'react';
-import Navbar from '@/components/shared/navbar'
+// import Navbar from '@/components/shared/navbar'
+import Header from "@/components/header";
 import { Toaster } from '@/components/ui/sonner';
 import Footer from '@/components/footer';
 
