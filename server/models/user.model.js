@@ -1,52 +1,16 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const { Schema, model } = require('mongoose')
 
 const userSchema = new Schema(
   {
-    // 📧 Email login uchun
-    email: {
-      type: String,
-      unique: true,
-      sparse: true, // ❗ email bo‘lmasa ham saqlash mumkin
-      trim: true,
-      lowercase: true,
-    },
-
-    // 🔐 Parol (email login bo‘lsa)
-    password: {
-      type: String,
-      select: false, // xavfsizlik uchun
-    },
-
-    // 📱 Telefon (OTP login uchun)
     phone: {
       type: String,
       unique: true,
-      sparse: true, // ❗ phone bo‘lmasa ham saqlanadi
+      sparse: true,
       index: true,
     },
-
-    // 👤 Ism
-    fullName: {
-      type: String,
-      default: null,
-      trim: true,
-    },
-
-    // 👤 Qo‘shimcha name (optional)
-    name: {
-      type: String,
-      default: null,
-    },
-
-    // 🎭 Role
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
-    },
-
-    // 🖼 Avatar
+    password: { type: String, required: true },
+    name: { type: String, required: true },
+    role: { type: String, required: true, default: 'user' },
     avatar: {
       type: String,
     },
@@ -54,21 +18,15 @@ const userSchema = new Schema(
     avatarKey: {
       type: String,
     },
-
-    // ❤️ Favorites
     favorites: [
       {
         type: Schema.Types.ObjectId,
         ref: "Product",
       },
     ],
-
-    // 💳 Stripe yoki boshqa payment
     customerId: {
       type: String,
     },
-
-    // ❌ Soft delete
     isDeleted: {
       type: Boolean,
       default: false,
@@ -77,10 +35,11 @@ const userSchema = new Schema(
     deletedAt: {
       type: Date,
     },
+    customerId: { type: String },
   },
   {
-    timestamps: true, // createdAt, updatedAt avtomatik
+    timestamps: true,
   }
 );
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = model("User", userSchema);

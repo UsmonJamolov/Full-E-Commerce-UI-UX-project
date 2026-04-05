@@ -14,51 +14,45 @@ export default function SignUp() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  // 🔹 OTP yuborish (register + send otp)
+  // 🔹 REGISTER + OTP
   const handleSendOTP = async () => {
     if (!name || !phone || !password) {
       setError("Barcha maydonlarni to‘ldiring");
       return;
     }
 
-    if (phone.length < 10) {
-      setError("Telefon raqam noto‘g‘ri");
-      return;
-    }
-
     setLoading(true);
     setError('');
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
+      const res = await fetch('http://localhost:8080/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone, password }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
       if (data.success) {
-        setMessage("SMS kod yuborildi (console’dan oling)");
+        setMessage("OTP kod yuborildi (console’da)");
         setStep(2);
       } else {
-        setError(data.message || "Xatolik yuz berdi");
+        setError(data.message || "Xatolik");
       }
+
     } catch (err) {
-      setError("Server bilan bog'lanishda xatolik");
       console.error(err);
+      setError("Server xatosi");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 OTP tekshirish
+  // 🔹 OTP VERIFY
   const handleVerifyOTP = async () => {
     if (!otp) {
-      setError("OTP kodni kiriting");
+      setError("OTP kiriting");
       return;
     }
 
@@ -67,22 +61,17 @@ export default function SignUp() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/verify-otp', {
+      const res = await fetch('http://localhost:8080/api/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Xatolik yuz berdi");
-        return;
-      }
+      const data = await res.json();
 
       if (data.success) {
         localStorage.setItem("token", data.token);
-        setMessage("Ro‘yxatdan o‘tish muvaffaqiyatli ✅");
+        setMessage("Muvaffaqiyatli ✅");
 
         setTimeout(() => {
           window.location.href = "/";
@@ -92,102 +81,72 @@ export default function SignUp() {
       }
 
     } catch (err) {
-      setError("Server bilan bog'lanishda xatolik");
       console.error(err);
+      setError("Server xatosi");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="p-6 border rounded w-80">
 
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Create an account
-        </h2>
+        <h2 className="text-xl mb-4 text-center">Sign Up</h2>
 
-        {/* 🔹 STEP 1: REGISTER */}
         {step === 1 && (
           <>
-            {/* NAME */}
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border rounded-lg"
-              />
-            </div>
+            <input
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full mb-2 p-2 border"
+            />
 
-            {/* PHONE */}
-            <div className="mb-4">
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+7..."
-                className="w-full px-4 py-3 border rounded-lg"
-              />
-            </div>
+            <input
+              placeholder="+7..."
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full mb-2 p-2 border"
+            />
 
-            {/* PASSWORD */}
-            <div className="mb-6">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border rounded-lg"
-              />
-            </div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mb-2 p-2 border"
+            />
 
             <button
               onClick={handleSendOTP}
-              disabled={loading}
-              className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg"
+              className="w-full bg-red-500 text-white p-2"
             >
-              {loading ? "Yuborilmoqda..." : "Create Account"}
+              {loading ? "Loading..." : "Register"}
             </button>
           </>
         )}
 
-        {/* 🔹 STEP 2: OTP */}
         {step === 2 && (
           <>
-            <div className="mb-6">
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="OTP kod"
-                className="w-full px-4 py-3 border rounded-lg"
-              />
-            </div>
+            <input
+              placeholder="OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="w-full mb-2 p-2 border"
+            />
 
             <button
               onClick={handleVerifyOTP}
-              disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg"
+              className="w-full bg-green-600 text-white p-2"
             >
-              {loading ? "Tekshirilmoqda..." : "Tasdiqlash"}
+              {loading ? "Checking..." : "Verify"}
             </button>
           </>
         )}
 
-        {/* 🔹 MESSAGE */}
-        {message && (
-          <p className="mt-4 text-center text-green-600">{message}</p>
-        )}
-
-        {error && (
-          <p className="mt-4 text-center text-red-600">{error}</p>
-        )}
-
-        <p className="text-xs text-gray-500 text-center mt-6">
-          Telefon raqam (+7 bilan boshlanishi kerak)
-        </p>
+        {message && <p className="text-green-600">{message}</p>}
+        {error && <p className="text-red-600">{error}</p>}
 
       </div>
     </div>

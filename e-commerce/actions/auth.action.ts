@@ -1,19 +1,70 @@
+// "use server";
+
+// import { axiosClient } from "@/http/axios";
+// import { actionClient } from "@/lib/safe-action";
+// import { loginSchema } from "@/lib/validation";
+// import { ReturnActionType } from "@/types";
+
+// export const login = async (values: {
+//   phone: string;
+//   password: string;
+// }) => {
+//   try {
+//     const { data } = await axiosClient.post("/api/auth/login", values, {
+//       withCredentials: true, // cookie ishlashi uchun
+//     });
+
+//     return JSON.parse(JSON.stringify(data))
+//   } catch (error: any) {
+//     return {
+//       success: false,
+//       message: error?.response?.data?.message || "Server error",
+//     };
+//   }
+// };
+
+// export const login = actionClient
+//   .schema(loginSchema)
+//   .action<ReturnActionType>(async ({ parsedInput }) => {
+//     try {
+//       const { data } = await axiosClient.post("/api/auth/login", parsedInput, {
+//         withCredentials: true,
+//       });
+
+//       return JSON.parse(JSON.stringify(data));
+//     } catch (error: any) {
+//       return {
+//         success: false,
+//         message: error?.response?.data?.message || "Server error",
+//       };
+//     }
+//   });
+
+
 "use server";
 
-export async function getCurrentUser() {
-  try {
-    const res = await fetch("http://localhost:8080/api/auth/me", {
-      credentials: "include", // 🔥 COOKIE OLISH UCHUN
-      cache: "no-store",
-    });
+import { axiosClient } from "@/http/axios";
+import { actionClient } from "@/lib/safe-action";
+import { loginSchema } from "@/lib/validation";
 
-    const data = await res.json();
+export const login = actionClient
+  .schema(loginSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const { data } = await axiosClient.post("/api/auth/login", parsedInput, {
+        withCredentials: true,
+      });
 
-    console.log("User actionda kelishi kerak", data);
-    
-
-    return data.user;
-  } catch (error) {
-    return null;
-  }
-}
+      return {
+        success: data?.success ?? true,
+        message: data?.message ?? "Login successful",
+        user: data?.user,
+        accessToken: data?.accessToken,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || "Server error",
+      };
+    }
+  });

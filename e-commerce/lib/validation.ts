@@ -1,9 +1,9 @@
 import * as z from "zod";
 
 export const loginSchema = z.object({
-	email: z.string().email(),
-	password: z.string().min(6),
-})
+  phone: z.string().min(9, "Telefon raqam noto‘g‘ri"),
+  password: z.string().min(4, "Parol kamida 4 ta bo‘lsin"),
+});
 
 export const verifyOtpSchema = z.object({
 	otp: z.string().length(6, { message: 'OTP must be 6 characters' }),

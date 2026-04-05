@@ -143,9 +143,18 @@ export interface IProduct {
 	cta: boolean
 }
 
+// export type SafeUser = Omit<IUser, "password">
+
+export type SafeUser = Partial<Omit<IUser, "password">> & {
+  _id: string
+  phone: string
+  name: string
+  role: string
+}
+
 export interface IUser {
-	email: string
-	fullName: string
+	phone: string
+	name: string
 	password: string
 	_id: string
 	role: string

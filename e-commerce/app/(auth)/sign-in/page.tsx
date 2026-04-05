@@ -4,77 +4,78 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { loginSchema } from "@/lib/validation";
+import { login } from "@/actions/auth.action";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { signIn } from "next-auth/react";
 
 export default function SignInSection() {
-  const [phone, setPhone] = useState("+7");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      phone: "+7",
+      password: "",
+    },
+  });
 
-  // 🔹 OTP yuborish
-  const handleSendOTP = async () => {
-    if (!phone || phone.length < 10) {
-      setError("Telefon raqam noto‘g‘ri");
-      return;
-    }
+  function onError(message: string) {
+    setIsLoading(false);
+    toast.error(message);
+  }
 
-    setLoading(true);
-    setError("");
+  // async function onSubmit(values: z.infer<typeof loginSchema>) {
+  //   setIsLoading(true);
 
-    try {
-      const res = await fetch("http://localhost:8080/api/auth/login-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
+  //   const res = await login(values);
 
-      const data = await res.json();
+  //   if (!res || res.success === false) {
+  //     return onError(res?.message || "Something went wrong");
+  //   }
 
-      if (data.success) {
-        setStep(2);
-      } else {
-        setError(data.message || "Xatolik");
-      }
-    } catch {
-      setError("Server error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   if (res.user) {
+  //     toast.success("Logged in successfully");
 
-  // 🔹 OTP tekshirish
-  const handleVerifyOTP = async () => {
-    if (!otp) {
-      setError("OTP kiriting");
-      return;
-    }
+  //     const data = await signIn("credentials", {
+  //       userId: res.user._id,
+  //       redirect: false,
+  //     });
 
-    setLoading(true);
-    setError("");
+  //     console.log('Data SIGN-IN', data);
+      
 
-    try {
-      const res = await fetch("http://localhost:8080/api/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp }),
-      });
+  //     window.location.href = "/";
+  //   }
 
-      const data = await res.json();
+  //   setIsLoading(false);
+  // }
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        window.location.href = "/";
-      } else {
-        setError("OTP noto‘g‘ri");
-      }
-    } catch {
-      setError("Server error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const onSubmit = async (values: { phone: string; password: string }) => {
+  const res = await login(values);
+
+  if (!res?.data?.success) {
+    console.log(res?.data?.message);
+    return;
+  }
+
+  const userId = res?.data?.user?._id;
+
+  if (!userId) {
+    console.log("User ID topilmadi");
+    return;
+  }
+
+  if (res.data.user) {
+			toast.success('Logged in successfully')
+			signIn('credentials', { userId: res.data.user._id, callbackUrl: '/' })
+		}
+
+  console.log("Login bo'ldi");
+};
 
   return (
     <section className="w-full flex justify-center px-6 py-16">
@@ -82,7 +83,11 @@ export default function SignInSection() {
         
         {/* IMAGE */}
         <div className="hidden lg:block">
-          <img src="/login-image.png" className="w-full max-w-[500px]" />
+          <img
+            src="/login-image.png"
+            alt="login"
+            className="w-full max-w-[500px]"
+          />
         </div>
 
         {/* FORM */}
@@ -95,52 +100,48 @@ export default function SignInSection() {
             Enter your details below
           </p>
 
-          <div className="space-y-5">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-5"
+          >
 
-            {/* STEP 1 */}
-            {step === 1 && (
-              <>
-                <Input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Phone Number"
-                  className="h-12"
-                />
-
-                <Button
-                  onClick={handleSendOTP}
-                  className="w-full bg-red-500 hover:bg-red-600 h-11"
-                >
-                  {loading ? "Sending..." : "Send OTP"}
-                </Button>
-              </>
-            )}
-
-            {/* STEP 2 */}
-            {step === 2 && (
-              <>
-                <Input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter OTP"
-                  className="h-12"
-                />
-
-                <Button
-                  onClick={handleVerifyOTP}
-                  className="w-full bg-green-600 hover:bg-green-700 h-11"
-                >
-                  {loading ? "Checking..." : "Verify"}
-                </Button>
-              </>
-            )}
+            {/* PHONE */}
+            <Input
+              type="tel"
+              placeholder="Phone Number"
+              className="h-12"
+              {...form.register("phone")}
+            />
 
             {/* ERROR */}
-            {error && (
-              <p className="text-red-500 text-sm">{error}</p>
+            {form.formState.errors.phone && (
+              <p className="text-red-500 text-sm">
+                {form.formState.errors.phone.message}
+              </p>
             )}
+
+            {/* PASSWORD */}
+            <Input
+              type="password"
+              placeholder="Password"
+              className="h-12"
+              {...form.register("password")}
+            />
+
+            {/* ERROR */}
+            {form.formState.errors.password && (
+              <p className="text-red-500 text-sm">
+                {form.formState.errors.password.message}
+              </p>
+            )}
+
+            {/* BUTTON */}
+            <Button
+              type="submit"
+              className="w-full bg-red-500 hover:bg-red-600 h-11"
+            >
+              {isLoading ? "Loading..." : "Login"}
+            </Button>
 
             {/* LINKS */}
             <div className="flex justify-between pt-2 text-sm">
@@ -149,11 +150,11 @@ export default function SignInSection() {
               </Link>
 
               <span className="text-gray-400">
-                OTP orqali kirish
+                Password orqali kirish
               </span>
             </div>
 
-          </div>
+          </form>
         </div>
       </div>
     </section>

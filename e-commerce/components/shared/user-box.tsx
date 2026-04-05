@@ -1,6 +1,5 @@
 'use client'
 
-import { IUser } from '@/types'
 import { FC, useState } from 'react'
 import {
 	DropdownMenu,
@@ -24,9 +23,10 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from '../ui/alert-dialog'
+import { SafeUser } from "@/types"
 
 interface Props {
-	user: IUser
+	user: SafeUser
 }
 const UserBox: FC<Props> = ({ user }) => {
 	const [open, setOpen] = useState(false)
@@ -36,8 +36,8 @@ const UserBox: FC<Props> = ({ user }) => {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Avatar className='cursor-pointer'>
-						<AvatarImage src={user.avatar} alt={user.fullName} />
-						<AvatarFallback className='capitalize bg-primary text-white'>{user.fullName.charAt(0)}</AvatarFallback>
+						<AvatarImage src={user.avatar} alt={user.name} />
+						<AvatarFallback className='capitalize bg-primary text-white'>{user.name.charAt(0)}</AvatarFallback>
 					</Avatar>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-56'>

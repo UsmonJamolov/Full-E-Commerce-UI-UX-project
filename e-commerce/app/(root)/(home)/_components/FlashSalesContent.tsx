@@ -35,7 +35,6 @@ interface FlashSalesContentProps {
 
 // Klient komponenti async bo'lmaydi va prop'larni to'g'ridan-to'g'ri qabul qiladi
 const FlashSalesContent: React.FC<FlashSalesContentProps> = ({ products, searchParams }) => {
-    console.log(products);
     
   // Barcha hooklar endi Klient Komponenti ichida to'g'ri ishlaydi
   const target = React.useMemo(

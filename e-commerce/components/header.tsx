@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+// import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -19,45 +16,15 @@ import {
 } from "lucide-react";
 
 import { nav } from "@/components/constants";
-import { getCurrentUser } from "@/actions/auth.action";
-// import { getServerSession } from 'next-auth'
-import { useSession } from "next-auth/react";
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import UserBox from "./shared/user-box";
 
-export default function Header({ cartCount = 2, wishlistCount = 1 }) {
-  const pathname = usePathname();
-  const [user, setUser] = useState(null);
-  const [open, setOpen] = useState(false);
+export default async function Header({ cartCount = 2, wishlistCount = 1 }) {
+  const session = await getServerSession(authOptions)
 
-  const { data: session } = useSession();
-
-  // ✅ USERNI BACKENDDAN OLISH
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await getCurrentUser();
-        console.log('user kelishi kerak', res);
-        
-        setUser(res?.user || null);
-      } catch (error) {
-        setUser(null);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  // ✅ LOGOUT
-  const handleLogout = async () => {
-    await fetch("http://localhost:8080/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-
-    setUser(null);
-    window.location.reload();
-  };
+  console.log("HEADER SESSION:", session);
+  
 
   return (
     <>
@@ -100,7 +67,7 @@ export default function Header({ cartCount = 2, wishlistCount = 1 }) {
                 href={i.href}
                 className={cn(
                   "hover:underline",
-                  pathname === i.href && "font-bold text-primary"
+                  "font-bold text-primary"
                 )}
               >
                 {i.label}
@@ -138,50 +105,10 @@ export default function Header({ cartCount = 2, wishlistCount = 1 }) {
             </Button>
 
             {/* 🔥 USER BLOCK */}
-            {/* {user ? (
-              <div className="relative group">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-            
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white border rounded-xl shadow-lg p-2 z-50 
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                                transition-all duration-200">
-                                
-                  <Link
-                    href="/profile"
-                    className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
-                  >
-                    Profile
-                  </Link>
-            
-                  <Link
-                    href="/dashboard"
-                    className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
-                  >
-                    Dashboard
-                  </Link>
-            
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-red-100 text-red-500 rounded"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <Link href="/sign-in">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
-            )} */}
-            {session?.currentUser?._id ? (
-              <UserBox user={session.currentUser} />
-            ) : (
-              <Button asChild size="icon">
-                <Link href="/sign-in">
+            {session?.currentUser?._id && <UserBox user={session.currentUser} />}
+            {!session?.currentUser?._id && (
+              <Button asChild size={'icon'}>
+                <Link href={'/sign-in'}>
                   <User />
                 </Link>
               </Button>

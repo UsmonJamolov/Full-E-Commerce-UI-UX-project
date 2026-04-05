@@ -1,4 +1,3 @@
-// utils/sms.js
 const axios = require('axios');
 
 const API_ID = process.env.SMS_RU_API_ID;
@@ -8,7 +7,7 @@ async function sendSMS(phone, message) {
     const response = await axios.get('https://sms.ru/sms/send', {
       params: {
         api_id: API_ID,
-        to: phone,           // +7XXXXXXXXXX
+        to: phone,
         msg: message,
         json: 1
       }
