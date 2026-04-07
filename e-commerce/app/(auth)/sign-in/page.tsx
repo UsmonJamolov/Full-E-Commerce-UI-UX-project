@@ -23,37 +23,6 @@ export default function SignInSection() {
     },
   });
 
-  function onError(message: string) {
-    setIsLoading(false);
-    toast.error(message);
-  }
-
-  // async function onSubmit(values: z.infer<typeof loginSchema>) {
-  //   setIsLoading(true);
-
-  //   const res = await login(values);
-
-  //   if (!res || res.success === false) {
-  //     return onError(res?.message || "Something went wrong");
-  //   }
-
-  //   if (res.user) {
-  //     toast.success("Logged in successfully");
-
-  //     const data = await signIn("credentials", {
-  //       userId: res.user._id,
-  //       redirect: false,
-  //     });
-
-  //     console.log('Data SIGN-IN', data);
-      
-
-  //     window.location.href = "/";
-  //   }
-
-  //   setIsLoading(false);
-  // }
-
   const onSubmit = async (values: { phone: string; password: string }) => {
   const res = await login(values);
 

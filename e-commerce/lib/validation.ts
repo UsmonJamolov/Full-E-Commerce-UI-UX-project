@@ -6,8 +6,15 @@ export const loginSchema = z.object({
 });
 
 export const verifyOtpSchema = z.object({
-	otp: z.string().length(6, { message: 'OTP must be 6 characters' }),
-	email: z.string().email({ message: 'Invalid email' }),
+  phone: z
+    .string()
+    .min(9, 'Telefon raqam kiriting')
+    .max(20, 'Telefon raqam noto‘g‘ri'),
+
+  otp: z
+    .string()
+    .min(6, 'OTP noto‘g‘ri')
+    .max(6, 'OTP noto‘g‘ri'),
 })
 
 export const otpSchema = z.object({
@@ -24,8 +31,18 @@ export const fullNameSchema = z.object({
 	fullName: z.string().min(3, { message: 'Full name must be at least 3 characters' }),
 })
 
-export const emailSchema = z.object({
-	email: z.string().email({ message: 'Invalid email' }),
+export const sendOtpSchema = z.object({
+  name: z.string().optional(),
+  phone: z.string().min(9, "Telefon raqam noto‘g‘ri"),
+  password: z.string().optional(),
+  type: z.enum(["register", "login"]),
+})
+
+export const phoneSchema = z.object({
+  phone: z
+    .string()
+    .min(9, 'Telefon raqam kiriting')
+    .max(20, 'Telefon raqam noto‘g‘ri'),
 })
 
 export const productSchema = z.object({

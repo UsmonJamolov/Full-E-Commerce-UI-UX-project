@@ -1,154 +1,377 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import Image from 'next/image'
+import { useState } from 'react'
+import { signIn, signOut } from 'next-auth/react'
+import { toast } from 'sonner'
 
-export default function SignUp() {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('+7');
-  const [password, setPassword] = useState('');
+import { sendOtp, verifyOtp, register } from '@/actions/auth.action'
 
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState(1);
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+const SignUpPage = () => {
+  // STEP 1
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('+7')
+  const [password, setPassword] = useState('')
 
-  // 🔹 REGISTER + OTP
-  const handleSendOTP = async () => {
-    if (!name || !phone || !password) {
-      setError("Barcha maydonlarni to‘ldiring");
-      return;
+  // STEP 2
+  const [otp, setOtp] = useState('')
+
+  // UI STATES
+  const [step, setStep] = useState<1 | 2>(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isResend, setIsResend] = useState(false)
+
+  // =========================
+  // HELPERS
+  // =========================
+  const normalizePhone = (value: string) => {
+    // faqat raqam va + qoldiramiz
+    let cleaned = value.replace(/[^\d+]/g, '')
+
+    // + faqat boshida bo'lsin
+    if (cleaned.includes('+')) {
+      cleaned = '+' + cleaned.replace(/\+/g, '')
     }
 
-    setLoading(true);
-    setError('');
-    setMessage('');
+    return cleaned
+  }
+
+  const normalizeOtp = (value: string) => {
+    return value.replace(/\D/g, '').slice(0, 6)
+  }
+
+  // =========================
+  // STEP 1: SEND OTP
+  // =========================
+  const handleSendOtp = async () => {
+    if (!name.trim() || !phone.trim() || !password.trim()) {
+      toast.error("Barcha maydonlarni to'ldiring")
+      return
+    }
+
+    if (phone.replace(/\D/g, '').length < 10) {
+      toast.error("Telefon raqam noto'g'ri")
+      return
+    }
 
     try {
-      const res = await fetch('http://localhost:8080/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, password }),
-      });
+      setIsLoading(true)
 
-      const data = await res.json();
+      const res = await sendOtp({
+        name: name.trim(),
+        phone: phone.trim(),
+        password,
+        type: 'register',
+      })
 
-      if (data.success) {
-        setMessage("OTP kod yuborildi (console’da)");
-        setStep(2);
-      } else {
-        setError(data.message || "Xatolik");
+      if (res?.serverError || res?.validationErrors || !res?.data) {
+        toast.error('OTP yuborishda xatolik yuz berdi')
+        return
       }
 
-    } catch (err) {
-      console.error(err);
-      setError("Server xatosi");
+      if (res.data.failure) {
+        toast.error(res.data.failure)
+        return
+      }
+
+      if (res.data.status === 200) {
+        setOtp('')
+        setStep(2)
+        setIsResend(false)
+        toast.success('OTP muvaffaqiyatli yuborildi')
+        return
+      }
+
+      toast.error('OTP yuborilmadi')
+    } catch (error) {
+      console.error(error)
+      toast.error('Server error')
     } finally {
-      setLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  // 🔹 OTP VERIFY
-  const handleVerifyOTP = async () => {
-    if (!otp) {
-      setError("OTP kiriting");
-      return;
+  // =========================
+  // STEP 2: VERIFY OTP
+  // =========================
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      toast.error('OTP kodni kiriting')
+      return
     }
 
-    setLoading(true);
-    setError('');
-    setMessage('');
+    if (otp.length < 4) {
+      toast.error("OTP juda qisqa")
+      return
+    }
 
     try {
-      const res = await fetch('http://localhost:8080/api/otp/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp }),
-      });
+      setIsLoading(true)
 
-      const data = await res.json();
+      const otpRes = await verifyOtp({
+        phone: phone.trim(),
+        otp: otp.trim(),
+      })
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        setMessage("Muvaffaqiyatli ✅");
-
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
-      } else {
-        setError(data.message || "OTP noto‘g‘ri");
+      if (otpRes?.serverError || otpRes?.validationErrors || !otpRes?.data) {
+        toast.error('OTP tekshirishda xatolik')
+        return
       }
 
-    } catch (err) {
-      console.error(err);
-      setError("Server xatosi");
-    } finally {
-      setLoading(false);
+      if (otpRes.data.failure) {
+        toast.error(otpRes.data.failure)
+        return
+      }
+
+      // OTP expired
+      if (otpRes.data.status === 301) {
+        setIsResend(true)
+        toast.error('OTP eskirgan. Qayta yuboring')
+        return
+      }
+
+      // OTP success
+      if (otpRes.data.status === 200) {
+      const registerRes = await register({
+        name: name.trim(),
+        phone: phone.trim(),
+        password,
+      })
+
+      if (
+        registerRes?.serverError ||
+        registerRes?.validationErrors ||
+        !registerRes?.data
+      ) {
+        toast.error("Ro'yxatdan o'tishda xatolik")
+        return
+      }
+
+      if (registerRes.data.failure) {
+        toast.error(registerRes.data.failure)
+        return
+      }
+
+      const createdUser = registerRes.data.user
+
+      if (!createdUser?._id) {
+        toast.error("User ID topilmadi")
+        return
+      }
+
+      toast.success("User muvaffaqiyatli yaratildi")
+
+      const loginRes = await signIn('credentials', {
+        userId: createdUser._id,
+        redirect: false,
+      })
+
+      if (loginRes?.error) {
+        toast.error('Login qilishda xatolik')
+        return
+      }
+
+      window.location.href = '/'
+      return
     }
-  };
+
+      toast.error("OTP noto'g'ri")
+    } catch (error) {
+      console.error(error)
+      toast.error('Server error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // =========================
+  // STEP 3: RESEND OTP
+  // =========================
+  const handleResendOtp = async () => {
+    if (!name.trim() || !phone.trim() || !password.trim()) {
+      toast.error("Ma'lumotlar yetarli emas")
+      return
+    }
+
+    try {
+      setIsLoading(true)
+
+      const res = await sendOtp({
+        name: name.trim(),
+        phone: phone.trim(),
+        password,
+        type: 'register',
+      })
+
+      if (res?.serverError || res?.validationErrors || !res?.data) {
+        toast.error('OTP qayta yuborishda xatolik')
+        return
+      }
+
+      if (res.data.failure) {
+        toast.error(res.data.failure)
+        return
+      }
+
+      if (res.data.status === 200) {
+        setOtp('')
+        setIsResend(false)
+        toast.success('OTP qayta yuborildi')
+        return
+      }
+
+      toast.error('OTP qayta yuborilmadi')
+    } catch (error) {
+      console.error(error)
+      toast.error('Server error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="p-6 border rounded w-80">
+    <div className="w-full min-h-screen flex items-center justify-center px-4 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-6xl bg-white">
+        {/* LEFT IMAGE */}
+        <div className="hidden md:flex items-center justify-center bg-[#eef5fb] p-8">
+          <Image
+            src="/images/auth.png"
+            alt="auth"
+            width={600}
+            height={600}
+            className="object-contain"
+            priority
+          />
+        </div>
 
-        <h2 className="text-xl mb-4 text-center">Sign Up</h2>
+        {/* RIGHT FORM */}
+        <div className="flex items-center justify-center p-4 md:p-10">
+          <Card className="w-full max-w-md p-6 shadow-none border">
+            <h1 className="text-3xl font-bold">Sign Up</h1>
+            <p className="text-sm text-muted-foreground mt-2">
+              Telefon raqamingiz orqali ro‘yxatdan o‘ting
+            </p>
 
-        {step === 1 && (
-          <>
-            <input
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full mb-2 p-2 border"
-            />
+            <Separator className="my-6" />
 
-            <input
-              placeholder="+7..."
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full mb-2 p-2 border"
-            />
+            {/* ================= STEP 1 ================= */}
+            {step === 1 && (
+              <div className="space-y-4">
+                {/* NAME */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Name</label>
+                  <Input
+                    type="text"
+                    placeholder="Ismingizni kiriting"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mb-2 p-2 border"
-            />
+                {/* PHONE */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Phone number</label>
+                  <Input
+                    type="tel"
+                    placeholder="+79991234567"
+                    value={phone}
+                    onChange={(e) => setPhone(normalizePhone(e.target.value))}
+                  />
+                </div>
 
-            <button
-              onClick={handleSendOTP}
-              className="w-full bg-red-500 text-white p-2"
-            >
-              {loading ? "Loading..." : "Register"}
-            </button>
-          </>
-        )}
+                {/* PASSWORD */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Password</label>
+                  <Input
+                    type="password"
+                    placeholder="Parol kiriting"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
 
-        {step === 2 && (
-          <>
-            <input
-              placeholder="OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full mb-2 p-2 border"
-            />
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={handleSendOtp}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Sending OTP...' : 'Continue'}
+                </Button>
+              </div>
+            )}
 
-            <button
-              onClick={handleVerifyOTP}
-              className="w-full bg-green-600 text-white p-2"
-            >
-              {loading ? "Checking..." : "Verify"}
-            </button>
-          </>
-        )}
+            {/* ================= STEP 2 ================= */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div className="rounded-md border bg-muted/30 p-3 text-sm">
+                  <p className="font-medium">OTP yuborildi:</p>
+                  <p className="text-muted-foreground">{phone}</p>
+                </div>
 
-        {message && <p className="text-green-600">{message}</p>}
-        {error && <p className="text-red-600">{error}</p>}
+                {/* OTP */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">OTP Code</label>
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="OTP kiriting"
+                    value={otp}
+                    onChange={(e) => setOtp(normalizeOtp(e.target.value))}
+                    maxLength={6}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    4-6 xonali kodni kiriting
+                  </p>
+                </div>
 
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={handleVerifyOtp}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Verifying...' : 'Verify OTP'}
+                </Button>
+
+                {isResend && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleResendOtp}
+                    disabled={isLoading}
+                  >
+                    Resend OTP
+                  </Button>
+                )}
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => {
+                    setStep(1)
+                    setOtp('')
+                    setIsResend(false)
+                  }}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+              </div>
+            )}
+          </Card>
+        </div>
       </div>
     </div>
-  );
+  )
 }
+
+export default SignUpPage

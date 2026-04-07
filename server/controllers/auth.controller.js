@@ -1,3 +1,4 @@
+const Otp = require('../models/otp.model');
 const User = require('../models/user.model');
 const bcrypt = require("bcrypt");
 const { createOTP } = require("../utils/createOtp");
@@ -49,38 +50,87 @@ async login(req, res, next) {
 }
 
   // 📲 REGISTER (OTP yuborish)
- async register  (req, res) {
+//  async register  (req, res) {
+//   try {
+//     let { name, phone, password } = req.body;
+
+//     phone = phone.replace(/\D/g, "");
+//     const fullPhone = "+" + phone;
+
+//     const user = await User.findOne({ phone: fullPhone });
+
+//     if (user) {
+//       return res.json({
+//         success: false,
+//         message: "User mavjud",
+//       });
+//     }
+
+//     // 🔥 SHU YERDA SEND OTP LOGIKA
+//     await createOTP({
+//       phone: fullPhone,
+//       name,
+//       password,
+//     });
+
+//     res.json({
+//       success: true,
+//       message: "OTP yuborildi",
+//     });
+
+//   } catch (e) {
+//     res.json({ success: false });
+//   }
+// };
+
+async register(req, res) {
   try {
     let { name, phone, password } = req.body;
 
     phone = phone.replace(/\D/g, "");
     const fullPhone = "+" + phone;
 
-    const user = await User.findOne({ phone: fullPhone });
+    const existingUser = await User.findOne({ phone: fullPhone });
 
-    if (user) {
+    if (existingUser) {
       return res.json({
         success: false,
         message: "User mavjud",
       });
     }
 
-    // 🔥 SHU YERDA SEND OTP LOGIKA
-    await createOTP({
-      phone: fullPhone,
-      name,
-      password,
+    // OTP recorddan hashed password olamiz
+    const otpRecord = await Otp.findOne({ phone: fullPhone });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP topilmadi",
+      });
+    }
+
+    const newUser = await User.create({
+      name: otpRecord.name || name,
+      phone: otpRecord.phone,
+      password: otpRecord.password, // hashed password
     });
 
-    res.json({
+    await Otp.deleteOne({ _id: otpRecord._id });
+
+    return res.status(201).json({
       success: true,
-      message: "OTP yuborildi",
+      message: "User yaratildi",
+      user: newUser,
     });
 
-  } catch (e) {
-    res.json({ success: false });
+  } catch (error) {
+    console.log("REGISTER ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
-};
+}
 }
 
 module.exports = new AuthController();

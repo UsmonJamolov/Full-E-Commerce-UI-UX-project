@@ -105,6 +105,7 @@ export interface QueryProps {
 
 export interface ReturnActionType {
 	user: IUser
+	message: string
 	failure: string
 	checkoutUrl: string
 	status: number

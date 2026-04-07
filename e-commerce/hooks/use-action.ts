@@ -1,0 +1,13 @@
+import { useState } from 'react'
+import { toast } from 'sonner'
+
+export const useAction = () => {
+	const [isLoading, setIsLoading] = useState(false)
+
+	function onError(message: string) {
+		setIsLoading(false)
+		toast.error(message)
+	}
+
+	return { isLoading, setIsLoading, onError }
+}
