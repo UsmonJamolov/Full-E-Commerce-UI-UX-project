@@ -48,19 +48,9 @@ export default function SignInSection() {
 
   return (
     <section className="w-full flex justify-center px-6 py-16">
-      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        
-        {/* IMAGE */}
-        <div className="hidden lg:block">
-          <img
-            src="/login-image.png"
-            alt="login"
-            className="w-full max-w-[500px]"
-          />
-        </div>
-
+      <div className="w-full max-w-2xl">
         {/* FORM */}
-        <div className="w-full max-w-md">
+        <div className="w-full mx-auto">
           <h2 className="text-3xl font-semibold mb-2">
             Log in to Exclusive
           </h2>

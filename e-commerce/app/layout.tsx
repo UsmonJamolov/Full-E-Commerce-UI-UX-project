@@ -3,7 +3,6 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { FC } from 'react';
-// import Navbar from '@/components/shared/navbar'
 import Header from "@/components/header";
 import { Toaster } from '@/components/ui/sonner';
 import Footer from '@/components/footer';
@@ -18,9 +17,9 @@ export const metadata: Metadata = {
 
 const RootLayout: FC<ChildProps> = ({children}) => {
   return (
-    <SessionProvider>
-      <html lang='en'>
+    <html lang='en'>
         <body className='antialised'>
+        <SessionProvider>
                 <div className='relative z-50 sticky top-0'>
                   <Header />
                 </div>
@@ -33,9 +32,9 @@ const RootLayout: FC<ChildProps> = ({children}) => {
                 <Footer />
               </div>
           <Toaster />
+        </SessionProvider>
         </body>
       </html>
-    </SessionProvider>
   )
 }
 
