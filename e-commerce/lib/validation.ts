@@ -54,6 +54,13 @@ export const productSchema = z.object({
 	imageKey: z.string(),
 })
 
+export const uploadSchema = z.object({
+  file: z.any(),
+  fileName: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+})
+
 export const updateProductSchema = z.object({ id: z.string() }).merge(productSchema)
 
 export const idSchema = z.object({ id: z.string() })

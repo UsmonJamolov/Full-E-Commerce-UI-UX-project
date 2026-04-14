@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Edit2 } from 'lucide-react'
 import FullNameForm from './full-name.form'
-import EmailForm from './email.form'
+// import EmailForm from './email.form'
 
 const EditInformation = () => {
 	return (
@@ -55,9 +55,9 @@ const EditInformation = () => {
 								<p className='text-muted-foreground'>info@sammi.ac</p>
 							</div>
 						</AccordionTrigger>
-						<AccordionContent className='border-l border-l-primary pl-4'>
+						{/* <AccordionContent className='border-l border-l-primary pl-4'>
 							<EmailForm />
-						</AccordionContent>
+						</AccordionContent> */}
 					</AccordionItem>
 				</Accordion>
 			</div>

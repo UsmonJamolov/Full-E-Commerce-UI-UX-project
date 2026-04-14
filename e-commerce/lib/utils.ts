@@ -8,8 +8,18 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
 }
 
-export function formatPrice(price: number) {
-	return new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS' }).format(price)
+// export function formatPrice(price: number) {
+// 	return new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS' }).format(price)
+// }
+
+// export const formatPrice = (price?: number | string) => {
+//   const amount = Number(price ?? 0)
+
+//   return `${new Intl.NumberFormat('uz-UZ').format(amount)} so'm`
+// }
+
+export const formatPrice = (price: number) => {
+   return price.toLocaleString("en-US")
 }
 
 export function formUrlQuery({ key, params, value }: QueryProps) {

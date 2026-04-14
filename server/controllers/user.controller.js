@@ -22,27 +22,7 @@ class UserController {
             next(error);
         }
     }
-
-    // async getMe(req, res, next) {
-    //     try {
-    //         const token = req.cookies.token;
-
-    //         if (!token) {
-    //             return res.json({ user: null });
-    //         }
-
-    //         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    //         const user = await userModel.findById(decoded.id).select("-password"); // ✅ userModel
-
-    //         console.log('User kelishi kerak', user);
-            
-
-    //         return res.json({ user });
-
-    //     } catch (error) {
-    //         next(error)
-    //     }
+    
     // [GET] /user/profile/:id
 	async getProfile(req, res, next) {
         try {
