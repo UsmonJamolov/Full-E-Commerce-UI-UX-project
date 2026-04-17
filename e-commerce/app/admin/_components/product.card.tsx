@@ -1,5 +1,6 @@
 'use client'
 
+import { deleteProduct } from '@/actions/admin.aciton'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -14,26 +15,49 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import {useAction} from '@/hooks/use-action'
 import { useProduct } from '@/hooks/use-product'
 import { formatPrice } from '@/lib/utils'
 import { IProduct } from '@/types'
 import Image from 'next/image'
 import { FC } from 'react'
+import { toast } from 'sonner'
 
 interface Props {
-	product: Partial<IProduct>
+	product: IProduct
 }
 const ProductCard: FC<Props> = ({ product }) => {
-	const { setOpen } = useProduct()
+	const { setOpen, setProduct } = useProduct()
+	const {isLoading, onError, setIsLoading} = useAction()
 
 	const onEdit = () => {
 		setOpen(true)
+		setProduct(product)
+	}
+
+	async function onDelete() {
+		setIsLoading(true)
+		const res = await deleteProduct({ id: product._id })
+
+		console.log('onDeleteda RES ni tekshiramiz: ', res);
+		
+		
+		if (res?.serverError || res?.validationErrors || !res?.data) {
+			return onError('Something went wrong')
+		}
+		if (res.data.failure) {
+			return onError(res.data.failure)
+		}
+		if (res.data.status === 200) {
+			toast.success('Product deleted successfully')
+			setIsLoading(false)
+		}
 	}
 
 	return (
 		<div className={'border relative flex justify-between flex-col'}>
 			<div className='bg-secondary relative'>
-				<Image src={product.image!} width={200} height={200} className='mx-auto' alt={product.title!} />
+				<Image src={product.image!} width={200} height={200} className='mx-auto' alt={product.title!} unoptimized />
 				<Badge className='absolute top-0 left-0'>{product.category}</Badge>
 			</div>
 
@@ -62,8 +86,8 @@ const ProductCard: FC<Props> = ({ product }) => {
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction>Continue</AlertDialogAction>
+							<AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={onDelete} disabled={isLoading}>Continue</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>

@@ -1,6 +1,6 @@
 'use client'
 
-import { createProduct, uploadFile} from "@/actions/admin.aciton";
+import { createProduct, updateProduct, uploadFile} from "@/actions/admin.aciton";
 import {Uploader} from "@/components/Uploader";
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -18,74 +18,100 @@ import { productSchema } from '@/lib/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, PlusCircle, X } from 'lucide-react'
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form'
 import { toast } from "sonner";
 import { z } from 'zod'
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const AddProduct = () => {
 	const { isLoading, onError, setIsLoading } = useAction()
-	const { open, setOpen } = useProduct()
+	const { open, setOpen, product, setProduct } = useProduct()
 	const [uploading, setUploading] = useState(false)
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+	console.log("SELECTED FILE:", selectedFile)
+
 	const form = useForm<z.infer<typeof productSchema>>({
 		resolver: zodResolver(productSchema),
-		defaultValues: { title: '', description: '', category: '', price: '', image: '', imageKey: '' },
+		defaultValues: { title: '', description: '', category: '', price: '', image: '', imageKey: '', },
 	})
 
 	console.log('Form getValues: ', form.getValues());
 	
+	
 	async function onSubmit(values: z.infer<typeof productSchema>) {
-	if (!values.image) {
-		return toast("Please upload an image")
-	}
-
 	console.log("SEND DATA:", values)
 
 	setIsLoading(true)
 
 	try {
-		if (!selectedFile) {
-		setIsLoading(false)
-		return toast("File not found")
-		}
+		let imageUrl = values.image
+		let imageKey = values.imageKey
 
-		// 1. upload to S3
+		// 🔥 AGAR yangi file tanlangan bo‘lsa → upload qilamiz
+		if (selectedFile) {
 		const uploaded = await uploadFile({
-		file: selectedFile,
-		fileName: selectedFile.name,
-		fileType: selectedFile.type,
-		fileSize: selectedFile.size,
+			file: selectedFile,
+			fileName: selectedFile.name,
+			fileType: selectedFile.type,
+			fileSize: selectedFile.size,
 		})
+
+		console.log("Uploaded:", uploaded)
 
 		if (!uploaded?.data?.url) {
-		setIsLoading(false)
-		return toast("Image upload failed")
+			return toast("Image upload failed")
 		}
 
-		// 2. create product (ONLY product DB)
-		const res = await createProduct({
-		...values,
-		image: uploaded.data.url,
-		imageKey: uploaded.data.key,
-		})
+		imageUrl = uploaded.data.url
+		imageKey = uploaded.data.key
+		}
 
+		// 🔥 AGAR create bo‘lsa → image majburiy
+		if (!product && !imageUrl) {
+		return toast("Please upload an image")
+		}
+
+		let res
+
+		if (product?._id) {
+		// ✅ UPDATE
+		res = await updateProduct({
+			...values,
+			image: imageUrl,
+			imageKey: imageKey,
+			id: product._id,
+		})
+		} else {
+		// ✅ CREATE
+		res = await createProduct({
+			...values,
+			image: imageUrl,
+			imageKey: imageKey,
+		})
+		}
+
+		// ❌ ERROR handling
 		if (res?.serverError || res?.validationErrors || !res?.data) {
-		setIsLoading(false)
 		return onError("Something went wrong")
 		}
 
 		if (res.data.failure) {
-		setIsLoading(false)
 		return onError(res.data.failure)
 		}
 
+		// ✅ SUCCESS
 		if (res.data.status === 201) {
 		toast.success("Product created successfully")
+		}
+
+		if (res.data.status === 200) {
+		toast("Product updated successfully")
+		}
+
 		setOpen(false)
 		form.reset()
-		}
 
 	} catch (err) {
 		console.error(err)
@@ -97,8 +123,16 @@ const AddProduct = () => {
 
 	function onOpen() {
 		setOpen(true)
+		// setProduct({_id: '', title: '', description: '', category: '', price: 0, image: '', imageKey: '',})
+		setProduct({ _id: '', title: '', description: '', category: '', price: 0, image: '', imageKey: '', reviews: 0, cta: false })
 	}
 
+	useEffect(() => {
+		if (product) {
+			form.reset({...product, price: product.price.toString()})
+		}
+	}, [product])
+	
 	return (
 		<>
 			<Button size={'sm'} onClick={onOpen}>
@@ -107,10 +141,12 @@ const AddProduct = () => {
 			</Button>
 			<Sheet open={open} onOpenChange={setOpen}>
 				<SheetContent>
+					<VisuallyHidden>
 					<SheetHeader>
 						<SheetTitle>Manage your product</SheetTitle>
 						<SheetDescription>Field marked with * are required fields and must be filled.</SheetDescription>
 					</SheetHeader>
+					</VisuallyHidden>
 					<Separator className='my-3' />
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
@@ -153,7 +189,7 @@ const AddProduct = () => {
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent>
-												{categories.map(category => (
+												{categories.slice(1).map(category => (
 													<SelectItem value={category} key={category}>
 														{category}
 													</SelectItem>
@@ -190,7 +226,7 @@ const AddProduct = () => {
 										value={field.value}
 										onChange={(file) => {
 											setSelectedFile(file);
-											form.setValue("image", "selected", { shouldValidate: true });
+											// form.setValue("image", "selected", { shouldValidate: true });											
 										}}
 										setUploading={setUploading}
 										/>
