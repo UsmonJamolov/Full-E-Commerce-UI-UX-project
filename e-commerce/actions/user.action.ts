@@ -1,76 +1,33 @@
-'use server';
+'use server'
 
-import { axiosClient } from '@/http/axios';
-import { actionClient } from '@/lib/safe-action';
-import { idSchema, searchParamsSchema } from '@/lib/validation';
-import {
-  GetProductsActionReturnType,
-  GetProductActionReturnType,
-  IProduct,
-} from '@/types';
-import { cookies } from 'next/headers';
+import { axiosClient } from '@/http/axios'
+import { authOptions } from '@/lib/auth-options'
+import { generateToken } from '@/lib/generate-token'
+import { actionClient } from '@/lib/safe-action'
+import { idSchema, searchParamsSchema } from '@/lib/validation'
+import { ReturnActionType } from '@/types'
+import { getServerSession } from 'next-auth'
 
-// 🔥 GET PRODUCTS
-export const getProducts = actionClient
-  .schema(searchParamsSchema)
-  .action(async ({ parsedInput }) => {
-    try {
-      // ✅ TO‘G‘RI
-      const cookieStore = await cookies();
-      const token = cookieStore.get("token")?.value;
+export const getProducts = actionClient.schema(searchParamsSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+	const { data } = await axiosClient.get('/api/user/products', {
+		params: parsedInput,
+	})
+	return JSON.parse(JSON.stringify(data))
+})
 
-      const response = await axiosClient.get('/api/user/products', {
-        params: parsedInput,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+export const getProduct = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+	const { data } = await axiosClient.get(`/api/user/product/${parsedInput.id}`)
+	return JSON.parse(JSON.stringify(data))
+})
 
-      const productsData: IProduct[] =
-        response.data?.data ||
-        response.data?.products ||
-        response.data ||
-        [];
-
-      return { data: productsData };
-
-    } catch (error: any) {
-      return {
-        data: [],
-        serverError: "Xatolik yuz berdi",
-      };
-    }
-  });
-
-// 🔥 GET SINGLE PRODUCT
-export const getProduct = actionClient
-  .schema(idSchema)
-  .action<GetProductActionReturnType>(async ({ parsedInput }) => {
-    try {
-      // ✅ TOKENNI COOKIE DAN OLAMIZ
-      const cookieStore = await cookies();
-      const token = cookieStore.get("token")?.value;
-
-      const response = await axiosClient.get(
-        `/api/user/product/${parsedInput.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const productData: IProduct = response.data.data;
-
-      return {
-        data: productData,
-      };
-    } catch (error: any) {
-      console.error('GET PRODUCT ERROR:', error);
-
-      return {
-        data: {} as IProduct,
-        serverError: 'Mahsulotni olishda xatolik yuz berdi',
-      };
-    }
-  });
+export const addFavorite = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	if (!session?.currentUser) return { failure: 'You must be logged in to add a favorite' }
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.post(
+		'/api/user/add-favorite',
+		{ productId: parsedInput.id },
+		{ headers: { Authorization: `Bearer ${token}` } }
+	)
+	return JSON.parse(JSON.stringify(data))
+})

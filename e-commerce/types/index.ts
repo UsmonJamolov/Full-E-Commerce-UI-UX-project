@@ -6,7 +6,7 @@ export interface ChildProps {
 
 export type SearchParams = {
   [key: string]: string | string[] | undefined;
-};
+}
 export type Params = Promise<{ productId: string }>
 
 export interface QueryProps {
@@ -52,7 +52,7 @@ export interface IProduct {
 	imageKey: string
 	_id: string
 	reviews: number
-	cta: boolean
+	cta?: boolean
 }
 
 // export type SafeUser = Omit<IUser, "password">

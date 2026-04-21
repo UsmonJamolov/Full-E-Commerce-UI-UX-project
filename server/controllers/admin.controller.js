@@ -46,8 +46,6 @@ class AdminController {
 	async createProduct(req, res, next) {
 		try {
 			const data = req.body
-
-			console.log("REQ BODY:", req.body)
 			
 			const newProduct = await productModel.create(data)
 			if (!newProduct) return res.json({ failure: 'Failed while creating product' })
@@ -69,21 +67,6 @@ class AdminController {
 			next(error)
 		}
 	}
-	// [DELETE] /admin/delete-product/:id
-	// async deleteProduct(req, res, next) {
-	// 	try {
-	// 		const { id } = req.params
-	// 		const userId = this.userId
-	// 		const user = await userModel.findById(userId)
-	// 		if (!user) return res.json({ failure: 'User not found' })
-	// 		if (user.role !== 'admin') return res.json({ failure: 'User is not admin' })
-	// 		const deletedProduct = await productModel.findByIdAndDelete(id)
-	// 		if (!deletedProduct) return res.json({ failure: 'Failed while deleting product' })
-	// 		return res.json({ success: 'Product deleted successfully' })
-	// 	} catch (error) {
-	// 		next(error)
-	// 	}
-	// }
 
 	async deleteProduct(req, res, next) {
 	try {

@@ -1,4 +1,3 @@
-
 import { Separator } from "@/components/ui/separator"
 import BrowseCategorySection from "./_components/BrowseCategorySection"
 import CategoryWithSlider from "./_components/categoryWithSlider"
@@ -9,20 +8,34 @@ import NewArrivalSection from "./_components/newArrivalSection"
 import FlashSalesSection from "./_components/flash-sales"
 import { SearchParams } from "@/types"
 import {FC} from 'react'
+import { getProducts } from "@/actions/user.action"
 
 interface Props {
-	searchParams: SearchParams
+	searchParams: Promise<SearchParams>
 }
 
 const HomePage: FC<Props> = async props => {
-    const searchParams = props.searchParams
+    const searchParams = await props.searchParams
+	const res = await getProducts({
+		searchQuery: `${searchParams.q || ''}`,
+		filter: `${searchParams.filter || ''}`,
+		category: `${searchParams.category || ''}`,
+		page: `${searchParams.page || '1'}`,
+        pageSize: '10'
+	})
+
+    const products = res?.data?.products || []
+	const isNext = res?.data?.isNext || false
+
+    console.log('HomePage - ', products);
+    
     
     return (
         <>
             <div className="mb-20">
                 <CategoryWithSlider />
             </div>
-                <FlashSalesSection searchParams={searchParams} />
+                <FlashSalesSection searchParams={searchParams} products={products} />
                 <Separator className="my-5" />
                 <BrowseCategorySection />
                 <Separator className="my-5" />

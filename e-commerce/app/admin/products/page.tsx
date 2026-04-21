@@ -8,7 +8,7 @@ import { SearchParams } from '@/types'
 import Pagination from '@/components/shared/pagination'
 
 interface Props {
-	searchParams: SearchParams
+	searchParams: Promise<SearchParams>
 }
 const Page: FC<Props> = async (props) => {
 	const searchParams = await props.searchParams
@@ -16,7 +16,8 @@ const Page: FC<Props> = async (props) => {
 		searchQuery: `${searchParams.q || ''}`,
 		filter: `${searchParams.filter || ''}`,
 		category: `${searchParams.category || ''}`,
-		page: `${searchParams.page || '1'}`
+		page: `${searchParams.page || '1'}`,
+		pageSize: '10'
 	})
 	const products = res?.data?.products
 	const isNext = res?.data?.isNext || false

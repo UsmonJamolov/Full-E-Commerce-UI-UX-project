@@ -1,7 +1,6 @@
 const Otp = require('../models/otp.model');
 const User = require('../models/user.model');
 const bcrypt = require("bcrypt");
-const { createOTP } = require("../utils/createOtp");
 const jwt = require('jsonwebtoken');
 
 class AuthController {
@@ -26,7 +25,7 @@ async login(req, res, next) {
     }
 
     const token = jwt.sign(
-      { id: user._id },
+      { userId: user._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );

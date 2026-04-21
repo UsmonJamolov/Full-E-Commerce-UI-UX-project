@@ -5,9 +5,12 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { FC } from 'react'
+import { FC, MouseEvent } from 'react'
 import { IProduct } from "@/types";
-
+import {useAction} from '@/hooks/use-action'
+import { addFavorite } from '@/actions/user.action'
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Props {
 	product: IProduct
@@ -15,6 +18,25 @@ interface Props {
 
 // === SHU YERdagi kodlarni yangiladik:
 const ProductCard: FC<Props> = ({product}) => {
+  const {isLoading, onError, setIsLoading} = useAction()
+  const rotuer = useRouter()
+
+  const onFavorite = async (e: MouseEvent) => {
+    e.stopPropagation()
+    setIsLoading(true)
+    const res = await addFavorite({id: product._id})
+    if (res?.serverError || res?.validationErrors || !res?.data) {
+      return onError('Something went wrong')
+    }
+    if (res.data.failure) {
+      return onError(res.data.failure)
+    }
+    if (res.data.status === 200) {
+      toast('Added to favorites')
+      setIsLoading(false)
+    }
+  }
+  
   return (
     <div className="relative -z-50 w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px] shrink-0">
       <Card className="border-0 shadow-none group">
@@ -24,7 +46,7 @@ const ProductCard: FC<Props> = ({product}) => {
           </Badge>
           <div className="absolute right-2 top-2 flex flex-col gap-2 z-50 sm:right-3 sm:top-3">
             <IconBubble ariaLabel="Wishlist">
-              <Heart className="h-4 w-4" />
+              <Heart className="h-4 w-4" onClick={onFavorite} />
             </IconBubble>
             <IconBubble ariaLabel="Quick view">
               <Eye className="h-4 w-4 z-50" />

@@ -1,10 +1,13 @@
-import { getProducts } from "@/actions/admin.aciton";
 import FlashSalesContent from "./FlashSalesContent";
+import { IProduct, SearchParams } from "@/types";
 
 
-export default async function FlashSalesSection() {
-  const res = await getProducts();
-  const products = res?.data?.products || [];
+interface Props {
+  searchParams: SearchParams
+  products: IProduct[]
+}
 
-  return <FlashSalesContent products={products} />;
+export default async function FlashSalesSection({searchParams, products}: Props) {
+
+  return <FlashSalesContent products={products} searchParams={searchParams}  />;
 }

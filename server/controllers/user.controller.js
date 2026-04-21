@@ -1,14 +1,35 @@
 const productModel = require('../models/product.model');
 const userModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken'); // ✅ qo‘shildi
 
 class UserController {
     
     async getProducts(req, res, next) {
         try {
-            const products = await productModel.find();
-            return res.json(products);
+            const { searchQuery, filter, category, page, pageSize } = req.query
+			const skipAmount = (+page - 1) * +pageSize
+			const query = {}
+
+			if (searchQuery) {
+				const escapedSearchQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+				query.$or = [{ title: { $regex: new RegExp(escapedSearchQuery, 'i') } }]
+			}
+
+			if (category === 'All') query.category = { $exists: true }
+			else if (category !== 'All') {
+				if (category) query.category = category
+			}
+
+			let sortOptions = { createdAt: -1 }
+			if (filter === 'newest') sortOptions = { createdAt: -1 }
+			else if (filter === 'oldest') sortOptions = { createdAt: 1 }
+
+			const products = await productModel.find(query).sort(sortOptions).skip(skipAmount).limit(+pageSize)
+
+			const totalProducts = await productModel.countDocuments(query)
+			const isNext = totalProducts > skipAmount + +products.length
+
+			return res.json({ products, isNext })
         } catch (error) {
             next(error);
         }
@@ -22,6 +43,17 @@ class UserController {
             next(error);
         }
     }
+
+	// [GET] /user/favorites
+	async getFavorites(req, res, next) {
+		try {
+			const userId = '67420187ce7f12bf6ec22428'
+			const user = await userModel.findById(userId).populate('favorites')
+			return res.json(user.favorites)
+		} catch (error) {
+			next(error)
+		}
+	}
     
     // [GET] /user/profile/:id
 	async getProfile(req, res, next) {
@@ -32,6 +64,20 @@ class UserController {
             next(error)
 		}
     }
+
+	// [POST] /user/add-favorite
+	async addFavorite(req, res, next) {
+		try {
+			const {productId} = req.body
+			const userId = req.user._id
+			const isExist = await userModel.findOne({_id: userId, favorites: productId})
+			if (isExist) return res.json({failure: 'Product already in favorites'})
+			await userModel.findByIdAndUpdate(userId, {$push: {favorites: productId}})
+			return res.json({status: 200})
+		} catch (error) {
+			next(error)
+		}
+	}
 
     // [PUT] /user/update-profile
 	async updateProfile(req, res, next) {

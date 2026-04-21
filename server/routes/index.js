@@ -1,4 +1,4 @@
-const adminMiddleware = require('../middlewares/admin.middleware')
+const adminMiddleware = require('../middlewares/admin.middleware');
 const router = require("express").Router();
 
 router.use('/auth', require('./auth'));
