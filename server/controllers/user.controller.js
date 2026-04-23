@@ -65,6 +65,22 @@ class UserController {
 		}
     }
 
+	// [GET] /user/statistics
+	async getStatistics(req, res, next) {
+		try {
+			const userId = req.user._id
+			const user = await userModel.findById(userId)
+
+			if (!user) return res.json({failure: 'User not found'})
+			const totalFavorites = user.favorites.length
+			
+			const statistics = {totalFavorites}
+			return res.json({statistics})
+		} catch (error) {
+			next(error)
+		}
+	}
+
 	// [POST] /user/add-favorite
 	async addFavorite(req, res, next) {
 		try {
@@ -82,11 +98,16 @@ class UserController {
     // [PUT] /user/update-profile
 	async updateProfile(req, res, next) {
 		try {
-			const userId = '67420187ce7f12bf6ec22428'
+			const userId = req.user._id
 			const user = await userModel.findById(userId)
-			user.set(req.body)
-			await user.save()
-			return res.json(user)
+			if (!user) return res.json({failure: 'User nto found'})
+			await userModel.findByIdAndUpdate(userId, {
+			name: req.body.fullName,
+			}, 
+			{
+			returnDocument: 'after',
+			})
+			return res.json({status: 200})
 		} catch (error) {
 			next(error)
 		}
@@ -96,15 +117,31 @@ class UserController {
 	async updatePassword(req, res, next) {
 		try {
 			const { oldPassword, newPassword } = req.body
-			const userId = '67420187ce7f12bf6ec22428'
+			const userId = req.user._id
 			const user = await userModel.findById(userId)
+			if (!user) return res.json({failure: 'User not found'})
 
 			const isPasswordMatch = await bcrypt.compare(oldPassword, user.password)
 			if (!isPasswordMatch) return res.json({ failure: 'Old password is incorrect' })
 
 			const hashedPassword = await bcrypt.hash(newPassword, 10)
 			await userModel.findByIdAndUpdate(userId, { password: hashedPassword })
-			res.json({ success: 'Password updated successfully' })
+
+			res.json({ status: 200 })
+		} catch (error) {
+			next(error)
+		}
+	}
+
+	// [DELETE] /user/delete-favorite/:id
+	async deleteFavorite(req, res, next) {
+		try {
+			const { id } = req.params
+			const userId = '67420187ce7f12bf6ec22428'
+			const user = await userModel.findById(userId)
+			user.favorites.pull(id)
+			await user.save()
+			return res.json({ success: 'Product removed from favorites' })
 		} catch (error) {
 			next(error)
 		}

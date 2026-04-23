@@ -224,10 +224,11 @@ const AddProduct = () => {
 									<FormControl>
 										<Uploader
 										value={field.value}
-										onChange={(file) => {
-											setSelectedFile(file);
-											// form.setValue("image", "selected", { shouldValidate: true });											
-										}}
+										// onChange={(file: File) => {
+										// 	setSelectedFile(file);
+										// 	// form.setValue("image", "selected", { shouldValidate: true });											
+										// }}
+										onChange={(file) => setSelectedFile(file)}
 										setUploading={setUploading}
 										/>
 									</FormControl>

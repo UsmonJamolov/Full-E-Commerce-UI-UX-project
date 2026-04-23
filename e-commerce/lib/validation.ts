@@ -86,7 +86,6 @@ export const searchParamsSchema = z.object({
 
 export const updateUserSchema = z.object({
 	fullName: z.string().optional(),
-	email: z.string().optional(),
 	avatar: z.string().optional(),
 	avatarKey: z.string().optional(),
 	isDeleted: z.boolean().optional(),

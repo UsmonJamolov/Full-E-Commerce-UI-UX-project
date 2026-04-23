@@ -24,6 +24,8 @@ async login(req, res, next) {
       return res.status(400).json({ message: "Password noto‘g‘ri" });
     }
 
+    if (user.isDeleted) return res.json({ failure: `User is deleted at ${user.deletedAt.toLocaleString()}` })
+
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
