@@ -24,6 +24,10 @@ const ProductCard: FC<Props> = ({product}) => {
   const onFavorite = async (e: MouseEvent) => {
     e.stopPropagation()
     setIsLoading(true)
+
+    console.log('Favoritega Bosildi');
+    
+    
     const res = await addFavorite({id: product._id})
     if (res?.serverError || res?.validationErrors || !res?.data) {
       return onError('Something went wrong')
@@ -38,15 +42,15 @@ const ProductCard: FC<Props> = ({product}) => {
   }
   
   return (
-    <div className="relative -z-50 w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px] shrink-0">
+    <div className="relative z-10 w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px] shrink-0">
       <Card className="border-0 shadow-none group">
         <div className="relative rounded-lg bg-muted/30 p-3 sm:p-4">
           <Badge className="absolute left-2 top-2 bg-red-500 text-white hover:bg-red-500 z-50 text-[11px] px-2 py-1 sm:left-3 sm:top-3">
             30%
           </Badge>
           <div className="absolute right-2 top-2 flex flex-col gap-2 z-50 sm:right-3 sm:top-3">
-            <IconBubble ariaLabel="Wishlist">
-              <Heart className="h-4 w-4" onClick={onFavorite} />
+            <IconBubble ariaLabel="Wishlist" onClick={onFavorite}>
+              <Heart className="h-4 w-4" />
             </IconBubble>
             <IconBubble ariaLabel="Quick view">
               <Eye className="h-4 w-4 z-50" />
@@ -89,11 +93,16 @@ const ProductCard: FC<Props> = ({product}) => {
   );
 }
 
-function IconBubble({ children, ariaLabel, }: { children: React.ReactNode; ariaLabel: string; }) {
+function IconBubble({ children, ariaLabel, onClick }:
+  { children: React.ReactNode; 
+    ariaLabel: string; 
+    onClick?: (e: MouseEvent<HTMLButtonElement>) => void
+  }) {
   return (
     <button
+      onClick={onClick}
       aria-label={ariaLabel}
-      className="grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5 hover:bg-muted sm:h-9 sm:w-9"
+      className="grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5 hover:bg-muted sm:h-9 sm:w-9 cursor-pointer"
       type="button"
     >
       {children}

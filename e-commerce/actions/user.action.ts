@@ -30,6 +30,16 @@ export const getStatistics = actionClient.action<ReturnActionType>(async () => {
 	return JSON.parse(JSON.stringify(data))
 })
 
+export const getFavorurites = actionClient.schema(searchParamsSchema).action<ReturnActionType>(async ({parsedInput}) => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const {data} = await axiosClient.get('/api/user/favorites', {
+		headers: {Authorization: `Barer ${token}`},
+		params: parsedInput
+	})
+	return JSON.parse(JSON.stringify(data))
+})
+
 export const addFavorite = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
 	const session = await getServerSession(authOptions)
 	if (!session?.currentUser) return { failure: 'You must be logged in to add a favorite' }
@@ -60,5 +70,16 @@ export const updatePassword = actionClient.schema(passwordSchema).action<ReturnA
 	const {data} = await axiosClient.put('/api/user/update-password', parsedInput, {
 		headers: {Authorization: `Barer ${token}`}
 	})
+	return JSON.parse(JSON.stringify(data))
+})
+
+export const deleteFavorite = actionClient.schema(idSchema).action<ReturnActionType>(async ({parsedInput}) => {
+	const session = await getServerSession(authOptions)
+	if (!session?.currentUser) return {failure: 'You must be logged in to add a favorite'}
+	const token = await generateToken(session?.currentUser?._id)
+	const {data} = await axiosClient.delete(`/api/user/delete-favorite/${parsedInput.id}`, {
+		headers: {Authorization: `Barer ${token}`}
+	})
+	revalidatePath('/dashboard/watch-list')
 	return JSON.parse(JSON.stringify(data))
 })
