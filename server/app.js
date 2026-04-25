@@ -5,10 +5,12 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middlewares/error.middleware')
+const {rateLimit} = require('express-rate-limit')
 
 const app = express()
 
 // Middleware
+app.use(rateLimit({windowMS: 1 * 60 * 1000, limit: 200, standardHeaders: 'draft-7', legacyHeaders: false}))
 app.use(express.json())
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }))
 app.use(cookieParser())
