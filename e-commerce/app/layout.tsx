@@ -7,15 +7,22 @@ import Header from "@/components/header";
 import { Toaster } from '@/components/ui/sonner';
 import Footer from '@/components/footer';
 import SessionProvider from '@/components/providers/session.provider'
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
+import { redirect } from 'next/navigation';
 
 
-export const metadata: Metadata = {
-  title: "E-Commerce full project",
-  description: "E-commerce website built with Next.js",
-  icons: {icon: '/favicon.png'}
-};
+// export const metadata: Metadata = {
+//   title: "E-Commerce full project",
+//   description: "E-commerce website built with Next.js",
+//   icons: {icon: '/favicon.png'}
+// };
 
-const RootLayout: FC<ChildProps> = ({children}) => {
+const RootLayout: FC<ChildProps> = async ({children}) => {
+  const session = await getServerSession(authOptions)
+
+  if (!session) return redirect('/sign-in')
+  
   return (
     <html lang='en'>
         <body className='antialised'>

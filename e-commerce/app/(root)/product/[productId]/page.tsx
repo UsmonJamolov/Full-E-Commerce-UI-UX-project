@@ -10,12 +10,29 @@ interface Props {
 	params: Params
 }
 
-const Page: FC<Props> = async ({params}) => {
+export async function generateMetadata({ params }: Props) {
+	const { productId } = await params
+	const res = await getProduct({ id: productId })
+	const product = res?.data
+
+	return {
+		title: product?.title,
+		description: product?.description,
+		openGraph: { images: product?.image },
+	}
+}
+
+const Page = async ({params}: Props) => {
 	const {productId} = await params
 
 	const res = await getProduct({id: productId})
-
-	const product = res?.data?.product
+	
+	console.log('Products Id ni tekshiramiz Res orqali', res);
+	
+	const product = res?.data
+	
+	console.log('Products Id ni tekshiramiz', res);
+	
 
 	if (!product) return notFound()
 	
@@ -39,4 +56,4 @@ const Page: FC<Props> = async ({params}) => {
 	)
 }
 
-export default Page
+export default Page	

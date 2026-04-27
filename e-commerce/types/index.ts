@@ -36,11 +36,20 @@ export interface GetProductsActionReturnType {
   validationErrors?: Record<string, string[]>;
 }
 
-export interface GetProductActionReturnType {
-  data: IProduct;
-  serverError?: string;
-  validationErrors?: Record<string, string[]>;
-}
+// export interface GetProductActionReturnType {
+//   data?: IProduct;
+//   serverError?: string;
+//   validationErrors?: Record<string, string[]>;
+// //   title: string
+// // 	category: string
+// // 	price: number
+// // 	image: string
+// // 	description: string
+// // 	imageKey: string
+// // 	_id: string
+// // 	reviews: number
+// // 	cta?: boolean
+// }
 
 
 export interface IProduct {
