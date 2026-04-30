@@ -1,10 +1,29 @@
 const adminController = require('../controllers/admin.controller')
+const categoryController = require('../controllers/category.controller')
+const purchaseController = require('../controllers/purchase.controller')
+const buyNowController = require('../controllers/buy-now.controller')
 
 const router = require('express').Router()
+
+router.get('/categories', categoryController.getCategories)
+router.post('/categories', categoryController.createCategory)
+router.put('/categories/:id', categoryController.updateCategory)
+router.delete('/categories/:id', categoryController.deleteCategory)
 
 router.get('/products', adminController.getProducts)
 router.post('/create-product', adminController.createProduct)
 router.put('/update-product/:id', adminController.updateProduct)
 router.delete('/delete-product/:id', adminController.deleteProduct)
+router.get('/product-reviews', adminController.getProductReviews)
+router.put('/product-reviews/:productId/:reviewId', adminController.updateProductReview)
+router.delete('/product-reviews/:productId/:reviewId', adminController.deleteProductReview)
+
+router.get('/purchase-items', purchaseController.getPurchaseItems)
+router.post('/purchase-items', purchaseController.createPurchaseItem)
+router.patch('/purchase-items/:id/approve', purchaseController.approvePurchaseItem)
+router.put('/purchase-items/:id', purchaseController.updatePurchaseItem)
+router.delete('/purchase-items/:id', purchaseController.deletePurchaseItem)
+router.get('/buy-now-settings', buyNowController.getSettings)
+router.put('/buy-now-settings', buyNowController.updateSettings)
 
 module.exports = router

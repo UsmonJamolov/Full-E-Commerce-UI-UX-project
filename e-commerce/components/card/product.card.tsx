@@ -1,16 +1,17 @@
 'use client'
-import { Badge, Eye, Heart, Star } from "lucide-react";
+import { Eye, Heart, Star } from "lucide-react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { FC, MouseEvent } from 'react'
+import { FC, MouseEvent, useState } from 'react'
 import { IProduct } from "@/types";
 import {useAction} from '@/hooks/use-action'
 import { addFavorite } from '@/actions/user.action'
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Badge } from "../ui/badge";
 
 interface Props {
 	product: IProduct
@@ -20,6 +21,10 @@ interface Props {
 const ProductCard: FC<Props> = ({product}) => {
   const {onError, setIsLoading} = useAction()
   const router = useRouter()
+  const [isFavourite, setIsFavourite] = useState(false)
+  const imageSrc = product.image
+    ? `${product.image}${product.image.includes("?") ? "&" : "?"}v=${encodeURIComponent(product.imageKey || product._id)}`
+    : "/images/gamepad.png"
 
   const onFavorite = async (e: MouseEvent) => {
     e.stopPropagation()
@@ -33,32 +38,49 @@ const ProductCard: FC<Props> = ({product}) => {
       return onError('Something went wrong')
     }
     if (res.data.failure) {
+      if (res.data.failure.toLowerCase().includes('already')) {
+        setIsFavourite(true)
+      }
+      setIsLoading(false)
       return onError(res.data.failure)
     }
     if (res.data.status === 200) {
       toast('Added to favorites')
+      setIsFavourite(true)
       setIsLoading(false)
     }
   }
+  const reviewCount = typeof product.reviewCount === 'number'
+    ? product.reviewCount
+    : Array.isArray(product.reviews)
+      ? product.reviews.length
+      : 0
+  const ratingAverage = typeof product.ratingAverage === 'number'
+    ? product.ratingAverage
+    : Array.isArray(product.reviews) && product.reviews.length > 0
+      ? product.reviews.reduce((sum, item) => sum + item.rating, 0) / product.reviews.length
+      : 0
   
   return (
     <div onClick={() => router.push(`/product/${product._id}`)} className="cursor-pointer">
       <div className="relative z-10 w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px] shrink-0">
         <Card className="border-0 shadow-none group">
           <div className="relative rounded-lg bg-muted/30 p-3 sm:p-4">
-            <Badge className="absolute left-2 top-2 bg-red-500 text-white hover:bg-red-500 z-50 text-[11px] px-2 py-1 sm:left-3 sm:top-3">
-              30%
-            </Badge>
+            {product.isNew && (
+              <Badge className="absolute left-2 top-2 bg-black text-white hover:bg-black z-50 text-[11px] px-2 py-1 sm:left-3 sm:top-3">
+                NEW
+              </Badge>
+            )}
             <div className="absolute right-2 top-2 flex flex-col gap-2 z-50 sm:right-3 sm:top-3">
               <IconBubble ariaLabel="Wishlist" onClick={onFavorite}>
-                <Heart className="h-4 w-4" />
+                <Heart className={cn("h-4 w-4", isFavourite && "fill-black text-black")} />
               </IconBubble>
               <IconBubble ariaLabel="Quick view">
                 <Eye className="h-4 w-4 z-50" />
               </IconBubble>
             </div>
             <div className="relative mx-auto aspect-square w-[110px] xs:w-[140px] sm:w-[180px]">
-              <Image src='/images/gamepad.png' alt={product.title} fill className="object-contain" unoptimized />
+              <Image src={imageSrc} alt={product.title} fill className="object-contain" unoptimized />
             </div>
             {product.cta && (
               <Button
@@ -85,8 +107,8 @@ const ProductCard: FC<Props> = ({product}) => {
               {/* <span className="text-[12px] text-muted-foreground line-through">$977</span> */}
             </div>
             <div className="flex items-center gap-1 sm:gap-2">
-              <Stars value={3} />
-              <span className="text-[11px] text-muted-foreground">(75)</span>
+              <Stars value={ratingAverage} />
+              <span className="text-[11px] text-muted-foreground">({reviewCount})</span>
             </div>
           </div>
         </Card>

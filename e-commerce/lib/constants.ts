@@ -1,4 +1,4 @@
-import { Banknote, Barcode, Heart, Settings2, Shuffle, User } from 'lucide-react'
+import { Barcode, Banknote, Heart, MessageSquare, PlusSquare, Settings2, ShoppingCart, Timer, User } from 'lucide-react'
 
 export const products = [
 	{
@@ -31,15 +31,15 @@ export const categories = ['All', 'Shoes', 'T-Shirts', 'Clothes', 'Books', 'Acce
 
 export const dashboardSidebar = [
 	{ name: 'Personal Information', route: '/dashboard', icon: User },
-	{ name: 'Orders', route: '/dashboard/orders', icon: Shuffle },
-	{ name: 'Payments', route: '/dashboard/payments', icon: Banknote },
 	{ name: 'Watch list', route: '/dashboard/watch-list', icon: Heart },
 	{ name: 'Settings', route: '/dashboard/settings', icon: Settings2 },
 ]
 
 export const adminSidebar = [
-	{ name: 'Customers', icon: User, route: '/admin' },
 	{ name: 'Products', icon: Barcode, route: '/admin/products' },
-	{ name: 'Orders', icon: Shuffle, route: '/admin/orders' },
-	{ name: 'Payments', icon: Banknote, route: '/admin/payments' },
+	{ name: "Qo'shimchalar", icon: PlusSquare, route: '/admin/additions' },
+	{ name: 'Buy now', icon: Timer, route: '/admin/buy-now' },
+	{ name: 'Yangi sotib olinadigan tovarlar', icon: ShoppingCart, route: '/admin/orders' },
+	{ name: 'Sotib olishga tasdiqlanganlar', icon: Banknote, route: '/admin/approved-purchases' },
+	{ name: 'Kommentariyalar', icon: MessageSquare, route: '/admin/comments' },
 ]

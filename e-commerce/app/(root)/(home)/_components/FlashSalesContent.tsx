@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import ProductCard from "@/components/card/product.card";
 import { IProduct, SearchParams } from "@/types";
+import Link from "next/link";
 
 interface Props {
   products: IProduct[]
@@ -37,7 +38,7 @@ const FlashSalesContent = ({ products, searchParams }: Props) => {
 
         {/* Header */}
         <div className="flex justify-between">
-          <h2 className="text-2xl md:text-4xl">Flash Sales</h2>
+          <h2 className="text-2xl md:text-4xl">Erkaklar oyoq kiyimi</h2>
 
           <div className="flex gap-2">
             <Button onClick={() => scrollByCards("prev")}>
@@ -56,6 +57,12 @@ const FlashSalesContent = ({ products, searchParams }: Props) => {
           {products.map((p) => (
             <ProductCard key={p._id} product={p} />
           ))}
+        </div>
+
+        <div className="flex justify-center mt-8">
+          <Button asChild className="bg-red-500 hover:bg-red-600 text-white px-8 h-12 text-base rounded">
+            <Link href="/shoes-products">View All Products</Link>
+          </Button>
         </div>
 
       </div>

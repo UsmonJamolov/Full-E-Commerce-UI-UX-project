@@ -97,19 +97,24 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 
 // Timer hook
-function useCountdown(target: Date | null) {
+function useCountdown(target: Date | null, isPaused: boolean, pausedRemainingSeconds: number) {
   const [ms, setMs] = React.useState(0);
 
   React.useEffect(() => {
+    if (isPaused) {
+      setMs(Math.max(0, pausedRemainingSeconds * 1000))
+      return
+    }
     if (!target) return;
     setMs(Math.max(0, target.getTime() - Date.now())); // Boshlang‘ich qiymat
     const t = setInterval(() => {
       setMs(Math.max(0, target.getTime() - Date.now()));
     }, 1000);
     return () => clearInterval(t);
-  }, [target]);
+  }, [target, isPaused, pausedRemainingSeconds]);
 
   const totalSeconds = Math.floor(ms / 1000);
   const days = Math.floor(totalSeconds / 86400);
@@ -120,16 +125,41 @@ function useCountdown(target: Date | null) {
 }
 
 export default function MusicBannerSection() {
-  // Timer to random 5 days ahead - FAQAT clientda yaratiladi!
   const [target, setTarget] = React.useState<Date | null>(null);
+  const [bannerImage, setBannerImage] = React.useState('/images/krosovkalar1.png')
+  const [isTimerVisible, setIsTimerVisible] = React.useState(true)
+  const [isTimerPaused, setIsTimerPaused] = React.useState(false)
+  const [pausedRemainingSeconds, setPausedRemainingSeconds] = React.useState(0)
 
   React.useEffect(() => {
-    setTarget(
-      new Date(Date.now() + (5 * 86400 + 23 * 3600 + 59 * 60 + 35) * 1000)
-    );
+    const fallbackDate = new Date(Date.now() + (5 * 86400 + 23 * 3600 + 59 * 60 + 35) * 1000)
+    setTarget(fallbackDate)
+
+    const loadTimer = async () => {
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_SERVER_URL || ''
+        const res = await fetch(`${apiBase}/api/user/buy-now-settings?t=${Date.now()}`, { cache: 'no-store' })
+        const data = await res.json()
+        if (data?.targetDate) {
+          setTarget(new Date(data.targetDate))
+        }
+        if (data?.image) {
+          setBannerImage(data.image)
+        }
+        setIsTimerVisible(data?.isTimerVisible ?? true)
+        setIsTimerPaused(data?.isTimerPaused ?? false)
+        setPausedRemainingSeconds(Number(data?.pausedRemainingSeconds || 0))
+      } catch {
+        setTarget(fallbackDate)
+      }
+    }
+
+    loadTimer()
+    const poll = setInterval(loadTimer, 15000)
+    return () => clearInterval(poll)
   }, []);
 
-  const { days, hours, minutes, seconds } = useCountdown(target);
+  const { days, hours, minutes, seconds } = useCountdown(target, isTimerPaused, pausedRemainingSeconds);
 
   return (
     <section className="w-full flex justify-center items-center py-4 xs:py-8 md:py-12 mt-4 md:mt-10 relative -z-10">
@@ -149,26 +179,28 @@ export default function MusicBannerSection() {
           py-6 xs:py-10 gap-4 xs:gap-8 z-10
         ">
           <span className="text-green-400 text-[15px] xs:text-[17px] font-semibold mb-2">
-            Categories
+            Bugungi so&apos;z
           </span>
           <h2 className="text-white text-2xl xs:text-3xl md:text-5xl font-bold leading-tight max-w-[24ch] select-none">
             Enhance Your <br /> Music Experience
           </h2>
           {/* TIMER BLOK */}
+          {isTimerVisible && (
           <div className="flex flex-wrap gap-3 xs:gap-5 md:gap-7 mt-3 xs:mt-4 mb-3 xs:mb-5">
-            <TimeBubble value={format2(hours)} label="Hours" />
             <TimeBubble value={format2(days)} label="Days" />
+            <TimeBubble value={format2(hours)} label="Hours" />
             <TimeBubble value={format2(minutes)} label="Minutes" />
             <TimeBubble value={format2(seconds)} label="Seconds" />
           </div>
-          <Button className="bg-green-500 text-white hover:bg-green-600 duration-150 rounded-md w-full xs:w-[170px] h-11 xs:h-12 text-base xs:text-lg font-normal mt-2">
-            Buy Now!
+          )}
+          <Button asChild className="bg-green-500 text-white hover:bg-green-600 duration-150 rounded-md w-full xs:w-[170px] h-11 xs:h-12 text-base xs:text-lg font-normal mt-2">
+            <Link href="/contacts">Buy Now!</Link>
           </Button>
         </div>
         {/* PRODUCT IMAGE */}
         <div className="flex-1 flex items-center justify-center relative px-1 xs:px-2 md:px-8 select-none min-h-[160px] xs:min-h-[220px] md:min-h-0">
           <Image 
-            src="/images/krosovkalar1.png"
+            src={bannerImage}
             alt="Music Speaker"
             width={500}
             height={330}

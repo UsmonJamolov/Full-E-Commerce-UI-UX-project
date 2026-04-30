@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Textarea } from '@/components/ui/textarea'
 import { useAction } from "@/hooks/use-action";
 import { useProduct } from '@/hooks/use-product'
-import { categories } from '@/lib/constants'
+import AdminCategoryField from './admin-category-field'
 import { formatPrice } from '@/lib/utils'
 import { productSchema } from '@/lib/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -34,7 +34,7 @@ const AddProduct = () => {
 
 	const form = useForm<z.infer<typeof productSchema>>({
 		resolver: zodResolver(productSchema),
-		defaultValues: { title: '', description: '', category: '', price: '', image: '', imageKey: '', },
+		defaultValues: { title: '', description: '', category: '', targetGroup: 'Erkak', price: '', image: '', imageKey: '', isNew: true },
 	})
 
 	console.log('Form getValues: ', form.getValues());
@@ -123,15 +123,14 @@ const AddProduct = () => {
 
 	function onOpen() {
 		setOpen(true)
-		// setProduct({_id: '', title: '', description: '', category: '', price: 0, image: '', imageKey: '',})
-		setProduct({ _id: '', title: '', description: '', category: '', price: 0, image: '', imageKey: '', reviews: 0, cta: false })
+		setProduct({ _id: '', title: '', description: '', category: '', targetGroup: 'Erkak', price: 0, image: '', imageKey: '', reviews: [], reviewCount: 0, ratingAverage: 0, isNew: true, cta: false })
 	}
 
 	useEffect(() => {
 		if (product) {
 			form.reset({...product, price: product.price.toString()})
 		}
-	}, [product])
+	}, [product, form])
 	
 	return (
 		<>
@@ -181,21 +180,36 @@ const AddProduct = () => {
 								name='category'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Cateogry</Label>
-										<Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
-											<FormControl>
+										<Label className='text-xs'>Category</Label>
+										<FormControl>
+											<AdminCategoryField
+												value={field.value}
+												onChange={field.onChange}
+												disabled={isLoading}
+											/>
+										</FormControl>
+										<FormMessage className='text-xs text-red-500' />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='targetGroup'
+								render={({ field }) => (
+									<FormItem className='space-y-0'>
+										<Label className='text-xs'>Yangi category (Erkak/Ayol/Bola)</Label>
+										<FormControl>
+											<Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
 												<SelectTrigger className='bg-secondary'>
-													<SelectValue placeholder='Select category' />
+													<SelectValue />
 												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{categories.slice(1).map(category => (
-													<SelectItem value={category} key={category}>
-														{category}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
+												<SelectContent>
+													<SelectItem value='Erkak'>Erkak</SelectItem>
+													<SelectItem value='Ayol'>Ayol</SelectItem>
+													<SelectItem value='Bola'>Bola</SelectItem>
+												</SelectContent>
+											</Select>
+										</FormControl>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
 								)}
@@ -211,6 +225,24 @@ const AddProduct = () => {
 										<FormControl>
 											<Input placeholder='100.000 UZS' type='number' className='bg-secondary' disabled={isLoading} {...field} />
 										</FormControl>
+										<FormMessage className='text-xs text-red-500' />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='isNew'
+								render={({ field }) => (
+									<FormItem className='space-y-0'>
+										<Label className='text-xs flex items-center gap-2'>
+											<input
+												type='checkbox'
+												checked={!!field.value}
+												onChange={e => field.onChange(e.target.checked)}
+												disabled={isLoading}
+											/>
+											New badge qo‘shilsin
+										</Label>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
 								)}

@@ -11,8 +11,9 @@ import { FC, useCallback } from 'react'
 
 interface Props {
 	showCategory?: boolean
+	categoryOptions?: string[]
 }
-const Filter: FC<Props> = ({ showCategory }) => {
+const Filter: FC<Props> = ({ showCategory, categoryOptions = categories }) => {
 	const searchParams = useSearchParams()
 	const router = useRouter()
 
@@ -22,6 +23,11 @@ const Filter: FC<Props> = ({ showCategory }) => {
 	}
 
 	const onCategoryChange = (value: string) => {
+		if (value === 'all') {
+			const newUrl = removeUrlQuery({ key: 'category', params: searchParams.toString() })
+			router.push(newUrl)
+			return
+		}
 		const newUrl = formUrlQuery({ key: 'category', params: searchParams.toString(), value })
 		router.push(newUrl)
 	}
@@ -61,7 +67,8 @@ const Filter: FC<Props> = ({ showCategory }) => {
 						<SelectValue placeholder='Select category' className='text-muted-foreground' />
 					</SelectTrigger>
 					<SelectContent>
-						{categories.map(category => (
+						<SelectItem value='all'>All category</SelectItem>
+						{categoryOptions.map(category => (
 							<SelectItem value={category} key={category}>
 								{category}
 							</SelectItem>

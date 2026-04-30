@@ -4,10 +4,194 @@ import { axiosClient } from '@/http/axios'
 import { authOptions } from '@/lib/auth-options'
 import { generateToken } from '@/lib/generate-token'
 import { actionClient } from '@/lib/safe-action'
-import { idSchema, productSchema, searchParamsSchema, updateProductSchema, uploadSchema } from '@/lib/validation'
+import {
+	categoryNameSchema,
+	categoryUpdateSchema,
+	adminDeleteReviewSchema,
+	adminUpdateReviewSchema,
+	idSchema,
+	purchaseItemSchema,
+	purchaseItemStatusSchema,
+	updatePurchaseItemSchema,
+	productSchema,
+	buyNowSettingsSchema,
+	searchParamsSchema,
+	updateProductSchema,
+	uploadSchema,
+} from '@/lib/validation'
 import { ReturnActionType } from '@/types'
 import { getServerSession } from 'next-auth'
 import { revalidatePath } from 'next/cache'
+
+type AdminCategory = { _id: string; name: string; isDefault?: boolean }
+type AdminReviewItem = {
+	productId: string
+	productTitle: string
+	reviewId: string
+	userName: string
+	rating: number
+	comment: string
+	adminReply: string
+	createdAt: string
+}
+
+export const getAdminCategories = actionClient.action(async () => {
+	const empty = { categories: [] as AdminCategory[] }
+	try {
+		const session = await getServerSession(authOptions)
+		if (!session?.currentUser?._id) {
+			return JSON.parse(JSON.stringify(empty)) as { categories: AdminCategory[] }
+		}
+		const token = await generateToken(session.currentUser._id)
+		const { data } = await axiosClient.get('/api/admin/categories', {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		return JSON.parse(JSON.stringify(data)) as { categories: AdminCategory[] }
+	} catch {
+		return JSON.parse(JSON.stringify(empty)) as { categories: AdminCategory[] }
+	}
+})
+
+export const createAdminCategory = actionClient
+	.schema(categoryNameSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.post(
+			'/api/admin/categories',
+			parsedInput,
+			{ headers: { Authorization: `Bearer ${token}` } },
+		)
+		revalidatePath('/admin/products')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const updateAdminCategory = actionClient
+	.schema(categoryUpdateSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put(
+			`/api/admin/categories/${parsedInput.id}`,
+			{ name: parsedInput.name },
+			{ headers: { Authorization: `Bearer ${token}` } },
+		)
+		revalidatePath('/admin/products')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const deleteAdminCategory = actionClient.schema(idSchema).action(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.delete(`/api/admin/categories/${parsedInput.id}`, {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	revalidatePath('/admin/products')
+	return JSON.parse(JSON.stringify(data))
+})
+
+type PurchaseItemsResponse = { items: Array<{ _id: string; name: string; status: 'pending' | 'approved'; createdAt: string; updatedAt: string }> }
+
+export const getPurchaseItems = actionClient
+	.schema(purchaseItemStatusSchema)
+	.action<PurchaseItemsResponse>(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.get('/api/admin/purchase-items', {
+			headers: { Authorization: `Bearer ${token}` },
+			params: parsedInput,
+		})
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const createPurchaseItem = actionClient
+	.schema(purchaseItemSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.post('/api/admin/purchase-items', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/admin/orders')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const approvePurchaseItem = actionClient.schema(idSchema).action(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.patch(
+		`/api/admin/purchase-items/${parsedInput.id}/approve`,
+		{},
+		{ headers: { Authorization: `Bearer ${token}` } },
+	)
+	revalidatePath('/admin/orders')
+	revalidatePath('/admin/approved-purchases')
+	return JSON.parse(JSON.stringify(data))
+})
+
+export const updatePurchaseItem = actionClient
+	.schema(updatePurchaseItemSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put(
+			`/api/admin/purchase-items/${parsedInput.id}`,
+			{ name: parsedInput.name },
+			{ headers: { Authorization: `Bearer ${token}` } },
+		)
+		revalidatePath('/admin/orders')
+		revalidatePath('/admin/approved-purchases')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const deletePurchaseItem = actionClient.schema(idSchema).action(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.delete(`/api/admin/purchase-items/${parsedInput.id}`, {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	revalidatePath('/admin/orders')
+	revalidatePath('/admin/approved-purchases')
+	return JSON.parse(JSON.stringify(data))
+})
+
+export const getAdminReviews = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.get('/api/admin/product-reviews', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as { reviews: AdminReviewItem[] }
+})
+
+export const updateAdminReview = actionClient.schema(adminUpdateReviewSchema).action(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.put(
+		`/api/admin/product-reviews/${parsedInput.productId}/${parsedInput.reviewId}`,
+		{
+			comment: parsedInput.comment,
+			rating: parsedInput.rating,
+			adminReply: parsedInput.adminReply || '',
+		},
+		{ headers: { Authorization: `Bearer ${token}` } },
+	)
+	revalidatePath('/admin/comments')
+	revalidatePath(`/product/${parsedInput.productId}`)
+	return JSON.parse(JSON.stringify(data))
+})
+
+export const deleteAdminReview = actionClient.schema(adminDeleteReviewSchema).action(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.delete(
+		`/api/admin/product-reviews/${parsedInput.productId}/${parsedInput.reviewId}`,
+		{ headers: { Authorization: `Bearer ${token}` } },
+	)
+	revalidatePath('/admin/comments')
+	revalidatePath(`/product/${parsedInput.productId}`)
+	return JSON.parse(JSON.stringify(data))
+})
 
 export const getProducts = actionClient.schema(searchParamsSchema).action<ReturnActionType>(async ({parsedInput}) => {
 	const session = await getServerSession(authOptions)
@@ -96,3 +280,32 @@ export const deleteProduct = actionClient.schema(idSchema).action<ReturnActionTy
 	revalidatePath('/admin/products')
 	return JSON.parse(JSON.stringify(data))
 })
+
+export const getBuyNowSettingsAdmin = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.get('/api/admin/buy-now-settings', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as {
+		targetDate: string
+		image?: string
+		imageKey?: string
+		isTimerVisible?: boolean
+		isTimerPaused?: boolean
+		pausedRemainingSeconds?: number
+	}
+})
+
+export const updateBuyNowSettingsAdmin = actionClient
+	.schema(buyNowSettingsSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put('/api/admin/buy-now-settings', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/admin/buy-now')
+		revalidatePath('/')
+		return JSON.parse(JSON.stringify(data))
+	})

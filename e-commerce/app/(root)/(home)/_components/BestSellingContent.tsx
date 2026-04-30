@@ -1,0 +1,58 @@
+'use client'
+
+import * as React from 'react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { IProduct } from '@/types'
+import ProductCard from '@/components/card/product.card'
+import Link from 'next/link'
+
+interface Props {
+	products: IProduct[]
+}
+
+const BestSellingContent = ({ products }: Props) => {
+	const scrollerRef = React.useRef<HTMLDivElement>(null)
+
+	const scrollByCards = (dir: 'prev' | 'next') => {
+		const el = scrollerRef.current
+		if (!el) return
+		const amount = Math.round(el.clientWidth * 0.9)
+		el.scrollBy({
+			left: dir === 'next' ? amount : -amount,
+			behavior: 'smooth',
+		})
+	}
+
+	return (
+		<section className='w-full py-6 md:py-10'>
+			<div className='mx-auto w-full max-w-6xl px-2 sm:px-4'>
+				<div className='flex justify-between'>
+					<h2 className='text-2xl md:text-4xl'>Ayollar oyoq kiyimi</h2>
+					<div className='flex gap-2'>
+						<Button onClick={() => scrollByCards('prev')}>
+							<ArrowLeft />
+						</Button>
+						<Button onClick={() => scrollByCards('next')}>
+							<ArrowRight />
+						</Button>
+					</div>
+				</div>
+
+				<div ref={scrollerRef} className='flex gap-4 overflow-x-auto mt-5'>
+					{products.length === 0 && <p>No products</p>}
+					{products.map(product => (
+						<ProductCard key={product._id} product={product} />
+					))}
+				</div>
+				<div className='flex justify-center mt-8'>
+					<Button asChild className='bg-red-500 hover:bg-red-600 text-white px-8 h-12 text-base rounded'>
+						<Link href='/shoes-products'>View All Products</Link>
+					</Button>
+				</div>
+			</div>
+		</section>
+	)
+}
+
+export default BestSellingContent

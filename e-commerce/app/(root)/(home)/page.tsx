@@ -19,17 +19,13 @@ const HomePage: FC<Props> = async props => {
 	const res = await getProducts({
 		searchQuery: `${searchParams.q || ''}`,
 		filter: `${searchParams.filter || ''}`,
-		category: `${searchParams.category || ''}`,
+		category: 'Shoes',
+		targetGroup: 'Erkak',
 		page: `${searchParams.page || '1'}`,
         pageSize: '10'
 	})
 
     const products = res?.data?.products || []
-	const isNext = res?.data?.isNext || false
-
-    console.log('HomePage - ', products);
-    
-    
     return (
         <>
             <div className="mb-20">

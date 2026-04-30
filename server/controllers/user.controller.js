@@ -3,10 +3,13 @@ const userModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 
 class UserController {
+	constructor() {
+		this.addProductReview = this.addProductReview.bind(this)
+	}
     
     async getProducts(req, res, next) {
         try {
-            const { searchQuery, filter, category, page, pageSize } = req.query
+            const { searchQuery, filter, category, targetGroup, page, pageSize } = req.query
 			const skipAmount = (+page - 1) * +pageSize
 			const query = {}
 
@@ -19,6 +22,7 @@ class UserController {
 			else if (category !== 'All') {
 				if (category) query.category = category
 			}
+			if (targetGroup) query.targetGroup = targetGroup
 
 			let sortOptions = { createdAt: -1 }
 			if (filter === 'newest') sortOptions = { createdAt: -1 }
@@ -74,6 +78,47 @@ class UserController {
 			const isNext = totalProducts > skipAmount + +products.length
 
 			return res.json({products, isNext})
+		} catch (error) {
+			next(error)
+		}
+	}
+
+	// [POST] /user/product/:id/review
+	async addProductReview(req, res, next) {
+		try {
+			const { id } = req.params
+			const { rating, comment } = req.body
+			const product = await productModel.findById(id)
+			if (!product) return res.json({ failure: 'Product not found' })
+
+			const parsedRating = Number(rating)
+			if (!parsedRating || parsedRating < 1 || parsedRating > 5) {
+				return res.json({ failure: 'Rating 1 dan 5 gacha bo‘lishi kerak' })
+			}
+			if (!comment || !String(comment).trim()) {
+				return res.json({ failure: 'Comment kiriting' })
+			}
+
+			const existed = product.reviews.find(item => String(item.user) === String(req.user._id))
+			if (existed) {
+				existed.rating = parsedRating
+				existed.comment = String(comment).trim()
+				existed.userName = req.user.name
+			} else {
+				product.reviews.push({
+					user: req.user._id,
+					userName: req.user.name,
+					rating: parsedRating,
+					comment: String(comment).trim(),
+				})
+			}
+
+			const totalRating = product.reviews.reduce((sum, item) => sum + item.rating, 0)
+			product.reviewCount = product.reviews.length
+			product.ratingAverage = product.reviewCount ? Number((totalRating / product.reviewCount).toFixed(1)) : 0
+
+			await product.save()
+			return res.json({ status: 200, product })
 		} catch (error) {
 			next(error)
 		}

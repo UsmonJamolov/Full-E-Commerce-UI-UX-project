@@ -1,30 +1,29 @@
 import Link from "next/link";
-// import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 import {
   ChevronDown,
   Heart,
-  Menu,
-  Search,
-  ShoppingCart,
-  User,
 } from "lucide-react";
 
-import { nav } from "@/components/constants";
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import UserBox from "./shared/user-box";
+import HeaderSearchPanel from "./shared/header-search-panel";
+import { getProducts } from "@/actions/user.action";
 
-export default async function Header({ cartCount = 2, wishlistCount = 1 }) {
+export default async function Header({ wishlistCount = 1 }) {
   const session = await getServerSession(authOptions)
-
-  console.log("HEADER SESSION:", session);
-  
+  const productsRes = await getProducts({
+    searchQuery: '',
+    filter: 'newest',
+    category: '',
+    targetGroup: '',
+    page: '1',
+    pageSize: '40',
+  })
+  const searchItems = productsRes?.data?.products || []
 
   return (
     <>
@@ -45,74 +44,42 @@ export default async function Header({ cartCount = 2, wishlistCount = 1 }) {
       </div>
 
       {/* MAIN HEADER */}
-      <div className="border-b bg-white">
+      <div className="border-b bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-
-          {/* LEFT */}
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
-
-            <Link href="/" className="font-bold text-xl">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="font-bold text-3xl tracking-[0.2em]">
               Exclusive
             </Link>
+            <nav className="hidden md:flex items-center gap-5 text-sm">
+              <Link href="/">Home</Link>
+              <Link href="/contacts">Contacts</Link>
+              <Link href="/about">About Us</Link>
+            </nav>
           </div>
 
-          {/* CENTER */}
-          <nav className="hidden md:flex gap-6">
-            {nav.map((i) => (
-              <Link
-                key={i.href}
-                href={i.href}
-                className={cn(
-                  "hover:underline",
-                  "font-bold text-primary"
-                )}
-              >
-                {i.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* RIGHT */}
           <div className="flex items-center gap-3">
-
-            {/* SEARCH */}
-            <div className="relative hidden sm:block">
-              <Input className="h-9 w-56 pr-9" placeholder="Search..." />
-              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-            </div>
-
-            {/* WISHLIST */}
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="h-5 w-5" />
+            <div className="relative">
+              <Button asChild variant="ghost" size="icon">
+                <Link href="/dashboard/watch-list">
+                  <Heart className="h-5 w-5" />
+                </Link>
+              </Button>
               {wishlistCount > 0 && (
                 <Badge className="absolute -top-1 -right-1 text-[10px]">
                   {wishlistCount}
                 </Badge>
               )}
-            </Button>
+            </div>
 
-            {/* CART */}
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 text-[10px]">
-                  {cartCount}
-                </Badge>
-              )}
-            </Button>
+            <HeaderSearchPanel items={searchItems} />
 
-            {/* 🔥 USER BLOCK */}
-            {session?.currentUser?._id && <UserBox user={session.currentUser} />}
             {!session?.currentUser?._id && (
-              <Button asChild size={'icon'}>
-                <Link href={'/sign-in'}>
-                  <User />
-                </Link>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/sign-in">Sign in</Link>
               </Button>
             )}
+
+            {session?.currentUser?._id && <UserBox user={session.currentUser} />}
           </div>
         </div>
       </div>

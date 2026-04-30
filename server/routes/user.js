@@ -1,4 +1,5 @@
 const userController = require('../controllers/user.controller');
+const buyNowController = require('../controllers/buy-now.controller')
 const userMiddleware = require('../middlewares/user.middleware');
 
 const router = require('express').Router();
@@ -11,8 +12,10 @@ router.get('/profile/:id', userController.getProfile)
 // router.get('/transactions', userController.getTransactions)
 router.get('/favorites', userMiddleware, userController.getFavorites)
 router.get('/statistics', userMiddleware, userController.getStatistics)
+router.get('/buy-now-settings', buyNowController.getSettings)
 
 router.post('/add-favorite', userMiddleware, userController.addFavorite)
+router.post('/product/:id/review', userMiddleware, userController.addProductReview)
 
 router.put('/update-profile', userMiddleware, userController.updateProfile)
 router.put('/update-password', userMiddleware, userController.updatePassword)

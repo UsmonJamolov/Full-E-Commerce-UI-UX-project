@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -11,40 +11,71 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
-export default function SignInSection() {
+function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const rawCallback = searchParams.get("callbackUrl") || "/";
+  const callbackUrl =
+    rawCallback.startsWith("/") && !rawCallback.startsWith("//")
+      ? rawCallback
+      : "/";
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      phone: "+7",
+      phone: "",
       password: "",
     },
   });
 
   const onSubmit = async (values: { phone: string; password: string }) => {
-  const res = await login(values);
+    setIsLoading(true);
+    try {
+      const res = await login(values);
 
-  if (!res?.data?.success) {
-    console.log(res?.data?.message);
-    return;
-  }
+      if (res?.serverError) {
+        toast.error(res.serverError);
+        return;
+      }
+      if (res?.validationErrors) {
+        toast.error("Ma'lumotlarni tekshiring");
+        return;
+      }
 
-  const userId = res?.data?.user?._id;
+      if (!res?.data?.success) {
+        toast.error(res?.data?.message || "Login muvaffaqiyatsiz");
+        return;
+      }
 
-  if (!userId) {
-    console.log("User ID topilmadi");
-    return;
-  }
+      const userId = res.data.user?._id;
+      if (!userId) {
+        toast.error("Foydalanuvchi ma'lumotlari topilmadi");
+        return;
+      }
 
-  if (res.data.user) {
-			toast.success('Logged in successfully')
-			signIn('credentials', { userId: res.data.user._id, callbackUrl: '/' })
-		}
+      const signInResult = await signIn("credentials", {
+        userId: String(userId),
+        redirect: false,
+        callbackUrl,
+      });
 
-  console.log("Login bo'ldi");
-};
+      if (signInResult?.error) {
+        toast.error(signInResult.error);
+        return;
+      }
+
+      toast.success("Muvaffaqiyatli kirdingiz");
+      window.location.assign(callbackUrl);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onInvalid = () => {
+    toast.error("Telefon va parolni to‘g‘ri kiriting");
+  };
 
   return (
     <section className="w-full flex justify-center px-6 py-16">
@@ -60,7 +91,7 @@ export default function SignInSection() {
           </p>
 
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit, onInvalid)}
             className="space-y-5"
           >
 
@@ -97,9 +128,10 @@ export default function SignInSection() {
             {/* BUTTON */}
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full bg-red-500 hover:bg-red-600 h-11"
             >
-              {isLoading ? "Loading..." : "Login"}
+              {isLoading ? "Kutilmoqda..." : "Login"}
             </Button>
 
             {/* LINKS */}
@@ -117,5 +149,19 @@ export default function SignInSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <section className="w-full flex justify-center px-6 py-16">
+          <p className="text-muted-foreground">Yuklanmoqda...</p>
+        </section>
+      }
+    >
+      <SignInForm />
+    </Suspense>
   );
 }

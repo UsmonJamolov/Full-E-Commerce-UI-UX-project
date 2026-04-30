@@ -55,22 +55,49 @@ export interface GetProductsActionReturnType {
 export interface IProduct {
 	title: string
 	category: string
+	targetGroup?: 'Erkak' | 'Ayol' | 'Bola'
 	price: number
 	image: string
 	description: string
 	imageKey: string
 	_id: string
-	reviews: number
+	reviews: IProductReview[]
+	reviewCount?: number
+	ratingAverage?: number
+	isNew?: boolean
 	cta?: boolean
+}
+
+export interface IProductReview {
+	_id: string
+	user: string
+	userName: string
+	rating: number
+	comment: string
+	adminReply?: string
+	createdAt: string
+	updatedAt: string
+}
+
+export interface IAdminReviewItem {
+	productId: string
+	productTitle: string
+	reviewId: string
+	userName: string
+	rating: number
+	comment: string
+	adminReply: string
+	createdAt: string
 }
 
 // export type SafeUser = Omit<IUser, "password">
 
-export type SafeUser = Partial<Omit<IUser, "password">> & {
+export type SafeUser = Partial<Omit<IUser, "password" | "favorites">> & {
   _id: string
   phone: string
   name: string
   role: string
+  favorites?: IProduct[] | string[]
 }
 
 export interface IUser {
@@ -110,4 +137,12 @@ export interface ITransaction {
 	cancel_time: number
 	reason: number
 	provider: string
+}
+
+export interface IPurchaseItem {
+	_id: string
+	name: string
+	status: 'pending' | 'approved'
+	createdAt: string
+	updatedAt: string
 }

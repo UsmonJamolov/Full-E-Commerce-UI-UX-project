@@ -50,8 +50,10 @@ export const productSchema = z.object({
 	price: z.string(),
 	description: z.string().min(10, { message: 'Description must be at least 10 characters' }),
 	category: z.string(),
+	targetGroup: z.enum(['Erkak', 'Ayol', 'Bola']),
 	image: z.string(),
 	imageKey: z.string(),
+	isNew: z.boolean().optional(),
 })
 
 export const uploadSchema = z.object({
@@ -64,6 +66,47 @@ export const uploadSchema = z.object({
 export const updateProductSchema = z.object({ id: z.string() }).merge(productSchema)
 
 export const idSchema = z.object({ id: z.string() })
+
+export const categoryNameSchema = z.object({
+	name: z.string().min(1, 'Nom kiriting').max(80).trim(),
+})
+
+export const categoryUpdateSchema = z.object({
+	id: z.string(),
+	name: z.string().min(1, 'Nom kiriting').max(80).trim(),
+})
+
+export const purchaseItemSchema = z.object({
+	name: z.string().min(2, 'Tovar nomi kamida 2 harf bo‘lsin').max(120),
+})
+
+export const purchaseItemStatusSchema = z.object({
+	status: z.enum(['pending', 'approved']).optional(),
+})
+
+export const updatePurchaseItemSchema = z.object({
+	id: z.string(),
+	name: z.string().min(2, 'Tovar nomi kamida 2 harf bo‘lsin').max(120),
+})
+
+export const productReviewSchema = z.object({
+	id: z.string(),
+	rating: z.number().min(1).max(5),
+	comment: z.string().min(2, 'Izoh juda qisqa').max(500),
+})
+
+export const adminUpdateReviewSchema = z.object({
+	productId: z.string(),
+	reviewId: z.string(),
+	comment: z.string().min(2).max(500),
+	rating: z.number().min(1).max(5),
+	adminReply: z.string().max(500).optional(),
+})
+
+export const adminDeleteReviewSchema = z.object({
+	productId: z.string(),
+	reviewId: z.string(),
+})
 
 export const passwordSchema = z
 	.object({
@@ -80,6 +123,7 @@ export const searchParamsSchema = z.object({
 	searchQuery: z.string().optional(),
 	filter: z.string().optional(),
 	category: z.string().optional(),
+	targetGroup: z.string().optional(),
 	page: z.string().default('1'),
 	pageSize: z.string().default('6'),
 })
@@ -93,3 +137,11 @@ export const updateUserSchema = z.object({
 })
 
 export const updateStatusSchema = z.object({ status: z.string() }).merge(idSchema)
+
+export const buyNowSettingsSchema = z.object({
+	targetDate: z.string().optional(),
+	image: z.string().optional(),
+	imageKey: z.string().optional(),
+	isTimerVisible: z.boolean().optional(),
+	isTimerPaused: z.boolean().optional(),
+})

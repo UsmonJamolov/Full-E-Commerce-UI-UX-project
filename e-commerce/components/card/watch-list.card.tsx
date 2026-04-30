@@ -47,7 +47,7 @@ const WatchListCard: FC<Props> = ({ product }) => {
 					<h1 className='font-bold'>{product.title}</h1>
 						<p className='font-medium'>{formatPrice(+product.price!)}</p>
 				</div>
-				<p className='text-xs text-muted-foreground leading-1 line-clamp-5'>{product.category}</p>
+				<p className='text-xs text-muted-foreground leading-4 line-clamp-3'>{product.description}</p>
 			</div>
 		</div>
 	)

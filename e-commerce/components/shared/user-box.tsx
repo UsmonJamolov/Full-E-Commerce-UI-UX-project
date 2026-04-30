@@ -35,7 +35,7 @@ const UserBox: FC<Props> = ({ user }) => {
 		<>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Avatar className='cursor-pointer'>
+					<Avatar className='h-10 w-10 cursor-pointer'>
 						<AvatarImage src={user.avatar} alt={user.name} />
 						<AvatarFallback className='capitalize bg-primary text-white'>{user.name.charAt(0)}</AvatarFallback>
 					</Avatar>
@@ -45,7 +45,7 @@ const UserBox: FC<Props> = ({ user }) => {
 					<DropdownMenuSeparator />
 					{user.role === 'admin' && (
 						<DropdownMenuItem className='cursor-pointer' asChild>
-							<Link href={'/admin'}>Admin</Link>
+							<Link href={'/admin/products'}>Admin</Link>
 						</DropdownMenuItem>
 					)}
 					<DropdownMenuItem className='cursor-pointer' asChild>

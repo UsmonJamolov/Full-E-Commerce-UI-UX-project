@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import {useAction} from '@/hooks/use-action'
 import { useProduct } from '@/hooks/use-product'
 import { formatPrice } from '@/lib/utils'
@@ -55,42 +54,41 @@ const ProductCard: FC<Props> = ({ product }) => {
 	}
 
 	return (
-		<div className={'border relative flex justify-between flex-col'}>
-			<div className='bg-secondary relative'>
-				<Image src={product.image!} width={200} height={200} className='mx-auto' alt={product.title!} unoptimized />
-				<Badge className='absolute top-0 left-0'>{product.category}</Badge>
-			</div>
-
-			<div className='p-2'>
-				<div className='flex justify-between items-center text-sm'>
-					<h1 className='font-bold'>{product.title}</h1>
-					<p className='font-medium'>{formatPrice(product.price!)}</p>
+		<div className='rounded-lg border bg-white p-3'>
+			<div className='flex flex-col gap-3 md:flex-row md:items-center'>
+				<div className='relative h-28 w-full overflow-hidden rounded-md bg-secondary md:w-32'>
+					<Image src={product.image!} fill className='object-contain p-2' alt={product.title!} unoptimized />
 				</div>
-				<p className='text-xs text-muted-foreground leading-1 line-clamp-5'>{product.description}</p>
-				<Separator className='my-2' />
-			</div>
-
-			<div className='grid grid-cols-2 gap-2 px-2 pb-2'>
-				<Button variant={'secondary'} onClick={onEdit}>
-					Edit
-				</Button>
-				<AlertDialog>
-					<AlertDialogTrigger asChild>
-						<Button variant={'outline'}>Delete</Button>
-					</AlertDialogTrigger>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-							<AlertDialogDescription>
-								This action cannot be undone. This will permanently delete your account and remove your data from our servers.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={onDelete} disabled={isLoading}>Continue</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
+				<div className='min-w-0 flex-1'>
+					<div className='mb-2 flex flex-wrap items-center gap-2'>
+						<Badge variant='secondary'>{product.category}</Badge>
+						<p className='text-sm font-semibold'>{formatPrice(product.price!)}</p>
+					</div>
+					<h1 className='line-clamp-1 text-base font-bold'>{product.title}</h1>
+					<p className='mt-1 line-clamp-2 text-sm text-muted-foreground'>{product.description}</p>
+				</div>
+				<div className='grid grid-cols-2 gap-2 md:w-[200px]'>
+					<Button variant={'secondary'} onClick={onEdit}>
+						Edit
+					</Button>
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button variant={'outline'}>Delete</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+								<AlertDialogDescription>
+									This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+								<AlertDialogAction onClick={onDelete} disabled={isLoading}>Continue</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+				</div>
 			</div>
 		</div>
 	)

@@ -1,14 +1,18 @@
 import { ChildProps } from '@/types'
 import { FC } from 'react'
+import AdminHeader from './_components/admin-header'
 import Sidebar from './_components/sidebar'
 
 const Layout: FC<ChildProps> = ({ children }) => {
 	return (
-		<div className='grid grid-cols-3 gap-4 pt-5'>
-			<div className='col-span-1'>
-				<Sidebar />
+		<div data-admin-layout>
+			<AdminHeader />
+			<div className='mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 px-4 py-6 md:grid-cols-[260px_minmax(0,1fr)]'>
+				<aside className='md:sticky md:top-20 md:h-fit'>
+					<Sidebar />
+				</aside>
+				<main>{children}</main>
 			</div>
-			<div className='col-span-2 pb-10'>{children}</div>
 		</div>
 	)
 }
