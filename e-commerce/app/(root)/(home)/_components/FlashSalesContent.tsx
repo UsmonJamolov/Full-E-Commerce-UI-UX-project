@@ -3,16 +3,19 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import ProductCard from "@/components/card/product.card";
+import ProductCard from "@/components/card/product-card";
 import { IProduct, SearchParams } from "@/types";
 import Link from "next/link";
 
 interface Props {
   products: IProduct[]
   searchParams: SearchParams
+  title: string
+  noProducts: string
+  viewAllLabel: string
 }
 
-const FlashSalesContent = ({ products, searchParams }: Props) => {
+const FlashSalesContent = ({ products, searchParams, title, noProducts, viewAllLabel }: Props) => {
 
   console.log('FlashSalesContent - ', products);
   console.log('FlashSalesContent - ', searchParams);
@@ -37,22 +40,22 @@ const FlashSalesContent = ({ products, searchParams }: Props) => {
       <div className="mx-auto w-full max-w-6xl px-2 sm:px-4">
 
         {/* Header */}
-        <div className="flex justify-between">
-          <h2 className="text-2xl md:text-4xl">Erkaklar oyoq kiyimi</h2>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <h2 className="text-xl sm:text-2xl md:text-4xl">{title}</h2>
 
-          <div className="flex gap-2">
-            <Button onClick={() => scrollByCards("prev")}>
+          <div className="flex shrink-0 gap-2 self-end sm:self-auto">
+            <Button type="button" size="icon" onClick={() => scrollByCards('prev')} aria-label="Previous">
               <ArrowLeft />
             </Button>
-            <Button onClick={() => scrollByCards("next")}>
+            <Button type="button" size="icon" onClick={() => scrollByCards('next')} aria-label="Next">
               <ArrowRight />
             </Button>
           </div>
         </div>
 
         {/* Products */}
-        <div ref={scrollerRef} className="flex gap-4 overflow-x-auto mt-5">
-          {products.length === 0 && <p>No products</p>}
+        <div ref={scrollerRef} className="mt-5 flex gap-4 overflow-x-auto no-scrollbar">
+          {products.length === 0 && <p>{noProducts}</p>}
 
           {products.map((p) => (
             <ProductCard key={p._id} product={p} />
@@ -61,7 +64,7 @@ const FlashSalesContent = ({ products, searchParams }: Props) => {
 
         <div className="flex justify-center mt-8">
           <Button asChild className="bg-red-500 hover:bg-red-600 text-white px-8 h-12 text-base rounded">
-            <Link href="/shoes-products">View All Products</Link>
+            <Link href="/shoes-products">{viewAllLabel}</Link>
           </Button>
         </div>
 

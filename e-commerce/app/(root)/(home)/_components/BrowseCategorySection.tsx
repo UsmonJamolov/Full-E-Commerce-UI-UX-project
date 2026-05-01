@@ -3,35 +3,62 @@
 import {
   ArrowLeft,
   ArrowRight,
-  Smartphone,
-  Monitor,
-  Watch,
-  Camera as CameraIcon,
-  Headphones,
-  Gamepad2,
+  Footprints,
+  Shirt,
+  Umbrella,
+  Handbag,
+  Backpack,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 type Category = {
   label: string;
   icon: React.ReactNode;
 };
 
+const JacketIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 64 64"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M26 8c2-2 10-2 12 0l2 4 6 2 9 12-2 28H37V36h-10v18H11L9 26l9-12 6-2 2-4Z" />
+    <path d="M18 14l8 12" />
+    <path d="M46 14l-8 12" />
+    <path d="M32 20v34" />
+    <path d="M32 8v12" />
+    <path d="M29 8h6" />
+    <path d="M26.5 26v10" />
+    <path d="M37.5 26v10" />
+    <path d="M22 40l-3 8" />
+    <path d="M42 40l3 8" />
+    <path d="M12 54h14" />
+    <path d="M38 54h14" />
+  </svg>
+);
+
 const categories: Category[] = [
-  { label: "Phones", icon: <Smartphone size={40} /> },
-  { label: "Computers", icon: <Monitor size={40} /> },
-  { label: "SmartWatch", icon: <Watch size={40} /> },
-  { label: "Camera", icon: <CameraIcon size={40} /> },
-  { label: "HeadPhones", icon: <Headphones size={40} /> },
-  { label: "Gaming", icon: <Gamepad2 size={40} /> },
+  { label: "Oyoq kiyim", icon: <Footprints size={40} /> },
+  { label: "Futbolka", icon: <Shirt size={40} /> },
+  { label: "Kurtka", icon: <JacketIcon /> },
+  { label: "Zontik", icon: <Umbrella size={40} /> },
+  { label: "Sumka", icon: <Handbag size={40} /> },
+  { label: "Ryukzak", icon: <Backpack size={40} /> },
 ];
 
-export default function BrowseCategorySection() {
-  const [selected, setSelected] = React.useState<number>(3); // default Camera
+export default function BrowseCategorySection({ categoriesLabel, title }: { categoriesLabel: string; title: string }) {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Kategoriya cardlarini scroll qilish uchun
   const scrollByCards = (dir: "prev" | "next") => {
@@ -39,6 +66,10 @@ export default function BrowseCategorySection() {
     if (!el) return;
     const amount = Math.round(el.clientWidth * 0.9);
     el.scrollBy({ left: dir === "next" ? amount : -amount, behavior: "smooth" });
+  };
+
+  const onCategoryClick = (index: number) => {
+    router.push(index === 0 ? "/shoes-products" : "/explore-products");
   };
 
   return (
@@ -50,9 +81,9 @@ export default function BrowseCategorySection() {
             {/* Title */}
             <div className="flex items-center gap-2">
               <div className="h-7 w-4 rounded bg-red-500" />
-              <span className="text-red-500 text-[15px] font-semibold">Categories</span>
+              <span className="text-red-500 text-[15px] font-semibold">{categoriesLabel}</span>
             </div>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold">Browse By Category</h2>
+            <h2 className="mt-3 text-3xl md:text-4xl font-bold">{title}</h2>
           </div>
           <div className="flex items-center gap-3 pt-2">
             <Button
@@ -88,22 +119,17 @@ export default function BrowseCategorySection() {
               className={cn(
                 `w-[170px] h-[150px] flex flex-col justify-center items-center gap-3 cursor-pointer transition
                  border-2 bg-white shadow-none min-w-[150px]
-                 hover:border-red-400 focus-visible:ring-red-500`,
-                selected === i
-                  ? "bg-red-500 border-red-500 text-white"
-                  : "border-gray-200 text-black"
+                 hover:bg-red-500 hover:text-white focus-visible:ring-red-500`,
+                "border-red-500 text-red-500"
               )}
               tabIndex={0}
-              onClick={() => setSelected(i)}
+              onClick={() => onCategoryClick(i)}
             >
-              <span className={cn("transition", selected === i ? "text-white" : "text-black")}>
+              <span className="transition-colors">
                 {cat.icon}
               </span>
               <span
-                className={cn(
-                  "mt-1 font-medium text-base transition",
-                  selected === i ? "text-white" : "text-black"
-                )}
+                className="mt-1 font-medium text-base transition-colors"
               >
                 {cat.label}
               </span>

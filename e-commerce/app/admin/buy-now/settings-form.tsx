@@ -56,7 +56,7 @@ const BuyNowSettingsForm = ({
 
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		if (!value) return onError('Vaqtni kiriting')
+		if (!value) return onError('Укажите время')
 
 		setIsLoading(true)
 		let finalImage = imageUrl
@@ -72,7 +72,7 @@ const BuyNowSettingsForm = ({
 
 			if (!uploaded?.data?.url) {
 				setIsLoading(false)
-				return onError('Image upload failed')
+				return onError('Не удалось загрузить изображение')
 			}
 
 			finalImage = uploaded.data.url
@@ -88,14 +88,14 @@ const BuyNowSettingsForm = ({
 		})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setIsLoading(false)
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			setIsLoading(false)
 			return onError(res.data.failure)
 		}
 
-		toast.success('Timer updated')
+		toast.success('Таймер обновлен')
 		setImageUrl(finalImage)
 		setImageKey(finalImageKey)
 		setSelectedFile(null)
@@ -114,10 +114,10 @@ const BuyNowSettingsForm = ({
 		})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setIsLoading(false)
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		setIsTimerVisible(next)
-		toast.success(next ? 'Timer ko‘rinadi' : 'Timer yashirildi')
+		toast.success(next ? 'Таймер показан' : 'Таймер скрыт')
 		setIsLoading(false)
 	}
 
@@ -133,10 +133,10 @@ const BuyNowSettingsForm = ({
 		})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setIsLoading(false)
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		setIsTimerPaused(next)
-		toast.success(next ? 'Timer to‘xtatildi' : 'Timer ishga tushdi')
+		toast.success(next ? 'Таймер остановлен' : 'Таймер запущен')
 		setIsLoading(false)
 	}
 
@@ -156,14 +156,14 @@ const BuyNowSettingsForm = ({
 				</div>
 			)}
 			<Button type='submit' disabled={isLoading}>
-				Save timer
+				Сохранить таймер
 			</Button>
 			<div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
 				<Button type='button' variant='outline' disabled={isLoading} onClick={onToggleVisibility}>
-					{isTimerVisible ? 'Timerni yashirish' : 'Timerni ko‘rsatish'}
+					{isTimerVisible ? 'Скрыть таймер' : 'Показать таймер'}
 				</Button>
 				<Button type='button' variant='outline' disabled={isLoading} onClick={onTogglePause}>
-					{isTimerPaused ? 'Timerni davom ettirish' : 'Timerni to‘xtatish'}
+					{isTimerPaused ? 'Продолжить таймер' : 'Остановить таймер'}
 				</Button>
 			</div>
 		</form>

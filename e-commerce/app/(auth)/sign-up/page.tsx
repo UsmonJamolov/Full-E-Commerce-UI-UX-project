@@ -1,8 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import { useState } from 'react'
-import { signIn, signOut } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
 
 import { sendOtp, verifyOtp, register } from '@/actions/auth.action'
@@ -235,24 +234,8 @@ const SignUpPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center px-4 py-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-6xl bg-white">
-        {/* LEFT IMAGE */}
-        <div className="hidden md:flex items-center justify-center bg-[#eef5fb] p-8">
-          <Image
-            src="/images/auth.png"
-            alt="auth"
-            width={600}
-            height={600}
-            className="object-contain"
-            priority
-          />
-        </div>
-
-        {/* RIGHT FORM */}
-        <div className="flex items-center justify-center p-4 md:p-10">
-          <Card className="w-full max-w-md p-6 shadow-none border">
-            <h1 className="text-3xl font-bold">Sign Up</h1>
+    <Card className="w-full border bg-card p-8 shadow-sm md:p-10">
+            <h1 className="text-3xl font-bold tracking-tight">Sign Up</h1>
             <p className="text-sm text-muted-foreground mt-2">
               Telefon raqamingiz orqali ro‘yxatdan o‘ting
             </p>
@@ -367,10 +350,7 @@ const SignUpPage = () => {
                 </Button>
               </div>
             )}
-          </Card>
-        </div>
-      </div>
-    </div>
+    </Card>
   )
 }
 

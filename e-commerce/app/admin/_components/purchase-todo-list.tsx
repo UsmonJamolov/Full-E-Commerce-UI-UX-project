@@ -26,13 +26,13 @@ const PurchaseTodoList = ({ items }: Props) => {
 		setIsLoading(true)
 		const res = await createPurchaseItem({ name })
 		if (res?.serverError || res?.validationErrors || !res?.data) {
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			return onError(res.data.failure)
 		}
 		setName('')
-		toast.success('Tovar ro‘yxatga qo‘shildi')
+		toast.success('Товар добавлен в список')
 		router.refresh()
 		setIsLoading(false)
 	}
@@ -42,13 +42,13 @@ const PurchaseTodoList = ({ items }: Props) => {
 		const res = await approvePurchaseItem({ id })
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setApprovingId('')
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			setApprovingId('')
 			return onError(res.data.failure)
 		}
-		toast.success('Sotib olishga tasdiqlandi')
+		toast.success('Закупка подтверждена')
 		router.refresh()
 		setApprovingId('')
 	}
@@ -56,9 +56,9 @@ const PurchaseTodoList = ({ items }: Props) => {
 	return (
 		<div className='space-y-4 rounded-lg border bg-white p-4'>
 			<div>
-				<h1 className='text-2xl font-bold'>Yangi sotib olinadigan tovarlar</h1>
+				<h1 className='text-2xl font-bold'>Новые заявки на закупку</h1>
 				<p className='text-sm text-muted-foreground'>
-					Sotuvchi tugab qolgan mahsulot nomini kiritadi. Tasdiqlangan tovarlar alohida bo‘limga o‘tadi.
+					Продавец добавляет закончившиеся товары. Подтвержденные позиции переходят в отдельный раздел.
 				</p>
 			</div>
 
@@ -66,18 +66,18 @@ const PurchaseTodoList = ({ items }: Props) => {
 				<Input
 					value={name}
 					onChange={e => setName(e.target.value)}
-					placeholder='Masalan: iPhone 15 Pro max original'
+					placeholder='Например: iPhone 15 Pro max original'
 					disabled={isLoading}
 				/>
 				<Button type='submit' disabled={isLoading || !name.trim()}>
 					<Plus />
-					Qo‘shish
+					Добавить
 					{isLoading && <Loader2 className='animate-spin' />}
 				</Button>
 			</form>
 
 			<div className='space-y-2'>
-				{items.length === 0 && <p className='text-sm text-muted-foreground'>Hozircha pending tovarlar yo‘q.</p>}
+				{items.length === 0 && <p className='text-sm text-muted-foreground'>Пока нет товаров в ожидании.</p>}
 				<PurchaseItemList items={items} onApprove={onApprove} approvingId={approvingId} />
 			</div>
 		</div>

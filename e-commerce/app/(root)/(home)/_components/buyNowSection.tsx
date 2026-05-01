@@ -124,7 +124,17 @@ function useCountdown(target: Date | null, isPaused: boolean, pausedRemainingSec
   return { days, hours, minutes, seconds };
 }
 
-export default function MusicBannerSection() {
+export default function MusicBannerSection({
+  tag,
+  title,
+  ctaLabel,
+  timerLabels,
+}: {
+  tag: string
+  title: string
+  ctaLabel: string
+  timerLabels: { days: string; hours: string; minutes: string; seconds: string }
+}) {
   const [target, setTarget] = React.useState<Date | null>(null);
   const [bannerImage, setBannerImage] = React.useState('/images/krosovkalar1.png')
   const [isTimerVisible, setIsTimerVisible] = React.useState(true)
@@ -162,49 +172,49 @@ export default function MusicBannerSection() {
   const { days, hours, minutes, seconds } = useCountdown(target, isTimerPaused, pausedRemainingSeconds);
 
   return (
-    <section className="w-full flex justify-center items-center py-4 xs:py-8 md:py-12 mt-4 md:mt-10 relative -z-10">
+    <section className="w-full flex justify-center items-center py-4 xs:py-8 md:py-12 mt-4 md:mt-10 relative z-0">
       <div className={`
         w-full max-w-6xl 
         bg-black 
         flex flex-col md:flex-row
-        relative overflow-hidden
+        relative overflow-hidden isolate
         items-stretch
         shadow-md
         md:aspect-[2.1/1]
       `}>
         {/* LEFT CONTENT */}
         <div className="
-          flex-1 flex flex-col justify-center 
+          relative z-10 flex-1 flex flex-col justify-center 
           px-3 xs:px-6 md:px-14 
-          py-6 xs:py-10 gap-4 xs:gap-8 z-10
+          py-6 xs:py-10 gap-4 xs:gap-8
         ">
           <span className="text-green-400 text-[15px] xs:text-[17px] font-semibold mb-2">
-            Bugungi so&apos;z
+            {tag}
           </span>
           <h2 className="text-white text-2xl xs:text-3xl md:text-5xl font-bold leading-tight max-w-[24ch] select-none">
-            Enhance Your <br /> Music Experience
+            {title}
           </h2>
           {/* TIMER BLOK */}
           {isTimerVisible && (
           <div className="flex flex-wrap gap-3 xs:gap-5 md:gap-7 mt-3 xs:mt-4 mb-3 xs:mb-5">
-            <TimeBubble value={format2(days)} label="Days" />
-            <TimeBubble value={format2(hours)} label="Hours" />
-            <TimeBubble value={format2(minutes)} label="Minutes" />
-            <TimeBubble value={format2(seconds)} label="Seconds" />
+            <TimeBubble value={format2(days)} label={timerLabels.days} />
+            <TimeBubble value={format2(hours)} label={timerLabels.hours} />
+            <TimeBubble value={format2(minutes)} label={timerLabels.minutes} />
+            <TimeBubble value={format2(seconds)} label={timerLabels.seconds} />
           </div>
           )}
-          <Button asChild className="bg-green-500 text-white hover:bg-green-600 duration-150 rounded-md w-full xs:w-[170px] h-11 xs:h-12 text-base xs:text-lg font-normal mt-2">
-            <Link href="/contacts">Buy Now!</Link>
+          <Button asChild className="relative z-20 bg-green-500 text-white hover:bg-green-600 duration-150 rounded-md w-full xs:w-[170px] h-11 xs:h-12 text-base xs:text-lg font-normal mt-2">
+            <Link href="/contacts">{ctaLabel}</Link>
           </Button>
         </div>
         {/* PRODUCT IMAGE */}
-        <div className="flex-1 flex items-center justify-center relative px-1 xs:px-2 md:px-8 select-none min-h-[160px] xs:min-h-[220px] md:min-h-0">
+        <div className="relative z-0 flex-1 flex items-center justify-center px-1 xs:px-2 md:px-8 select-none min-h-[160px] xs:min-h-[220px] md:min-h-0">
           <Image 
             src={bannerImage}
             alt="Music Speaker"
             width={500}
             height={330}
-            className="object-contain w-full max-w-[320px] xs:max-w-[400px] md:max-w-[480px] drop-shadow-lg"
+            className="object-contain w-full max-w-[320px] xs:max-w-[400px] md:max-w-[480px] drop-shadow-lg pointer-events-none"
             priority
             unoptimized
           />

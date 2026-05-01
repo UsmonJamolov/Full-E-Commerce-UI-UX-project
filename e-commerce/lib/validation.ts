@@ -145,3 +145,28 @@ export const buyNowSettingsSchema = z.object({
 	isTimerVisible: z.boolean().optional(),
 	isTimerPaused: z.boolean().optional(),
 })
+
+export const newArrivalCardSchema = z.object({
+	title: z.string().min(1, 'Sarlavha kiriting').max(120),
+	desc: z.string().min(1, 'Tavsif kiriting').max(400),
+	image: z.string().min(1, 'Rasm URL yoki yuklash kerak'),
+	imageKey: z.string().optional(),
+})
+
+export const newArrivalSettingsSchema = z.object({
+	cards: z.array(newArrivalCardSchema).length(4),
+})
+
+export const headerSettingsSchema = z.object({
+	locationLabel: z.string().min(1, 'Joylashuv kiriting').max(120),
+})
+
+export const footerSettingsSchema = z.object({
+	phonePrimary: z.string().min(7).max(30),
+	phoneSecondary: z.string().min(7).max(30),
+	supportHours: z.string().min(3).max(80),
+	email: z.string().email().max(120),
+	telegramUrl: z.string().url().max(240),
+	maxMessengerUrl: z.string().url().max(240),
+	brandBlurb: z.string().min(10).max(500),
+})

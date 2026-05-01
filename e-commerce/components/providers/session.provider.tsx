@@ -3,10 +3,15 @@
 import { ChildProps } from '@/types'
 import { SessionProvider as Session } from 'next-auth/react'
 import { FC, Suspense } from 'react'
+import { Session as NextAuthSession } from 'next-auth'
 
-const SessionProvider: FC<ChildProps> = ({ children }) => {
+type Props = ChildProps & {
+	session?: NextAuthSession | null
+}
+
+const SessionProvider: FC<Props> = ({ children, session }) => {
 	return (
-	 <Session>
+	 <Session session={session} refetchInterval={0} refetchOnWindowFocus={false}>
 		<Suspense>{children}</Suspense>
 	</Session>
 	)

@@ -1,5 +1,5 @@
 import { getProducts } from '@/actions/user.action'
-import ProductCard from '@/components/card/product.card'
+import ProductCard from '@/components/card/product-card'
 import Pagination from '@/components/shared/pagination'
 import { SearchParams } from '@/types'
 import { FC } from 'react'

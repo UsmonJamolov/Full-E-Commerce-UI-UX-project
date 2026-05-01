@@ -17,42 +17,6 @@ export const categories = [
   "Health & Beauty",
 ];
 
-// Slider bannerlar ma'lumoti
-export const slides = [
-  {
-    title: "Кроссовки, лоферы, ботинки",
-    text: "Мужская и женская обувь от 900 рублей.",
-    image:
-      "/images/kv banner.png",
-    alt: "Кроссовки, лоферы, ботинки",
-    link: "#",
-  },
-  {
-    title: "Автоматические и полуавтоматические зонты",
-    text: "От 700 рублей.",
-    image:
-      "/images/zontik banner.png",
-    alt: "Автоматические и полуавтоматические зонты",
-    link: "#",
-  },
-  {
-    title: "Детская обувь",
-    text: "От 600 рублей.",
-    image:
-      "/images/dets-kros banner.png",
-    alt: "Детская обувь",
-    link: "#",
-  },
-  {
-    title: "Сумки и рюкзаки",
-    text: "Сумки и рюкзаки по 800 рублей.",
-    image:
-      "/images/sumka, ryukzaklar.png",
-    alt: "Сумки и рюкзаки по 800 рублей.",
-    link: "#",
-  },
-];
-
 export const products = [
     { id: "1", title: "HAVIT HV-G92 Gamepad", image: "/images/gamepad.png", discountPercent: 40, price: 120, oldPrice: 160, rating: 5, reviews: 88, cta: true },
     { id: "2", title: "AK-900 Wired Keyboard", image: "/images/keyboard.png", discountPercent: 35, price: 960, oldPrice: 1160, rating: 4, reviews: 75, cta: true, },

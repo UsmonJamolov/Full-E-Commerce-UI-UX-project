@@ -15,6 +15,9 @@ import {
 	updatePurchaseItemSchema,
 	productSchema,
 	buyNowSettingsSchema,
+	footerSettingsSchema,
+	headerSettingsSchema,
+	newArrivalSettingsSchema,
 	searchParamsSchema,
 	updateProductSchema,
 	uploadSchema,
@@ -306,6 +309,84 @@ export const updateBuyNowSettingsAdmin = actionClient
 			headers: { Authorization: `Bearer ${token}` },
 		})
 		revalidatePath('/admin/buy-now')
+		revalidatePath('/admin/header-settings')
 		revalidatePath('/')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export type NewArrivalCard = { title: string; desc: string; image: string; imageKey?: string }
+
+export const getNewArrivalSettingsAdmin = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.get('/api/admin/new-arrival', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as { cards: NewArrivalCard[]; failure?: string }
+})
+
+export const updateNewArrivalSettingsAdmin = actionClient
+	.schema(newArrivalSettingsSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put('/api/admin/new-arrival', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/admin/new-arrival')
+		revalidatePath('/')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const getHeaderSettingsAdmin = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.get('/api/admin/header-settings', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as { locationLabel?: string }
+})
+
+export const updateHeaderSettingsAdmin = actionClient
+	.schema(headerSettingsSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put('/api/admin/header-settings', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/admin/header-settings')
+		revalidatePath('/admin/buy-now')
+		revalidatePath('/', 'layout')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export const getFooterSettingsAdmin = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.get('/api/admin/footer-settings', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as {
+		phonePrimary?: string
+		phoneSecondary?: string
+		supportHours?: string
+		email?: string
+		telegramUrl?: string
+		maxMessengerUrl?: string
+		brandBlurb?: string
+	}
+})
+
+export const updateFooterSettingsAdmin = actionClient
+	.schema(footerSettingsSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put('/api/admin/footer-settings', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/admin/buy-now')
+		revalidatePath('/', 'layout')
 		return JSON.parse(JSON.stringify(data))
 	})

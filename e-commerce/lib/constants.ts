@@ -1,4 +1,4 @@
-import { Barcode, Banknote, Heart, MessageSquare, PlusSquare, Settings2, ShoppingCart, Timer, User } from 'lucide-react'
+import { Barcode, Banknote, Heart, MapPin, MessageSquare, Settings2, ShoppingCart, Sparkles, User } from 'lucide-react'
 
 export const products = [
 	{
@@ -36,10 +36,34 @@ export const dashboardSidebar = [
 ]
 
 export const adminSidebar = [
-	{ name: 'Products', icon: Barcode, route: '/admin/products' },
-	{ name: "Qo'shimchalar", icon: PlusSquare, route: '/admin/additions' },
-	{ name: 'Buy now', icon: Timer, route: '/admin/buy-now' },
-	{ name: 'Yangi sotib olinadigan tovarlar', icon: ShoppingCart, route: '/admin/orders' },
-	{ name: 'Sotib olishga tasdiqlanganlar', icon: Banknote, route: '/admin/approved-purchases' },
-	{ name: 'Kommentariyalar', icon: MessageSquare, route: '/admin/comments' },
+	{
+		name: { ru: 'Товары', en: 'Products', uz: 'Mahsulotlar' },
+		icon: Barcode,
+		route: '/admin/products',
+	},
+	{
+		name: { ru: 'Новые поступления', en: 'New arrivals', uz: 'Yangi kelganlar' },
+		icon: Sparkles,
+		route: '/admin/new-arrival',
+	},
+	{
+		name: { ru: 'Настройки хедера и Buy now', en: 'Header & Buy now settings', uz: 'Header va Buy now sozlamalari' },
+		icon: MapPin,
+		route: '/admin/buy-now',
+	},
+	{
+		name: { ru: 'Новые заявки на закупку', en: 'New purchase requests', uz: 'Yangi xarid so‘rovlari' },
+		icon: ShoppingCart,
+		route: '/admin/orders',
+	},
+	{
+		name: { ru: 'Подтвержденные закупки', en: 'Approved purchases', uz: 'Tasdiqlangan xaridlar' },
+		icon: Banknote,
+		route: '/admin/approved-purchases',
+	},
+	{
+		name: { ru: 'Комментарии', en: 'Comments', uz: 'Kommentariyalar' },
+		icon: MessageSquare,
+		route: '/admin/comments',
+	},
 ]

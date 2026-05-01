@@ -26,37 +26,15 @@
 
 // export default AuthLayout
 
-import { ChildProps } from "@/types";
-import Image from "next/image";
-import { FC } from "react";
+import { ChildProps } from '@/types'
+import { FC } from 'react'
 
 const AuthLayout: FC<ChildProps> = ({ children }) => {
-  return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-2 min-h-[calc(100vh-200px)]">
-      
-      {/* LEFT SIDE */}
-      <div className="hidden md:flex items-center justify-center bg-[#EAF4FA]">
-        <div className="max-w-[500px] w-full flex justify-center">
-          <Image
-            src="/images/signup-banner.png"
-            alt="auth"
-            width={400}
-            height={400}
-            className="object-contain w-full h-auto"
-            priority
-          />
-        </div>
-      </div>
+	return (
+		<section className='flex min-h-[calc(100vh-200px)] w-full items-center justify-center bg-gradient-to-b from-background via-background to-muted/40 px-4 py-10 md:py-16'>
+			<div className='w-full max-w-xl'>{children}</div>
+		</section>
+	)
+}
 
-      {/* RIGHT SIDE */}
-      <div className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
-          {children}
-        </div>
-      </div>
-
-    </section>
-  );
-};
-
-export default AuthLayout;
+export default AuthLayout

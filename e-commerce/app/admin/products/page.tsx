@@ -28,8 +28,8 @@ const Page: FC<Props> = async (props) => {
 			<div className='rounded-lg border bg-white p-4'>
 				<div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
 					<div>
-						<h1 className='text-2xl font-bold'>Products</h1>
-						<p className='text-sm text-muted-foreground'>Mahsulotlarni qidiring, filterlang va boshqaring.</p>
+						<h1 className='text-2xl font-bold'>Товары</h1>
+						<p className='text-sm text-muted-foreground'>Ищите, фильтруйте и управляйте товарами.</p>
 					</div>
 					<AddProduct />
 				</div>
@@ -37,7 +37,7 @@ const Page: FC<Props> = async (props) => {
 				<Filter showCategory categoryOptions={categoryOptions} />
 			</div>
 			<div className='grid grid-cols-1 gap-3'>
-				{products && products.length === 0 && <p className='text-muted-foreground'>No products found</p>}
+				{products && products.length === 0 && <p className='text-muted-foreground'>Товары не найдены</p>}
 				{products && products.map(product => <ProductCard key={product._id} product={product} />)}
 			</div>
 

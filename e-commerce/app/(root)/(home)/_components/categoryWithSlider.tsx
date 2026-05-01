@@ -1,35 +1,52 @@
 "use client";
 
 import React from "react";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { categories, slides } from "@/components/constants";
+import Link from "next/link";
+import type { HomeSliderSlide, Locale } from "@/lib/i18n/dictionaries";
 
 // Slider asl komponenti
-export default function CategoryWithSlider() {
+export default function CategoryWithSlider({
+  locale,
+  ctaLabel,
+  sliderSlides,
+  sidebarCategories,
+}: {
+  locale: Locale
+  ctaLabel: string
+  sliderSlides: HomeSliderSlide[]
+  sidebarCategories: string[]
+}) {
   const [current, setCurrent] = React.useState(0);
+  const slideCount = sliderSlides.length || 1;
+  const slide = sliderSlides[Math.min(current, slideCount - 1)] ?? sliderSlides[0];
 
   // Auto slide - har 4 sekund
   React.useEffect(() => {
     const t = setInterval(() => {
-      setCurrent((i) => (i + 1) % slides.length);
+      setCurrent((i) => (i + 1) % slideCount);
     }, 4000);
     return () => clearInterval(t);
-  }, []);
-
-  // Sliderda chap/ongga bosish
-  const prev = () => setCurrent((i) => (i - 1 + slides.length) % slides.length);
-  const next = () => setCurrent((i) => (i + 1) % slides.length);
+  }, [slideCount]);
 
   // Dot bosilganda
   const goTo = (idx: number) => setCurrent(idx);
+  const localizedCategories = React.useMemo(
+    () =>
+      sidebarCategories.length > 0
+        ? sidebarCategories
+        : ["Women's fashion", "Men's fashion", "Children's fashion", 'Umbrellas', 'Bags', 'Backpacks', 'Clothes'],
+    [sidebarCategories],
+  );
 
   return (
-    <section className="w-full max-w-screen-xl mx-auto flex flex-col md:flex-row gap-4 md:gap-0 px-2 sm:px-4">
+    <section className="flex w-full min-w-0 flex-col md:flex-row md:items-stretch md:gap-0">
       {/* Categories */}
       <div
         className="
           w-full 
+          shrink-0
           md:w-[250px] 
           border-b md:border-b-0 md:border-r
           pt-2 md:pt-6
@@ -39,7 +56,7 @@ export default function CategoryWithSlider() {
         style={{ borderColor: "#E5E7EB" }}
       >
         <nav className="flex md:block overflow-x-auto md:overflow-visible">
-          {categories.map((cat, i) => (
+          {localizedCategories.map((cat, i) => (
             <div
               key={cat}
               className={[
@@ -56,40 +73,37 @@ export default function CategoryWithSlider() {
         </nav>
       </div>
       {/* Slider */}
-      <div className="flex-1 flex flex-col md:pl-8 pt-2 md:pt-6">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col pt-2 md:pt-6 md:pl-4 lg:pl-6">
         <div
           className="
-            relative flex flex-col md:flex-row items-center
-            -z-50
-            bg-black
-            h-[240px] xs:h-[270px] sm:h-[295px] md:h-[335px] w-full mt-0 
-            overflow-hidden
+            relative z-0 flex h-[240px] w-full flex-col bg-black overflow-hidden
+            xs:h-[270px] sm:h-[295px] md:h-[335px] md:flex-row md:items-stretch
           "
         >
           {/* Banner content */}
-          <div className="flex-1 flex flex-col justify-center items-start md:pl-12 pl-5 py-5 z-10">
+          <div className="z-10 flex flex-1 flex-col items-start justify-center py-5 pl-5 md:pl-8 lg:pl-12">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs xs:text-sm md:text-base font-semibold text-white">
-                {slides[current].title}
+                {slide.title}
               </span>
             </div>
             <div className="mb-5 xs:mb-6">
               <span className="block text-2xl xs:text-[30px] sm:text-[36px] md:text-[44px] leading-[1.1] font-bold text-white">
-                {slides[current].text}
+                {slide.text}
               </span>
             </div>
-            <a
-              href={slides[current].link}
+            <Link
+              href={slide.link}
               className="inline-flex items-center gap-2 text-sm md:text-base font-normal text-white underline underline-offset-8"
             >
-              Купить сейчас <ChevronRight className="h-5 w-5" />
-            </a>
+              {ctaLabel} <ChevronRight className="h-5 w-5" />
+            </Link>
           </div>
           {/* Banner image */}
-          <div className="flex-1 w-full flex items-end justify-end md:pr-10 md:pb-2 pr-3 pb-2 min-w-[140px] md:min-w-[240px]">
+          <div className="flex min-w-[140px] flex-1 items-end justify-end pb-2 pr-3 md:min-w-[200px] md:pb-2 md:pr-8 lg:pr-10">
             <Image
-              src={slides[current].image}
-              alt={slides[current].alt}
+              src={slide.image}
+              alt={slide.alt}
               width={190}
               height={180}
               className="object-contain w-[110px] xs:w-[130px] sm:w-[170px] md:w-[250px] h-auto"
@@ -99,7 +113,7 @@ export default function CategoryWithSlider() {
           </div>
           {/* Slider dots */}
           <div className="absolute left-1/2 bottom-3 xs:bottom-4 md:bottom-6 -translate-x-1/2 flex gap-2 md:gap-3 z-20">
-            {slides.map((_, idx) => (
+            {sliderSlides.map((_, idx) => (
               <button
                 key={idx}
                 aria-label={`Go to slide ${idx + 1}`}

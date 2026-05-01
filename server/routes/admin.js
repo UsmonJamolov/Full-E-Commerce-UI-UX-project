@@ -2,6 +2,9 @@ const adminController = require('../controllers/admin.controller')
 const categoryController = require('../controllers/category.controller')
 const purchaseController = require('../controllers/purchase.controller')
 const buyNowController = require('../controllers/buy-now.controller')
+const newArrivalController = require('../controllers/new-arrival.controller')
+const headerSettingsController = require('../controllers/header-settings.controller')
+const footerSettingsController = require('../controllers/footer-settings.controller')
 
 const router = require('express').Router()
 
@@ -25,5 +28,13 @@ router.put('/purchase-items/:id', purchaseController.updatePurchaseItem)
 router.delete('/purchase-items/:id', purchaseController.deletePurchaseItem)
 router.get('/buy-now-settings', buyNowController.getSettings)
 router.put('/buy-now-settings', buyNowController.updateSettings)
+
+router.get('/new-arrival', newArrivalController.getSettings)
+router.put('/new-arrival', newArrivalController.updateSettings)
+
+router.get('/header-settings', headerSettingsController.getSettings)
+router.put('/header-settings', headerSettingsController.updateSettings)
+router.get('/footer-settings', footerSettingsController.getSettings)
+router.put('/footer-settings', footerSettingsController.updateSettings)
 
 module.exports = router

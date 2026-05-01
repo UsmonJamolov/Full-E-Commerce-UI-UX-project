@@ -1,38 +1,55 @@
-import { ChildProps } from '@/types'
-import "./globals.css";
+import './globals.css'
 
-import { FC } from 'react';
-import Header from "@/components/header";
-import { Toaster } from '@/components/ui/sonner';
-import Footer from '@/components/footer';
+import { cookies } from 'next/headers'
+import { getServerSession } from 'next-auth'
+
+import { getProducts } from '@/actions/user.action'
 import SessionProvider from '@/components/providers/session.provider'
+import SiteChrome from '@/components/site-chrome'
+import { Toaster } from '@/components/ui/sonner'
+import { authOptions } from '@/lib/auth-options'
+import { getPublicFooterSettings } from '@/lib/footer-public'
+import { getPublicHeaderSettings } from '@/lib/header-public'
+import { getDictionary, parseLocale } from '@/lib/i18n/dictionaries'
+import { ChildProps } from '@/types'
 
-// export const metadata: Metadata = {
-//   title: "E-Commerce full project",
-//   description: "E-commerce website built with Next.js",
-//   icons: {icon: '/favicon.png'}
-// };
+const RootLayout = async ({ children }: ChildProps) => {
+  const [session, cookieStore, headerSettings, footerSettings, productsRes] = await Promise.all([
+    getServerSession(authOptions),
+    cookies(),
+    getPublicHeaderSettings(),
+    getPublicFooterSettings(),
+    getProducts({
+      searchQuery: '',
+      filter: 'newest',
+      category: '',
+      targetGroup: '',
+      page: '1',
+      pageSize: '40',
+    }),
+  ])
+  const locale = parseLocale(cookieStore.get('locale')?.value)
+  const dictionary = getDictionary(locale)
+  const searchItems = productsRes?.data?.products || []
 
-const RootLayout: FC<ChildProps> = ({ children }) => {
   return (
-    <html lang='en'>
-        <body className='antialised'>
-        <SessionProvider>
-                <div className='site-global-header relative z-50 sticky top-0'>
-                  <Header />
-                </div>
-                <div className="site-main-wrapper flex flex-col justify-center items-center">
-                  <main className="site-main-content container max-w-6xl">
-                      {children}
-                  </main>
-                </div>
-              <div className="site-global-footer">
-                <Footer />
-              </div>
+    <html lang={locale}>
+      <body className='antialised'>
+        <SessionProvider session={session}>
+          <SiteChrome
+            locale={locale}
+            dictionary={dictionary}
+            locationLabel={headerSettings.locationLabel}
+            searchItems={searchItems}
+            currentUser={session?.currentUser}
+            footerSettings={footerSettings}
+          >
+            {children}
+          </SiteChrome>
           <Toaster />
         </SessionProvider>
-        </body>
-      </html>
+      </body>
+    </html>
   )
 }
 

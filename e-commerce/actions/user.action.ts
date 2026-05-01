@@ -16,6 +16,26 @@ export const getProducts = actionClient.schema(searchParamsSchema).action<Return
 		})
 		return JSON.parse(JSON.stringify(data))
 	} catch {
+		const params = new URLSearchParams()
+		for (const [key, value] of Object.entries(parsedInput || {})) {
+			if (typeof value === 'string') params.set(key, value)
+		}
+		const bases = [
+			'http://localhost:8080',
+			'http://127.0.0.1:8080',
+			'http://localhost:5000',
+			'http://127.0.0.1:5000',
+		]
+		for (const base of bases) {
+			try {
+				const res = await fetch(`${base}/api/user/products?${params.toString()}`, { cache: 'no-store' })
+				if (!res.ok) continue
+				const data = await res.json()
+				return JSON.parse(JSON.stringify(data)) as ReturnActionType
+			} catch {
+				/* try next base */
+			}
+		}
 		return JSON.parse(JSON.stringify({ products: [], isNext: false })) as ReturnActionType
 	}
 })
@@ -77,6 +97,8 @@ export const addFavorite = actionClient.schema(idSchema).action<ReturnActionType
 		{ productId: parsedInput.id },
 		{ headers: { Authorization: `Bearer ${token}` } }
 	)
+	revalidatePath('/', 'layout')
+	revalidatePath('/dashboard/watch-list')
 	return JSON.parse(JSON.stringify(data))
 })
 

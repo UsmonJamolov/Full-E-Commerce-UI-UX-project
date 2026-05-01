@@ -42,13 +42,13 @@ const CommentsManager = ({ reviews }: Props) => {
 		})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setLoadingId('')
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			setLoadingId('')
 			return onError(res.data.failure)
 		}
-		toast.success('Comment yangilandi')
+		toast.success('Комментарий обновлен')
 		setEditingId('')
 		setLoadingId('')
 		router.refresh()
@@ -62,27 +62,27 @@ const CommentsManager = ({ reviews }: Props) => {
 		})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setLoadingId('')
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			setLoadingId('')
 			return onError(res.data.failure)
 		}
-		toast.success('Comment o‘chirildi')
+		toast.success('Комментарий удален')
 		setLoadingId('')
 		router.refresh()
 	}
 
 	return (
 		<div className='space-y-3'>
-			{reviews.length === 0 && <p className='text-sm text-muted-foreground'>Hozircha commentlar yo‘q.</p>}
+			{reviews.length === 0 && <p className='text-sm text-muted-foreground'>Пока комментариев нет.</p>}
 			{reviews.map(item => (
 				<div key={item.reviewId} className='rounded-lg border p-4 space-y-2'>
 					<div className='flex items-center justify-between'>
 						<p className='font-semibold'>{item.productTitle}</p>
 						<p className='text-xs text-muted-foreground'>{new Date(item.createdAt).toLocaleDateString()}</p>
 					</div>
-					<p className='text-sm text-muted-foreground'>Mijoz: {item.userName}</p>
+					<p className='text-sm text-muted-foreground'>Клиент: {item.userName}</p>
 
 					{editingId === item.reviewId ? (
 						<>
@@ -96,19 +96,19 @@ const CommentsManager = ({ reviews }: Props) => {
 							<Textarea
 								value={form.comment}
 								onChange={e => setForm(prev => ({ ...prev, comment: e.target.value }))}
-								placeholder='Mijoz kommenti'
+								placeholder='Комментарий клиента'
 							/>
 							<Textarea
 								value={form.adminReply}
 								onChange={e => setForm(prev => ({ ...prev, adminReply: e.target.value }))}
-								placeholder='Admin javobi'
+								placeholder='Ответ администратора'
 							/>
 						</>
 					) : (
 						<>
 							<p className='text-sm'>Rating: {item.rating}/5</p>
 							<p className='text-sm'>{item.comment}</p>
-							{item.adminReply && <p className='text-sm rounded bg-secondary p-2'>Admin javobi: {item.adminReply}</p>}
+							{item.adminReply && <p className='text-sm rounded bg-secondary p-2'>Ответ администратора: {item.adminReply}</p>}
 						</>
 					)}
 
@@ -116,19 +116,19 @@ const CommentsManager = ({ reviews }: Props) => {
 						{editingId === item.reviewId ? (
 							<>
 								<Button size='sm' onClick={() => onSave(item)} disabled={loadingId === item.reviewId}>
-									Saqlash {loadingId === item.reviewId && <Loader2 className='animate-spin' />}
+									Сохранить {loadingId === item.reviewId && <Loader2 className='animate-spin' />}
 								</Button>
 								<Button size='sm' variant='outline' onClick={() => setEditingId('')}>
-									Bekor
+									Отмена
 								</Button>
 							</>
 						) : (
 							<>
 								<Button size='sm' variant='secondary' onClick={() => onStartEdit(item)}>
-									Edit
+									Редактировать
 								</Button>
 								<Button size='sm' variant='outline' onClick={() => onDelete(item)} disabled={loadingId === item.reviewId}>
-									Delete {loadingId === item.reviewId && <Loader2 className='animate-spin' />}
+									Удалить {loadingId === item.reviewId && <Loader2 className='animate-spin' />}
 								</Button>
 							</>
 						)}

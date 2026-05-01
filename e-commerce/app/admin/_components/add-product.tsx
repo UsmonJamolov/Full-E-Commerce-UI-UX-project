@@ -154,9 +154,9 @@ const AddProduct = () => {
 								name='title'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Title</Label>
+										<Label className='text-xs'>Название</Label>
 										<FormControl>
-											<Input placeholder='Adidas shoes' className='bg-secondary' disabled={isLoading} {...field} />
+											<Input placeholder='Например: Adidas shoes' className='bg-secondary' disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -167,9 +167,9 @@ const AddProduct = () => {
 								name='description'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Description</Label>
+										<Label className='text-xs'>Описание</Label>
 										<FormControl>
-											<Textarea placeholder='Adidas shoes are the best shoes in the world' disabled={isLoading} className='bg-secondary' {...field} />
+											<Textarea placeholder='Краткое описание товара' disabled={isLoading} className='bg-secondary' {...field} />
 										</FormControl>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -180,7 +180,7 @@ const AddProduct = () => {
 								name='category'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Category</Label>
+										<Label className='text-xs'>Категория</Label>
 										<FormControl>
 											<AdminCategoryField
 												value={field.value}
@@ -197,7 +197,7 @@ const AddProduct = () => {
 								name='targetGroup'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Yangi category (Erkak/Ayol/Bola)</Label>
+										<Label className='text-xs'>Группа (Мужчины/Женщины/Дети)</Label>
 										<FormControl>
 											<Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
 												<SelectTrigger className='bg-secondary'>
@@ -241,7 +241,7 @@ const AddProduct = () => {
 												onChange={e => field.onChange(e.target.checked)}
 												disabled={isLoading}
 											/>
-											New badge qo‘shilsin
+											Показывать бейдж New
 										</Label>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -288,9 +288,9 @@ const AddProduct = () => {
 							</div>
 							)}
 							
-							{uploading && <p>Uploading image...</p>}
+							{uploading && <p>Загрузка изображения...</p>}
 							<Button type='submit' disabled={isLoading} className='w-full'>
-								Submit {isLoading && <Loader2 className='animate-spin' />}
+								Сохранить {isLoading && <Loader2 className='animate-spin' />}
 							</Button>
 						</form>
 					</Form>

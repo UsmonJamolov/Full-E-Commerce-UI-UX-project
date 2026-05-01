@@ -78,15 +78,12 @@ function SignInForm() {
   };
 
   return (
-    <section className="w-full flex justify-center px-6 py-16">
-      <div className="w-full max-w-2xl">
-        {/* FORM */}
-        <div className="w-full mx-auto">
-          <h2 className="text-3xl font-semibold mb-2">
+    <div className="w-full rounded-2xl border bg-card p-8 shadow-sm md:p-10">
+          <h2 className="text-3xl font-semibold tracking-tight mb-2">
             Log in to Exclusive
           </h2>
 
-          <p className="text-gray-500 mb-8">
+          <p className="text-muted-foreground mb-8">
             Enter your details below
           </p>
 
@@ -146,9 +143,7 @@ function SignInForm() {
             </div>
 
           </form>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }
 
@@ -156,9 +151,9 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <section className="w-full flex justify-center px-6 py-16">
-          <p className="text-muted-foreground">Yuklanmoqda...</p>
-        </section>
+        <div className="w-full rounded-2xl border bg-card p-8 text-center text-muted-foreground shadow-sm">
+          Yuklanmoqda...
+        </div>
       }
     >
       <SignInForm />

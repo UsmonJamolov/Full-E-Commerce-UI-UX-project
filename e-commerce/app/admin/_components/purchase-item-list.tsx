@@ -39,13 +39,13 @@ const PurchaseItemList = ({ items, onApprove, approvingId }: Props) => {
 		const res = await updatePurchaseItem({ id, name: draftName })
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setSavingId('')
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			setSavingId('')
 			return onError(res.data.failure)
 		}
-		toast.success('Tovar nomi yangilandi')
+		toast.success('Название товара обновлено')
 		cancelEdit()
 		router.refresh()
 		setSavingId('')
@@ -56,13 +56,13 @@ const PurchaseItemList = ({ items, onApprove, approvingId }: Props) => {
 		const res = await deletePurchaseItem({ id })
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setDeletingId('')
-			return onError('Something went wrong')
+			return onError('Что-то пошло не так')
 		}
 		if (res.data.failure) {
 			setDeletingId('')
 			return onError(res.data.failure)
 		}
-		toast.success('Tovar o‘chirildi')
+		toast.success('Товар удален')
 		router.refresh()
 		setDeletingId('')
 	}
@@ -84,28 +84,28 @@ const PurchaseItemList = ({ items, onApprove, approvingId }: Props) => {
 								<>
 									<Button size='sm' onClick={() => onSave(item._id)} disabled={savingId === item._id || !draftName.trim()}>
 										<Check />
-										Saqlash
+										Сохранить
 										{savingId === item._id && <Loader2 className='animate-spin' />}
 									</Button>
 									<Button size='sm' variant='outline' onClick={cancelEdit}>
 										<X />
-										Bekor qilish
+										Отмена
 									</Button>
 								</>
 							) : (
 								<>
 									<Button size='sm' variant='secondary' onClick={() => startEdit(item)}>
 										<Pencil />
-										Edit
+										Редактировать
 									</Button>
 									<Button size='sm' variant='outline' onClick={() => onDelete(item._id)} disabled={deletingId === item._id}>
 										<Trash2 />
-										Delete
+										Удалить
 										{deletingId === item._id && <Loader2 className='animate-spin' />}
 									</Button>
 									{onApprove && (
 										<Button size='sm' onClick={() => void onApprove(item._id)} disabled={approvingId === item._id}>
-											Tasdiqlash
+											Подтвердить
 											{approvingId === item._id && <Loader2 className='animate-spin' />}
 										</Button>
 									)}
