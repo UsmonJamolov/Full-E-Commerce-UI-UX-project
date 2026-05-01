@@ -3,6 +3,11 @@
 Современный полнофункциональный e-commerce проект с клиентской витриной и административной панелью.  
 Приложение построено на `Next.js` (frontend) и `Node.js/Express` (backend), поддерживает каталог товаров, фильтрацию, избранное, блоки главной страницы, мультиязычность интерфейса и управление контентом через админку.
 
+## Структура репозитория
+
+- `e-commerce` — frontend приложение на Next.js
+- `server` — backend API на Express + MongoDB
+
 ## Технологии
 
 - `Next.js`
@@ -16,37 +21,37 @@
 ## Запуск проекта
 
 ```bash
+# frontend
+cd e-commerce
 npm install
 npm run dev
 ```
 
-Откройте [http://localhost:3000](http://localhost:3000) в браузере.
-
 ## Скриншоты проекта
 
 ### Главная страница (верхняя часть)
-![Главная страница](public/readme/01-home-top.png)
+![Главная страница](e-commerce/public/readme/01-home-top.png)
 
 ### Секция мужской обуви
-![Мужская обувь](public/readme/02-men-shoes.png)
+![Мужская обувь](e-commerce/public/readme/02-men-shoes.png)
 
 ### Секция категорий
-![Категории](public/readme/03-categories.png)
+![Категории](e-commerce/public/readme/03-categories.png)
 
 ### Секция женской обуви
-![Женская обувь](public/readme/04-women-shoes.png)
+![Женская обувь](e-commerce/public/readme/04-women-shoes.png)
 
 ### Промо-блок Buy Now
-![Buy Now](public/readme/05-buy-now.png)
+![Buy Now](e-commerce/public/readme/05-buy-now.png)
 
 ### Секция детской обуви
-![Детская обувь](public/readme/06-kids-shoes.png)
+![Детская обувь](e-commerce/public/readme/06-kids-shoes.png)
 
 ### Секция "Наши товары"
-![Наши товары](public/readme/07-explore-products.png)
+![Наши товары](e-commerce/public/readme/07-explore-products.png)
 
 ### Секция новинок
-![Новинки](public/readme/08-new-arrivals.png)
+![Новинки](e-commerce/public/readme/08-new-arrivals.png)
 
 ### Футер
-![Футер](public/readme/09-footer.png)
+![Футер](e-commerce/public/readme/09-footer.png)
