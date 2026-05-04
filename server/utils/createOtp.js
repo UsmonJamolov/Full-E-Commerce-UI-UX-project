@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const Otp = require("../models/otp.model");
 
-const createOTP = async ({ phone, name, password, type }) => {
+const createOTP = async ({ phone, name, password, type, email }) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   console.log("OTP:", otp);
@@ -17,6 +17,10 @@ const createOTP = async ({ phone, name, password, type }) => {
       phone,
       otp,
       name,
+      email:
+        typeof email === "string" && email.trim()
+          ? email.trim().toLowerCase()
+          : undefined,
       type,
       password: hashedPassword,
       expiresAt: new Date(Date.now() + 5 * 60 * 1000),

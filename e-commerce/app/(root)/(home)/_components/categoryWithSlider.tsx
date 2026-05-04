@@ -7,16 +7,28 @@ import Link from "next/link";
 import type { HomeSliderSlide, Locale } from "@/lib/i18n/dictionaries";
 
 // Slider asl komponenti
+const defaultHrefs = [
+  '/women-products',
+  '/men-products',
+  '/children-products',
+  '/umbrellas-products',
+  '/bags-products',
+  '/backpacks-products',
+  '/clothes-products',
+]
+
 export default function CategoryWithSlider({
   locale,
   ctaLabel,
   sliderSlides,
   sidebarCategories,
+  sidebarCategoryHrefs,
 }: {
   locale: Locale
   ctaLabel: string
   sliderSlides: HomeSliderSlide[]
   sidebarCategories: string[]
+  sidebarCategoryHrefs: string[]
 }) {
   const [current, setCurrent] = React.useState(0);
   const slideCount = sliderSlides.length || 1;
@@ -38,7 +50,15 @@ export default function CategoryWithSlider({
         ? sidebarCategories
         : ["Women's fashion", "Men's fashion", "Children's fashion", 'Umbrellas', 'Bags', 'Backpacks', 'Clothes'],
     [sidebarCategories],
-  );
+  )
+
+  const hrefs = React.useMemo(() => {
+    if (sidebarCategoryHrefs.length === localizedCategories.length) return sidebarCategoryHrefs
+    return localizedCategories.map((_, i) => defaultHrefs[i] ?? '/explore-products')
+  }, [sidebarCategoryHrefs, localizedCategories.length])
+
+  const rowClass =
+    'flex items-center justify-between min-w-[150px] md:min-w-0 px-4 md:px-6 py-3 md:py-[7px] text-[15px] md:text-[16px] whitespace-nowrap transition-colors hover:bg-gray-50'
 
   return (
     <section className="flex w-full min-w-0 flex-col md:flex-row md:items-stretch md:gap-0">
@@ -57,18 +77,16 @@ export default function CategoryWithSlider({
       >
         <nav className="flex md:block overflow-x-auto md:overflow-visible">
           {localizedCategories.map((cat, i) => (
-            <div
-              key={cat}
-              className={[
-                "flex items-center justify-between min-w-[150px] md:min-w-0 px-4 md:px-6 py-3 md:py-[7px] text-[15px] md:text-[16px] cursor-pointer whitespace-nowrap",
-                "transition-colors hover:bg-gray-50",
-              ].join(" ")}
+            <Link
+              key={`${i}-${cat}`}
+              href={hrefs[i] ?? '/explore-products'}
+              className={[rowClass, 'cursor-pointer text-inherit no-underline'].join(' ')}
             >
               <span>{cat}</span>
               {i <= 1 && (
-                <ChevronRight className="h-5 w-5 text-zinc-400" />
+                <ChevronRight className="h-5 w-5 shrink-0 text-zinc-400" aria-hidden />
               )}
-            </div>
+            </Link>
           ))}
         </nav>
       </div>

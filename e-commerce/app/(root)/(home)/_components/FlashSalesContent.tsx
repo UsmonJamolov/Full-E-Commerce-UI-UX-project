@@ -4,23 +4,17 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import ProductCard from "@/components/card/product-card";
-import { IProduct, SearchParams } from "@/types";
+import { IProduct } from "@/types";
 import Link from "next/link";
 
 interface Props {
   products: IProduct[]
-  searchParams: SearchParams
   title: string
   noProducts: string
   viewAllLabel: string
 }
 
-const FlashSalesContent = ({ products, searchParams, title, noProducts, viewAllLabel }: Props) => {
-
-  console.log('FlashSalesContent - ', products);
-  console.log('FlashSalesContent - ', searchParams);
-  
-  
+const FlashSalesContent = ({ products, title, noProducts, viewAllLabel }: Props) => {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
 
   const scrollByCards = (dir: "prev" | "next") => {

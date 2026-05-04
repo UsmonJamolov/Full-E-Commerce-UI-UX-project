@@ -7,7 +7,12 @@ const DEFAULTS = {
 	email: 'exclusive@gmail.com',
 	telegramUrl: 'https://t.me/',
 	maxMessengerUrl: 'https://max.ru/',
-	brandBlurb: 'Exclusive — quality fashion & footwear. Join thousands of happy customers shopping with us every day.',
+	brandBlurb:
+		'Quality fashion and footwear. Thousands of happy customers shop with us every day.',
+	mapEmbedSrc:
+		'https://www.openstreetmap.org/export/embed.html?bbox=69.18%2C41.23%2C69.38%2C41.38&layer=mapnik',
+	mapExternalUrl: 'https://www.openstreetmap.org/?mlat=41.2995&mlon=69.2401#map=14/41.2995/69.2401',
+	mapAddress: '',
 }
 
 class FooterSettingsController {
@@ -25,6 +30,9 @@ class FooterSettingsController {
 				telegramUrl: doc.telegramUrl || DEFAULTS.telegramUrl,
 				maxMessengerUrl: doc.maxMessengerUrl || DEFAULTS.maxMessengerUrl,
 				brandBlurb: doc.brandBlurb || DEFAULTS.brandBlurb,
+				mapEmbedSrc: typeof doc.mapEmbedSrc === 'string' ? doc.mapEmbedSrc : DEFAULTS.mapEmbedSrc,
+				mapExternalUrl: typeof doc.mapExternalUrl === 'string' ? doc.mapExternalUrl : DEFAULTS.mapExternalUrl,
+				mapAddress: typeof doc.mapAddress === 'string' ? doc.mapAddress : DEFAULTS.mapAddress,
 			})
 		} catch (error) {
 			next(error)
@@ -41,6 +49,9 @@ class FooterSettingsController {
 				telegramUrl,
 				maxMessengerUrl,
 				brandBlurb,
+				mapEmbedSrc,
+				mapExternalUrl,
+				mapAddress,
 			} = req.body
 
 			let doc = await footerSettingsModel.findOne({ key: 'main' })
@@ -56,6 +67,19 @@ class FooterSettingsController {
 			if (typeof maxMessengerUrl === 'string' && maxMessengerUrl.trim()) doc.maxMessengerUrl = maxMessengerUrl.trim().slice(0, 240)
 			if (typeof brandBlurb === 'string' && brandBlurb.trim()) doc.brandBlurb = brandBlurb.trim().slice(0, 500)
 
+			const mapBodyKeys = ['mapEmbedSrc', 'mapExternalUrl', 'mapAddress']
+			const hasMapInBody = mapBodyKeys.some(k => Object.prototype.hasOwnProperty.call(req.body, k))
+			if (!hasMapInBody) {
+				doc.mapEmbedSrc = ''
+				doc.mapExternalUrl = ''
+				doc.mapAddress = ''
+			} else {
+				if (typeof mapEmbedSrc === 'string' && mapEmbedSrc.trim()) doc.mapEmbedSrc = mapEmbedSrc.trim().slice(0, 2000)
+				if (typeof mapExternalUrl === 'string' && mapExternalUrl.trim())
+					doc.mapExternalUrl = mapExternalUrl.trim().slice(0, 2000)
+				if (typeof mapAddress === 'string') doc.mapAddress = mapAddress.trim().slice(0, 400)
+			}
+
 			await doc.save()
 
 			return res.json({
@@ -67,6 +91,9 @@ class FooterSettingsController {
 				telegramUrl: doc.telegramUrl,
 				maxMessengerUrl: doc.maxMessengerUrl,
 				brandBlurb: doc.brandBlurb,
+				mapEmbedSrc: typeof doc.mapEmbedSrc === 'string' ? doc.mapEmbedSrc : DEFAULTS.mapEmbedSrc,
+				mapExternalUrl: typeof doc.mapExternalUrl === 'string' ? doc.mapExternalUrl : DEFAULTS.mapExternalUrl,
+				mapAddress: typeof doc.mapAddress === 'string' ? doc.mapAddress : DEFAULTS.mapAddress,
 			})
 		} catch (error) {
 			next(error)

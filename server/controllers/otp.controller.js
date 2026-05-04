@@ -66,25 +66,63 @@ const { sendSMS } = require("../utils/sms");
 
 const sendOTP = async (req, res) => {
   try {
-    let { phone, type, name, password } = req.body;
+    let { phone, type = "register", name, password, email } = req.body;
 
     phone = phone.replace(/\D/g, "");
     const fullPhone = "+" + phone;
+    const emailNorm = typeof email === "string" ? email.trim().toLowerCase() : "";
 
     const user = await User.findOne({ phone: fullPhone });
 
-    if (type === "login" && !user) {
-      return res.json({
-        success: false,
-        message: "User topilmadi",
-      });
+    if (type === "login") {
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User topilmadi",
+          failure: "User topilmadi",
+          status: 400,
+        });
+      }
+      if (user.isDeleted) {
+        return res.json({
+          success: false,
+          message: "Akkaunt o‘chirilgan",
+          failure: "Akkaunt o‘chirilgan",
+          status: 400,
+        });
+      }
     }
 
     if (type === "register" && user) {
       return res.json({
         success: false,
         message: "User mavjud",
+        failure: "User mavjud",
+        status: 400,
       });
+    }
+
+    if (type === "register") {
+      const trimmedName = typeof name === "string" ? name.trim() : "";
+      if (trimmedName.length < 2) {
+        return res.json({
+          success: false,
+          message: "Ism kamida 2 ta harf bo‘lishi kerak",
+          failure: "Ism kamida 2 ta harf bo‘lishi kerak",
+          status: 400,
+        });
+      }
+      if (emailNorm && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNorm)) {
+        const emailTaken = await User.findOne({ email: emailNorm });
+        if (emailTaken) {
+          return res.json({
+            success: false,
+            message: "Email band",
+            failure: "Email band",
+            status: 400,
+          });
+        }
+      }
     }
 
     // OTP yaratadi va DB ga yozadi
@@ -92,16 +130,34 @@ const sendOTP = async (req, res) => {
       phone: fullPhone,
       name,
       password,
+      type,
+      email: type === "register" && emailNorm ? emailNorm : undefined,
     });
 
-    // 🔥 Development uchun SMS yubormaymiz
-    console.log("DEV OTP:", otp);
+    const smsMsg = `Tasdiqlash kodi: ${otp}`;
+    if (process.env.SMS_RU_API_ID) {
+      const smsOk = await sendSMS(fullPhone, smsMsg);
+      if (!smsOk) {
+        return res.status(500).json({
+          success: false,
+          message: "SMS yuborilmadi",
+          failure: "SMS yuborilmadi",
+          errorCode: "SMS_SEND_FAILED",
+        });
+      }
+      return res.json({
+        success: true,
+        message: "OTP SMS orqali yuborildi",
+        status: 200,
+      });
+    }
 
+    console.log("DEV OTP (SMS_RU_API_ID yo‘q):", otp);
     return res.json({
       success: true,
-      message: "OTP yaratildi (development mode)",
+      message: "OTP yaratildi (development — SMS sozlanmagan)",
       status: 200,
-      otp, // faqat development uchun
+      otp,
     });
 
   } catch (e) {
@@ -241,6 +297,25 @@ const verifyOTP = async (req, res) => {
         success: false,
         message: "OTP muddati tugagan",
         status: 301,
+      });
+    }
+
+    const flowType = record.type || "register";
+
+    if (flowType === "login") {
+      const user = await User.findOne({ phone: fullPhone });
+      if (!user || user.isDeleted) {
+        return res.status(400).json({
+          success: false,
+          message: "User topilmadi",
+        });
+      }
+      await Otp.deleteOne({ _id: record._id });
+      return res.status(200).json({
+        success: true,
+        message: "OTP tasdiqlandi",
+        status: 200,
+        userId: String(user._id),
       });
     }
 

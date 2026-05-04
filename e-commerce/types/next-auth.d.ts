@@ -54,6 +54,7 @@ declare module "next-auth" {
       phone: string;
       name: string;
       role: string;
+      email?: string | null;
       avatar?: string;
       favorites?: string[];
       isDeleted?: boolean;

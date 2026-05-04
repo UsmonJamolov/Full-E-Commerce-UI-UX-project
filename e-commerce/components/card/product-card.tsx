@@ -1,6 +1,7 @@
 'use client'
 
-import { addFavorite } from '@/actions/user.action'
+import { addFavorite, deleteFavorite } from '@/actions/user.action'
+import { useI18n } from '@/components/providers/i18n-provider'
 import { useAction } from '@/hooks/use-action'
 import { cn, formatPrice } from '@/lib/utils'
 import { IProduct } from '@/types'
@@ -12,20 +13,39 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FC, MouseEvent, useMemo, useState } from 'react'
+import { FC, MouseEvent, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 interface Props {
 	product: IProduct
+	/** Grid sahifalarida to‘liq katak kengligi. */
+	layout?: 'carousel' | 'grid'
 }
 
-const ProductCard: FC<Props> = ({ product }) => {
+function favoriteEntryId(item: unknown): string {
+	if (item == null) return ''
+	if (typeof item === 'string' || typeof item === 'number') return String(item)
+	if (typeof item === 'object' && '_id' in (item as object)) return String((item as { _id: unknown })._id)
+	return ''
+}
+
+const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
+	const isGrid = layout === 'grid'
+	const { dictionary } = useI18n()
+	const t = dictionary.productCard
 	const { onError, setIsLoading } = useAction()
-	const { data: session } = useSession()
+	const { data: session, update: updateSession } = useSession()
 	const router = useRouter()
 	const favoriteIds = session?.currentUser?.favorites || []
-	const inFavorites = useMemo(() => favoriteIds.some(item => String(item) === String(product._id)), [favoriteIds, product._id])
+	const inFavorites = useMemo(
+		() => favoriteIds.some(item => favoriteEntryId(item) === String(product._id)),
+		[favoriteIds, product._id],
+	)
 	const [isFavourite, setIsFavourite] = useState(inFavorites)
+
+	useEffect(() => {
+		setIsFavourite(inFavorites)
+	}, [inFavorites])
 
 	const imageSrc = product.image
 		? `${product.image}${product.image.includes('?') ? '&' : '?'}v=${encodeURIComponent(product.imageKey || product._id)}`
@@ -33,23 +53,34 @@ const ProductCard: FC<Props> = ({ product }) => {
 
 	const onFavorite = async (e: MouseEvent) => {
 		e.stopPropagation()
+		if (!session?.currentUser) {
+			const path =
+				typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : '/'
+			const safe = path.startsWith('/') && !path.startsWith('//') ? path : '/'
+			router.push(`/sign-in?callbackUrl=${encodeURIComponent(safe)}`)
+			return
+		}
+		if (!product._id) return
 		setIsLoading(true)
 
-		const res = await addFavorite({ id: product._id })
+		const currentlyFavorited = inFavorites || isFavourite
+		const res = currentlyFavorited
+			? await deleteFavorite({ id: product._id })
+			: await addFavorite({ id: product._id })
+
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			setIsLoading(false)
-			return onError('Something went wrong')
+			return onError(t.genericError)
 		}
 		if (res.data.failure) {
-			if (res.data.failure.toLowerCase().includes('already')) {
-				setIsFavourite(true)
-			}
 			setIsLoading(false)
+			await updateSession()
 			return onError(res.data.failure)
 		}
 		if (res.data.status === 200) {
-			setIsFavourite(true)
-			toast.success('Added to favorites')
+			setIsFavourite(!currentlyFavorited)
+			await updateSession()
+			toast.success(currentlyFavorited ? t.favoriteRemoved : t.favoriteAdded)
 		}
 		setIsLoading(false)
 	}
@@ -63,24 +94,37 @@ const ProductCard: FC<Props> = ({ product }) => {
 				: 0
 
 	return (
-		<div onClick={() => router.push(`/product/${product._id}`)} className='cursor-pointer'>
-			<div className='relative z-10 w-[170px] shrink-0 xs:w-[195px] sm:w-[230px] md:w-[260px]'>
-				<Card className='group border-0 shadow-none'>
+		<div
+			onClick={() => router.push(`/product/${product._id}`)}
+			className={cn('cursor-pointer', isGrid && 'h-full w-full min-w-0')}
+		>
+			<div
+				className={cn(
+					'relative z-10 shrink-0',
+					isGrid ? 'w-full max-w-full' : 'w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px]',
+				)}
+			>
+				<Card className={cn('group border-0 shadow-none', isGrid && 'h-full')}>
 					<div className='relative rounded-lg bg-muted/30 p-3 sm:p-4'>
 						{product.isNew && (
 							<Badge className='absolute left-2 top-2 z-50 bg-black px-2 py-1 text-[11px] text-white hover:bg-black sm:left-3 sm:top-3'>
-								NEW
+								{t.newBadge}
 							</Badge>
 						)}
 						<div className='absolute right-2 top-2 z-50 flex flex-col gap-2 sm:right-3 sm:top-3'>
-							<IconBubble ariaLabel='Wishlist' onClick={onFavorite}>
+							<IconBubble ariaLabel={t.wishlistAria} onClick={onFavorite}>
 								<Heart className={cn('h-4 w-4', (isFavourite || inFavorites) && 'fill-black text-black')} />
 							</IconBubble>
-							<IconBubble ariaLabel='Quick view'>
+							<IconBubble ariaLabel={t.quickViewAria}>
 								<Eye className='h-4 w-4' />
 							</IconBubble>
 						</div>
-						<div className='relative mx-auto aspect-square w-[110px] xs:w-[140px] sm:w-[180px]'>
+						<div
+							className={cn(
+								'relative mx-auto aspect-square',
+								isGrid ? 'w-full max-w-[200px]' : 'w-[110px] xs:w-[140px] sm:w-[180px]',
+							)}
+						>
 							<Image src={imageSrc} alt={product.title} fill className='object-contain' unoptimized />
 						</div>
 						{product.cta && (
@@ -88,7 +132,7 @@ const ProductCard: FC<Props> = ({ product }) => {
 								asChild
 								className='mt-4 h-[6vh] w-full rounded-none bg-black py-2 text-xs font-medium text-white opacity-0 transition-opacity duration-200 group-hover:pointer-events-auto group-hover:opacity-100 pointer-events-none sm:py-3 sm:text-sm'
 							>
-								<Link href='/'>Add To Cart</Link>
+								<Link href='/'>{t.addToCart}</Link>
 							</Button>
 						)}
 					</div>

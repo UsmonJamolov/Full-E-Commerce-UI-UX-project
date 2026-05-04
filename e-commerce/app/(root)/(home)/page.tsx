@@ -7,57 +7,29 @@ import KidsFootwearProductsSection from "./_components/KidsFootwearProductsSecti
 import ExploreProductsSection from "./_components/exploreProductsSection"
 import NewArrivalSection from "./_components/newArrivalSection"
 import FlashSalesSection from "./_components/flash-sales"
-import { SearchParams } from "@/types"
-import {FC} from 'react'
-import { getProducts } from "@/actions/user.action"
 import { getPublicNewArrivalCards } from "@/lib/new-arrival-public"
 import { cookies } from "next/headers"
+import { getPublicHomeSliderSlides } from "@/lib/home-slider-public"
 import { getDictionary, parseLocale } from "@/lib/i18n/dictionaries"
 
-interface Props {
-	searchParams: Promise<SearchParams>
-}
-
-const HomePage: FC<Props> = async props => {
+const HomePage = async () => {
     const store = await cookies()
     const locale = parseLocale(store.get('locale')?.value)
     const dict = getDictionary(locale)
-    const searchParams = await props.searchParams
-	const res = await getProducts({
-		searchQuery: `${searchParams.q || ''}`,
-		filter: `${searchParams.filter || 'newest'}`,
-		category: '',
-		targetGroup: '',
-		page: `${searchParams.page || '1'}`,
-        pageSize: '10'
-	})
-
-    let products = res?.data?.products || []
-    if (products.length === 0) {
-        const fallbackRes = await getProducts({
-            searchQuery: `${searchParams.q || ''}`,
-            filter: `${searchParams.filter || 'newest'}`,
-            category: '',
-            targetGroup: '',
-            page: '1',
-            pageSize: '10',
-        })
-        products = fallbackRes?.data?.products || []
-    }
-    const newArrivalCards = await getPublicNewArrivalCards()
+    const newArrivalCards = await getPublicNewArrivalCards(locale)
+    const sliderSlides = await getPublicHomeSliderSlides(locale)
     return (
         <>
             <div className="mb-20 w-full min-w-0">
                 <CategoryWithSlider
                     locale={locale}
                     ctaLabel={dict.home.sliderCta}
-                    sliderSlides={dict.home.sliderSlides}
+                    sliderSlides={sliderSlides}
                     sidebarCategories={dict.home.sidebarCategories}
+                    sidebarCategoryHrefs={dict.home.sidebarCategoryHrefs}
                 />
             </div>
                 <FlashSalesSection
-                    searchParams={searchParams}
-                    products={products}
                     title={dict.home.flashSalesTitle}
                     noProducts={dict.home.noProducts}
                     viewAllLabel={dict.home.viewAllProducts}
@@ -97,7 +69,7 @@ const HomePage: FC<Props> = async props => {
                 />
                 <NewArrivalSection
                     initialCards={newArrivalCards}
-                    shopNowLabel={dict.home.shopNow}
+                    locale={locale}
                     featuredLabel={dict.header.featured}
                     titleLabel={dict.header.newArrival}
                 />

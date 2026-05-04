@@ -16,6 +16,7 @@ import {
 	productSchema,
 	buyNowSettingsSchema,
 	footerSettingsSchema,
+	homeSliderSettingsSchema,
 	headerSettingsSchema,
 	newArrivalSettingsSchema,
 	searchParamsSchema,
@@ -308,6 +309,7 @@ export const updateBuyNowSettingsAdmin = actionClient
 		const { data } = await axiosClient.put('/api/admin/buy-now-settings', parsedInput, {
 			headers: { Authorization: `Bearer ${token}` },
 		})
+		revalidatePath('/admin/settings')
 		revalidatePath('/admin/buy-now')
 		revalidatePath('/admin/header-settings')
 		revalidatePath('/')
@@ -356,6 +358,7 @@ export const updateHeaderSettingsAdmin = actionClient
 			headers: { Authorization: `Bearer ${token}` },
 		})
 		revalidatePath('/admin/header-settings')
+		revalidatePath('/admin/settings')
 		revalidatePath('/admin/buy-now')
 		revalidatePath('/', 'layout')
 		return JSON.parse(JSON.stringify(data))
@@ -386,7 +389,38 @@ export const updateFooterSettingsAdmin = actionClient
 		const { data } = await axiosClient.put('/api/admin/footer-settings', parsedInput, {
 			headers: { Authorization: `Bearer ${token}` },
 		})
+		revalidatePath('/admin/settings')
 		revalidatePath('/admin/buy-now')
+		revalidatePath('/', 'layout')
+		return JSON.parse(JSON.stringify(data))
+	})
+
+export type HomeSliderSlideAdmin = {
+	title: string
+	text: string
+	alt: string
+	image: string
+	link: string
+}
+
+export const getHomeSliderSettingsAdmin = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	const token = await generateToken(session?.currentUser?._id)
+	const { data } = await axiosClient.get('/api/admin/home-slider-settings', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as { slides: HomeSliderSlideAdmin[]; failure?: string }
+})
+
+export const updateHomeSliderSettingsAdmin = actionClient
+	.schema(homeSliderSettingsSchema)
+	.action(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const token = await generateToken(session?.currentUser?._id)
+		const { data } = await axiosClient.put('/api/admin/home-slider-settings', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/admin/settings')
 		revalidatePath('/', 'layout')
 		return JSON.parse(JSON.stringify(data))
 	})

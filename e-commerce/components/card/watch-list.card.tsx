@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@/components/providers/i18n-provider'
 import { IProduct } from '@/types'
 import Image from 'next/image'
 import { FC } from 'react'
@@ -14,19 +15,21 @@ interface Props {
 	product: Partial<IProduct>
 }
 const WatchListCard: FC<Props> = ({ product }) => {
+	const { dictionary } = useI18n()
+	const d = dictionary.dashboard
 	const {isLoading, onError, setIsLoading} = useAction()
 
 	async function onDelete() {
 		setIsLoading(true)
 		const res = await deleteFavorite({id: product._id!})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
-			return onError('Something went wrong')
+			return onError(d.genericError)
 		}
 		if (res.data.failure) {
 			return onError(res.data.failure)
 		}
 		if (res.data.status === 200) {
-			toast.error('Product removed from watchlist')
+			toast.success(d.watchListRemoved)
 			setIsLoading(false)
 		}
 	}

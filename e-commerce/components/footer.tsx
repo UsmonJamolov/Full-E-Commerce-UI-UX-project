@@ -20,11 +20,6 @@ function FooterLink({ href, children }: { href: string; children: ReactNode }) {
 
 export default function Footer({ dictionary, settings }: Props) {
   const { footer } = dictionary
-  const companyLinks = [
-    { href: '/about', label: footer.about },
-    { href: '/contacts', label: footer.contacts },
-    { href: '/explore-products', label: footer.shop },
-  ] as const
 
   const socialLinks = [
     { href: settings.telegramUrl, label: footer.telegram, Icon: Send },
@@ -34,8 +29,8 @@ export default function Footer({ dictionary, settings }: Props) {
   return (
     <footer className='border-t border-gray-800 bg-black text-white'>
       <div className='mx-auto w-full max-w-6xl px-3 py-12 sm:px-4 md:py-14'>
-        <div className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:gap-12'>
-          <div className='flex flex-col gap-6 sm:col-span-2 lg:col-span-1'>
+        <div className='grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start lg:gap-12'>
+          <div className='flex flex-col gap-6'>
             <Link
               href='/'
               className='flex h-14 w-14 items-center justify-center rounded-md border border-red-500/60 bg-gradient-to-br from-red-600 via-orange-500 to-amber-500 text-[11px] font-black tracking-tight text-white transition hover:border-orange-400'
@@ -64,22 +59,11 @@ export default function Footer({ dictionary, settings }: Props) {
               >
                 #1
               </div>
-              <p className='text-xs leading-relaxed text-gray-400'>{settings.brandBlurb}</p>
+              <p className='text-xs leading-relaxed text-gray-400'>{footer.brandBlurb}</p>
             </div>
           </div>
 
-          <div>
-            <h3 className='mb-4 text-base font-semibold text-white'>{footer.company}</h3>
-            <ul className='flex flex-col gap-3'>
-              {companyLinks.map(({ href, label }) => (
-                <li key={href + label}>
-                  <FooterLink href={href}>{label}</FooterLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
+          <div className='min-w-0'>
             <h3 className='mb-4 text-base font-semibold text-white'>{footer.contact}</h3>
             <div className='flex flex-col gap-1 text-sm font-medium text-white'>
               <a href={`tel:${settings.phonePrimary}`} className='text-lg hover:text-gray-200'>
@@ -96,8 +80,8 @@ export default function Footer({ dictionary, settings }: Props) {
             >
               {settings.email}
             </a>
-            <div className='mt-4'>
-              <FooterLink href='/contacts'>{footer.storeAddresses}</FooterLink>
+            <div className='mt-4 flex flex-col gap-2'>
+              <FooterLink href='/contacts'>{footer.contacts}</FooterLink>
             </div>
             <div className='mt-5 flex flex-wrap gap-2'>
               <a
@@ -139,7 +123,7 @@ export default function Footer({ dictionary, settings }: Props) {
             <span className='text-gray-600' aria-hidden>
               /
             </span>
-            <Link href='/contacts' className='hover:text-white'>
+            <Link href='#' className='hover:text-white'>
               {footer.sitemap}
             </Link>
           </div>

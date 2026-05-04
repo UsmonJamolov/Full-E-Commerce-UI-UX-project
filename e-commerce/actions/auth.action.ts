@@ -19,7 +19,7 @@ export const login = actionClient
       });
 
       return {
-        success: data?.success ?? true,
+        success: Boolean(data?.success && data?.user),
         message: data?.message ?? "Login successful",
         user: data?.user,
         accessToken: data?.accessToken,
@@ -35,20 +35,45 @@ export const login = actionClient
 export const register = actionClient
   .schema(registerSchema)
   .action<ReturnActionType>(async ({ parsedInput }) => {
-    const { data } = await axiosClient.post("/api/auth/register", parsedInput);
-    return JSON.parse(JSON.stringify(data));
+    const { confirmPassword: _omit, ...payload } = parsedInput;
+    try {
+      const { data } = await axiosClient.post("/api/auth/register", payload);
+      return JSON.parse(JSON.stringify(data));
+    } catch (error: unknown) {
+      const d = (error as { response?: { data?: unknown } })?.response?.data;
+      if (d && typeof d === "object") {
+        return JSON.parse(JSON.stringify(d)) as ReturnActionType;
+      }
+      return { success: false, message: "Server error" } as unknown as ReturnActionType;
+    }
   });
 
 export const sendOtp = actionClient
   .schema(sendOtpSchema)
   .action<ReturnActionType>(async ({ parsedInput }) => {
-    const { data } = await axiosClient.post("/api/otp/send", parsedInput);
-    return JSON.parse(JSON.stringify(data));
+    try {
+      const { data } = await axiosClient.post("/api/otp/send", parsedInput);
+      return JSON.parse(JSON.stringify(data));
+    } catch (error: unknown) {
+      const d = (error as { response?: { data?: unknown } })?.response?.data;
+      if (d && typeof d === "object") {
+        return JSON.parse(JSON.stringify(d)) as ReturnActionType;
+      }
+      return { success: false, message: "Server error" } as unknown as ReturnActionType;
+    }
   });
 
 export const verifyOtp = actionClient
   .schema(verifyOtpSchema)
   .action<ReturnActionType>(async ({ parsedInput }) => {
-    const { data } = await axiosClient.post("/api/otp/verify", parsedInput);
-    return JSON.parse(JSON.stringify(data));
+    try {
+      const { data } = await axiosClient.post("/api/otp/verify", parsedInput);
+      return JSON.parse(JSON.stringify(data));
+    } catch (error: unknown) {
+      const d = (error as { response?: { data?: unknown } })?.response?.data;
+      if (d && typeof d === "object") {
+        return JSON.parse(JSON.stringify(d)) as ReturnActionType;
+      }
+      return { success: false, message: "Server error" } as unknown as ReturnActionType;
+    }
   });

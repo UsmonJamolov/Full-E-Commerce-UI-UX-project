@@ -1,12 +1,15 @@
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import EditInformation from '../_components/edit-information'
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
+import { getDictionary, parseLocale } from '@/lib/i18n/dictionaries'
 import { IUser } from '@/types'
+import { getServerSession } from 'next-auth'
+import { cookies } from 'next/headers'
 
 const Page = async () => {
-	const session = await getServerSession(authOptions)
+	const [session, cookieStore] = await Promise.all([getServerSession(authOptions), cookies()])
+	const dict = getDictionary(parseLocale(cookieStore.get('locale')?.value))
 
 	const serializedUser = session?.currentUser
 		? (JSON.parse(JSON.stringify(session.currentUser)) as IUser)
@@ -14,7 +17,7 @@ const Page = async () => {
 
 	return (
 		<>
-			<h1 className='text-xl font-semibold'>Personal information</h1>
+			<h1 className='text-xl font-semibold'>{dict.dashboard.personalInfoPageTitle}</h1>
 			<Separator className='my-3' />
 			{serializedUser ? (
 				<EditInformation user={serializedUser} />

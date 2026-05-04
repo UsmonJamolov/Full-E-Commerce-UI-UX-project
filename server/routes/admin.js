@@ -5,6 +5,7 @@ const buyNowController = require('../controllers/buy-now.controller')
 const newArrivalController = require('../controllers/new-arrival.controller')
 const headerSettingsController = require('../controllers/header-settings.controller')
 const footerSettingsController = require('../controllers/footer-settings.controller')
+const homeSliderSettingsController = require('../controllers/home-slider-settings.controller')
 
 const router = require('express').Router()
 
@@ -36,5 +37,7 @@ router.get('/header-settings', headerSettingsController.getSettings)
 router.put('/header-settings', headerSettingsController.updateSettings)
 router.get('/footer-settings', footerSettingsController.getSettings)
 router.put('/footer-settings', footerSettingsController.updateSettings)
+router.get('/home-slider-settings', homeSliderSettingsController.getSettings)
+router.put('/home-slider-settings', homeSliderSettingsController.updateSettings)
 
 module.exports = router

@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 
 import HeaderSearchPanel from './shared/header-search-panel'
 import HeaderMobileNav from './shared/header-mobile-nav'
+import HeaderUserAction from './shared/header-user-action'
 import LanguageSwitcher from './shared/language-switcher'
-import UserBox from './shared/user-box'
 
 type Props = {
   locale: Locale
@@ -21,7 +21,15 @@ type Props = {
 export default function Header({ locale, searchItems, locationLabel, currentUser }: Props) {
   const dict = getDictionary(locale)
   const favorites = currentUser?.favorites
-  const wishlistCount = Array.isArray(favorites) ? favorites.length : 0
+  const wishlistCount = Array.isArray(favorites)
+    ? new Set(
+        favorites
+          .map(favorite =>
+            typeof favorite === 'string' ? favorite : (favorite as Partial<IProduct>)?._id
+          )
+          .filter((favoriteId): favoriteId is string => Boolean(favoriteId))
+      ).size
+    : 0
 
   return (
     <>
@@ -38,10 +46,7 @@ export default function Header({ locale, searchItems, locationLabel, currentUser
               menuTitle={dict.header.menu}
               locationLabel={locationLabel}
               locationAria={dict.header.locationAria}
-              links={[
-                { href: '/', label: dict.header.home },
-                { href: '/contacts', label: dict.header.contacts },
-              ]}
+              links={[]}
             />
             <Link
               href='/'
@@ -49,10 +54,6 @@ export default function Header({ locale, searchItems, locationLabel, currentUser
             >
               600 плюс
             </Link>
-            <nav className='hidden items-center gap-5 text-sm md:flex'>
-              <Link href='/'>{dict.header.home}</Link>
-              <Link href='/contacts'>{dict.header.contacts}</Link>
-            </nav>
           </div>
 
           <div className='flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3'>
@@ -76,15 +77,9 @@ export default function Header({ locale, searchItems, locationLabel, currentUser
               )}
             </div>
 
-            <HeaderSearchPanel items={searchItems} />
+            <HeaderSearchPanel items={searchItems} searchPanel={dict.searchPanel} locale={locale} />
 
-            {!currentUser?._id && (
-              <Button asChild variant='outline' size='sm'>
-                <Link href='/sign-in'>{dict.header.signIn}</Link>
-              </Button>
-            )}
-
-            {currentUser?._id && <UserBox user={currentUser} />}
+            <HeaderUserAction currentUser={currentUser} signInLabel={dict.header.signIn} />
           </div>
         </div>
       </div>

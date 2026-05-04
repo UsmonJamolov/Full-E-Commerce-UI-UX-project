@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
         session.user = {
           ...session.user,
           name: user.name || user.phone || "User",
-          email: null,
+          email: user.email || null,
           image: user.avatar || "", // <-- MUHIM
           id: user._id,
           phone: user.phone,
@@ -90,6 +90,7 @@ export const authOptions: NextAuthOptions = {
           phone: user.phone,
           name: user.name || user.phone || "User",
           role: user.role,
+          email: user.email || null,
           avatar: user.avatar || "", // <-- MUHIM
           favorites: user.favorites || [],
           isDeleted: user.isDeleted,

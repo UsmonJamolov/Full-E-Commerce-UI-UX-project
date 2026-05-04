@@ -1,18 +1,32 @@
 'use client'
 
+import { useI18n } from '@/components/providers/i18n-provider'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { dashboardSidebar } from '@/lib/constants'
+import { dashboardSidebar, type DashboardNavKey } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+const navLabel = (key: DashboardNavKey, d: ReturnType<typeof useI18n>['dictionary']['dashboard']) => {
+	switch (key) {
+		case 'personal':
+			return d.navPersonal
+		case 'watchList':
+			return d.navWatchList
+		case 'settings':
+			return d.navSettings
+	}
+}
+
 const Sidebar = () => {
 	const pathname = usePathname()
+	const { dictionary } = useI18n()
+	const d = dictionary.dashboard
 
 	return (
 		<div className='p-4 shadow-lg'>
-			<h1 className='font-semibold'>Dashboard</h1>
+			<h1 className='font-semibold'>{d.sidebarTitle}</h1>
 			<Separator />
 			<div className='flex flex-col mt-2'>
 				{dashboardSidebar.map(item => (
@@ -24,7 +38,7 @@ const Sidebar = () => {
 					>
 						<Link href={item.route}>
 							<item.icon />
-							<span>{item.name}</span>
+							<span>{navLabel(item.navKey, d)}</span>
 						</Link>
 					</Button>
 				))}

@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { getServerSession } from 'next-auth'
 
 import { getProducts } from '@/actions/user.action'
+import { I18nProvider } from '@/components/providers/i18n-provider'
 import SessionProvider from '@/components/providers/session.provider'
 import SiteChrome from '@/components/site-chrome'
 import { Toaster } from '@/components/ui/sonner'
@@ -35,19 +36,21 @@ const RootLayout = async ({ children }: ChildProps) => {
   return (
     <html lang={locale}>
       <body className='antialised'>
-        <SessionProvider session={session}>
-          <SiteChrome
-            locale={locale}
-            dictionary={dictionary}
-            locationLabel={headerSettings.locationLabel}
-            searchItems={searchItems}
-            currentUser={session?.currentUser}
-            footerSettings={footerSettings}
-          >
-            {children}
-          </SiteChrome>
-          <Toaster />
-        </SessionProvider>
+        <I18nProvider locale={locale} dictionary={dictionary}>
+          <SessionProvider session={session}>
+            <SiteChrome
+              locale={locale}
+              dictionary={dictionary}
+              locationLabel={headerSettings.locationLabel}
+              searchItems={searchItems}
+              currentUser={session?.currentUser}
+              footerSettings={footerSettings}
+            >
+              {children}
+            </SiteChrome>
+            <Toaster />
+          </SessionProvider>
+        </I18nProvider>
       </body>
     </html>
   )

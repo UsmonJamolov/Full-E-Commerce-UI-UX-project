@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@/components/providers/i18n-provider'
 import { updatePassword, updateUser } from '@/actions/user.action'
 import {
 	AlertDialog,
@@ -26,6 +27,8 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 const Page = () => {
+	const { dictionary } = useI18n()
+	const d = dictionary.dashboard
 	const {isLoading, onError, setIsLoading} = useAction()
 	const form = useForm<z.infer<typeof passwordSchema>>({
 		resolver: zodResolver(passwordSchema),
@@ -36,13 +39,13 @@ const Page = () => {
 		setIsLoading(true)
 		const res = await updateUser({isDeleted: true, deletedAt: new Date()})
 		if (res?.serverError || res?.validationErrors || !res?.data) {
-			return onError('Something went wrong')
+			return onError(d.genericError)
 		}
 		if (res.data.failure) {
 			return onError(res.data.failure)
 		}
 		if (res.data.status === 200) {
-			toast('Account deleted successfully')
+			toast(d.settingsAccountDeleted)
 			setIsLoading(false)
 			signOut({callbackUrl: '/sign-up'})
 		}
@@ -52,13 +55,13 @@ const Page = () => {
 		setIsLoading(true)
 		const res = await updatePassword(values)
 		if (res?.serverError || res?.validationErrors || !res?.data) {
-			return onError('Something went wrong')
+			return onError(d.genericError)
 		}
 		if (res.data.failure) {
 			return onError(res.data.failure)
 		}
 		if (res.data.status === 200) {
-			toast('Password updated successfully')
+			toast(d.settingsPasswordUpdated)
 			setIsLoading(false)
 			form.reset()
 		}
@@ -66,29 +69,27 @@ const Page = () => {
 
 	return (
 		<>
-			<h1 className='text-xl font-bold'>Danger zone</h1>
+			<h1 className='text-xl font-bold'>{d.settingsDangerZone}</h1>
 			<Separator className='my-3' />
 			<div className='p-4 bg-secondary flex flex-col space-y-0'>
-				<div className='text-lg font-bold'>Delete account</div>
-				<p className='text-sm text-muted-foreground'>
-					Deleting your account will remove all your data from our servers. This action is irreversible.
-				</p>
+				<div className='text-lg font-bold'>{d.settingsDeleteAccount}</div>
+				<p className='text-sm text-muted-foreground'>{d.settingsDeleteDesc}</p>
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
 						<Button className='w-fit' size={'sm'} variant={'destructive'}>
-							Delete account
+							{d.settingsDeleteButton}
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
 						<AlertDialogHeader>
-							<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-							<AlertDialogDescription>
-								This action cannot be undone. This will permanently delete your account and remove your data from our servers.
-							</AlertDialogDescription>
+							<AlertDialogTitle>{d.settingsAlertTitle}</AlertDialogTitle>
+							<AlertDialogDescription>{d.settingsAlertDescription}</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={onDelete} disabled={isLoading}>Continue</AlertDialogAction>
+							<AlertDialogCancel disabled={isLoading}>{d.settingsCancel}</AlertDialogCancel>
+							<AlertDialogAction onClick={onDelete} disabled={isLoading}>
+								{d.settingsContinue}
+							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>
@@ -103,7 +104,7 @@ const Page = () => {
 								name='oldPassword'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label>Old password</Label>
+										<Label>{d.oldPassword}</Label>
 										<FormControl>
 											<Input placeholder='****' type='password' className='bg-white' {...field} />
 										</FormControl>
@@ -116,7 +117,7 @@ const Page = () => {
 								name='newPassword'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label>New password</Label>
+										<Label>{d.newPassword}</Label>
 										<FormControl>
 											<Input placeholder='****' type='password' className='bg-white' {...field} />
 										</FormControl>
@@ -129,7 +130,7 @@ const Page = () => {
 								name='confirmPassword'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label>Confirm password</Label>
+										<Label>{d.confirmPassword}</Label>
 										<FormControl>
 											<Input placeholder='****' type='password' className='bg-white' {...field} />
 										</FormControl>
@@ -137,7 +138,7 @@ const Page = () => {
 									</FormItem>
 								)}
 							/>
-							<Button type='submit'>Submit</Button>
+							<Button type='submit'>{d.submit}</Button>
 						</form>
 					</Form>
 				</div>

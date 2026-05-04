@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
 const HeaderSettingsPage = async () => {
-	redirect('/admin/buy-now')
+	redirect('/admin/settings')
 }
 
 export default HeaderSettingsPage

@@ -10,6 +10,13 @@ const userSchema = new Schema(
     },
     password: { type: String, required: true },
     name: { type: String, required: true },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      sparse: true,
+      unique: true,
+    },
     role: { type: String, required: true, default: 'user' },
     avatar: {
       type: String,
@@ -35,7 +42,6 @@ const userSchema = new Schema(
     deletedAt: {
       type: Date,
     },
-    customerId: { type: String },
   },
   {
     timestamps: true,

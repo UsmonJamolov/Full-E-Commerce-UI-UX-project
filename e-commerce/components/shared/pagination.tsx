@@ -31,7 +31,7 @@ const Pagination: FC<Props> = ({isNext, pageNumber}) => {
 	return (
 		<div className='flex w-full items-center justify-center gap-2 mt-4'>
 			<Button size={'sm'} onClick={() => onNavigate('prev')} disabled={pageNumber === 1}>Prev</Button>
-			<p>1</p>
+			<p className='min-w-[2ch] text-center tabular-nums'>{pageNumber}</p>
 			<Button size={'sm'} onClick={() => onNavigate('next')} disabled={!isNext}>Next</Button>
 		</div>
 	)

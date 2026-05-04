@@ -3,12 +3,17 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getDictionary, parseLocale } from '@/lib/i18n/dictionaries'
 import { Banknote, Edit2, Heart, Shuffle } from 'lucide-react'
+import { cookies } from 'next/headers'
 
-const Loading = () => {
+const Loading = async () => {
+	const cookieStore = await cookies()
+	const d = getDictionary(parseLocale(cookieStore.get('locale')?.value)).dashboard
+
 	return (
 		<>
-			<h1 className='text-xl font-semibold'>Personal information</h1>
+			<h1 className='text-xl font-semibold'>{d.personalInfoPageTitle}</h1>
 
 			<Separator className='my-3' />
 
@@ -43,21 +48,21 @@ const Loading = () => {
 				<div className='border-2 p-2 flex justify-center flex-col space-y-2 items-center shadow-md hover:animate-pulse transition-all cursor-pointer'>
 					<Shuffle size={50} />
 					<div className='text-center'>
-						<p>Orders</p>
+						<p>{d.ordersTitle}</p>
 					</div>
 				</div>
 
 				<div className='border-2 p-2 flex justify-center flex-col space-y-2 items-center shadow-md hover:animate-pulse transition-all cursor-pointer'>
 					<Banknote size={50} />
 					<div className='text-center'>
-						<p>Payments</p>
+						<p>{d.paymentsTitle}</p>
 					</div>
 				</div>
 
 				<div className='border-2 p-2 flex justify-center flex-col space-y-2 items-center shadow-md hover:animate-pulse transition-all cursor-pointer'>
 					<Heart size={50} />
 					<div className='text-center'>
-						<p>Watch list</p>
+						<p>{d.watchListPageTitle}</p>
 					</div>
 				</div>
 			</div>

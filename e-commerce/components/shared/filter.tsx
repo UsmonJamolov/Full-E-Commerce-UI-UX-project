@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@/components/providers/i18n-provider'
 import { Search } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -30,6 +31,8 @@ function FilterFallback({ showCategory }: Pick<Props, 'showCategory'>) {
 }
 
 function FilterInner({ showCategory, categoryOptions = categories }: Props) {
+	const { dictionary } = useI18n()
+	const f = dictionary.filter
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const paramsString = searchParams.toString()
@@ -69,7 +72,7 @@ function FilterInner({ showCategory, categoryOptions = categories }: Props) {
 		<div className={cn('gap-1 max-md:w-full grid', showCategory ? 'grid-cols-3' : 'grid-cols-2')}>
 			<div className='flex items-center bg-secondary max-md:w-1/2 border'>
 				<Input
-					placeholder='Qidirish'
+					placeholder={f.searchPlaceholder}
 					className='text-xs border-none no-focus'
 					onChange={e => debouncedSearch(e.target.value)}
 				/>
@@ -78,20 +81,20 @@ function FilterInner({ showCategory, categoryOptions = categories }: Props) {
 
 			<Select onValueChange={onFilterChange}>
 				<SelectTrigger className='bg-secondary text-xs max-md:w-1/2'>
-					<SelectValue placeholder='Select filter' className='text-muted-foreground' />
+					<SelectValue placeholder={f.filterPlaceholder} className='text-muted-foreground' />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value='newest'>Newest</SelectItem>
-					<SelectItem value='oldest'>Oldest</SelectItem>
+					<SelectItem value='newest'>{f.newest}</SelectItem>
+					<SelectItem value='oldest'>{f.oldest}</SelectItem>
 				</SelectContent>
 			</Select>
 			{showCategory && (
 				<Select onValueChange={onCategoryChange}>
 					<SelectTrigger className='bg-secondary text-xs max-md:w-1/2'>
-						<SelectValue placeholder='Select category' className='text-muted-foreground' />
+						<SelectValue placeholder={f.categoryPlaceholder} className='text-muted-foreground' />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value='all'>All category</SelectItem>
+						<SelectItem value='all'>{f.allCategories}</SelectItem>
 						{categoryOptions.map(category => (
 							<SelectItem value={category} key={category}>
 								{category}

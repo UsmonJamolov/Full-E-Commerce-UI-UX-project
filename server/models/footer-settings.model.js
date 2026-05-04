@@ -11,7 +11,24 @@ const footerSettingsSchema = new Schema(
 		maxMessengerUrl: { type: String, default: 'https://max.ru/', trim: true },
 		brandBlurb: {
 			type: String,
-			default: 'Exclusive — quality fashion & footwear. Join thousands of happy customers shopping with us every day.',
+			default:
+				'Quality fashion and footwear. Thousands of happy customers shop with us every day.',
+			trim: true,
+		},
+		mapEmbedSrc: {
+			type: String,
+			default:
+				'https://www.openstreetmap.org/export/embed.html?bbox=69.18%2C41.23%2C69.38%2C41.38&layer=mapnik',
+			trim: true,
+		},
+		mapExternalUrl: {
+			type: String,
+			default: 'https://www.openstreetmap.org/?mlat=41.2995&mlon=69.2401#map=14/41.2995/69.2401',
+			trim: true,
+		},
+		mapAddress: {
+			type: String,
+			default: '',
 			trim: true,
 		},
 	},

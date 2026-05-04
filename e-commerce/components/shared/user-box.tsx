@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@/components/providers/i18n-provider'
 import { FC, useState } from 'react'
 import {
 	DropdownMenu,
@@ -11,7 +12,7 @@ import {
 } from '../ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { signOut } from 'next-auth/react'
-import { LogIn } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import Link from 'next/link'
 import {
 	AlertDialog,
@@ -30,6 +31,8 @@ interface Props {
 }
 const UserBox: FC<Props> = ({ user }) => {
 	const [open, setOpen] = useState(false)
+	const { dictionary } = useI18n()
+	const h = dictionary.header
 
 	return (
 		<>
@@ -41,33 +44,33 @@ const UserBox: FC<Props> = ({ user }) => {
 					</Avatar>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-56'>
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
+					<DropdownMenuLabel>{h.userMenuLabel}</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					{user.role === 'admin' && (
 						<DropdownMenuItem className='cursor-pointer' asChild>
-							<Link href={'/admin/products'}>Admin</Link>
+							<Link href={'/admin/products'}>{h.userMenuAdmin}</Link>
 						</DropdownMenuItem>
 					)}
 					<DropdownMenuItem className='cursor-pointer' asChild>
-						<Link href={'/dashboard'}>Dashboard</Link>
+						<Link href={'/dashboard'}>{h.userMenuDashboard}</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem className='cursor-pointer' onClick={() => setOpen(true)}>
-						<LogIn />
-						<span>Logout</span>
+					<DropdownMenuItem className='flex cursor-pointer items-center' onClick={() => setOpen(true)}>
+						<LogOut className='mr-2 h-4 w-4 shrink-0' />
+						<span>{h.userMenuLogout}</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<AlertDialog open={open} onOpenChange={setOpen}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-						<AlertDialogDescription>
-							This action cannot be undone. This will logout you from the application.
-						</AlertDialogDescription>
+						<AlertDialogTitle>{h.logoutDialogTitle}</AlertDialogTitle>
+						<AlertDialogDescription>{h.logoutDialogDescription}</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={() => signOut({ callbackUrl: '/sign-in' })}>Continue</AlertDialogAction>
+						<AlertDialogCancel>{h.logoutDialogCancel}</AlertDialogCancel>
+						<AlertDialogAction onClick={() => signOut({ callbackUrl: '/sign-in' })}>
+							{h.logoutDialogContinue}
+						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>

@@ -1,16 +1,23 @@
-import FlashSalesContent from "./FlashSalesContent";
-import { IProduct, SearchParams } from "@/types";
+import { getProducts } from '@/actions/user.action'
+import FlashSalesContent from './FlashSalesContent'
 
 
 interface Props {
-  searchParams: SearchParams
-  products: IProduct[]
-  title: string
-  noProducts: string
-  viewAllLabel: string
+	title: string
+	noProducts: string
+	viewAllLabel: string
 }
 
-export default async function FlashSalesSection({searchParams, products, title, noProducts, viewAllLabel}: Props) {
+export default async function FlashSalesSection({ title, noProducts, viewAllLabel }: Props) {
+	const res = await getProducts({
+		searchQuery: '',
+		filter: 'newest',
+		category: 'Shoes',
+		targetGroup: 'Erkak',
+		page: '1',
+		pageSize: '8',
+	})
+	const products = res?.data?.products || []
 
-  return <FlashSalesContent products={products} searchParams={searchParams} title={title} noProducts={noProducts} viewAllLabel={viewAllLabel}  />;
+	return <FlashSalesContent products={products} title={title} noProducts={noProducts} viewAllLabel={viewAllLabel} />
 }

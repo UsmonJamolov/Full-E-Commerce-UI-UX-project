@@ -2,7 +2,17 @@ const categoryModel = require('../models/category.model')
 const productModel = require('../models/product.model')
 
 const HIDDEN_NAMES = ['Erkak', 'Ayol', 'Bola']
-const DEFAULT_NAMES = ['Shoes', 'T-Shirts', 'Clothes', 'Books', 'Accessories', 'Universal']
+const DEFAULT_NAMES = [
+	'Shoes',
+	'T-Shirts',
+	'Clothes',
+	'Umbrellas',
+	'Bags',
+	'Backpacks',
+	'Books',
+	'Accessories',
+	'Universal',
+]
 
 function sortCategories(docs) {
 	const visibleDocs = docs.filter((x) => !HIDDEN_NAMES.includes(x.name))

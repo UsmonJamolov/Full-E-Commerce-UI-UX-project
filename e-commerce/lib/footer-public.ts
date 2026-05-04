@@ -15,7 +15,8 @@ const fallback: PublicFooterSettings = {
 	email: 'exclusive@gmail.com',
 	telegramUrl: 'https://t.me/',
 	maxMessengerUrl: 'https://max.ru/',
-	brandBlurb: 'Exclusive — quality fashion & footwear. Join thousands of happy customers shopping with us every day.',
+	brandBlurb:
+		'Quality fashion and footwear. Thousands of happy customers shop with us every day.',
 }
 
 export async function getPublicFooterSettings(): Promise<PublicFooterSettings> {

@@ -1,4 +1,15 @@
-import { Barcode, Banknote, Heart, MapPin, MessageSquare, Settings2, ShoppingCart, Sparkles, User } from 'lucide-react'
+import {
+	Barcode,
+	Banknote,
+	Heart,
+	MapPin,
+	MessageSquare,
+	Settings2,
+	ShoppingCart,
+	Sparkles,
+	User,
+	type LucideIcon,
+} from 'lucide-react'
 
 export const products = [
 	{
@@ -27,12 +38,29 @@ export const products = [
 	},
 ]
 
-export const categories = ['All', 'Shoes', 'T-Shirts', 'Clothes', 'Books', 'Accessories', 'Universal']
+export const categories = [
+	'All',
+	'Shoes',
+	'T-Shirts',
+	'Clothes',
+	'Umbrellas',
+	'Bags',
+	'Backpacks',
+	'Books',
+	'Accessories',
+	'Universal',
+]
 
-export const dashboardSidebar = [
-	{ name: 'Personal Information', route: '/dashboard', icon: User },
-	{ name: 'Watch list', route: '/dashboard/watch-list', icon: Heart },
-	{ name: 'Settings', route: '/dashboard/settings', icon: Settings2 },
+export type DashboardNavKey = 'personal' | 'watchList' | 'settings'
+
+export const dashboardSidebar: {
+	route: string
+	icon: LucideIcon
+	navKey: DashboardNavKey
+}[] = [
+	{ route: '/dashboard', icon: User, navKey: 'personal' },
+	{ route: '/dashboard/watch-list', icon: Heart, navKey: 'watchList' },
+	{ route: '/dashboard/settings', icon: Settings2, navKey: 'settings' },
 ]
 
 export const adminSidebar = [
@@ -45,11 +73,6 @@ export const adminSidebar = [
 		name: { ru: 'Новые поступления', en: 'New arrivals', uz: 'Yangi kelganlar' },
 		icon: Sparkles,
 		route: '/admin/new-arrival',
-	},
-	{
-		name: { ru: 'Настройки хедера и Buy now', en: 'Header & Buy now settings', uz: 'Header va Buy now sozlamalari' },
-		icon: MapPin,
-		route: '/admin/buy-now',
 	},
 	{
 		name: { ru: 'Новые заявки на закупку', en: 'New purchase requests', uz: 'Yangi xarid so‘rovlari' },
@@ -65,5 +88,10 @@ export const adminSidebar = [
 		name: { ru: 'Комментарии', en: 'Comments', uz: 'Kommentariyalar' },
 		icon: MessageSquare,
 		route: '/admin/comments',
+	},
+	{
+		name: { ru: 'Настройки хедера и Buy now', en: 'Header & Buy now settings', uz: 'Header va Buy now sozlamalari' },
+		icon: MapPin,
+		route: '/admin/settings',
 	},
 ]

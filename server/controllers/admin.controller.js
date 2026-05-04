@@ -1,5 +1,6 @@
 const userModel = require('../models/user.model')
 const productModel = require('../models/product.model')
+const favoriteModel = require('../models/favorite.model')
 const { DeleteObjectCommand } = require('@aws-sdk/client-s3')
 const s3 = require('../config/s3') // agar alohida qilgan bo‘lsang
 
@@ -119,6 +120,8 @@ class AdminController {
 
 		// 🔥 KEYIN DB
 		await productModel.findByIdAndDelete(id)
+		await favoriteModel.deleteMany({ product: id })
+		await userModel.updateMany({ favorites: id }, { $pull: { favorites: id } })
 
 		return res.json({ success: 'Product deleted successfully' })
 

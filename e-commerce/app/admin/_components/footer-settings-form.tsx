@@ -41,6 +41,7 @@ export default function FooterSettingsForm({
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setIsLoading(true)
+
 		const res = await updateFooterSettingsAdmin({
 			phonePrimary: phonePrimary.trim(),
 			phoneSecondary: phoneSecondary.trim(),
@@ -94,6 +95,7 @@ export default function FooterSettingsForm({
 				<Label htmlFor='footer-brand'>Описание бренда</Label>
 				<Textarea id='footer-brand' value={brandBlurb} onChange={e => setBrandBlurb(e.target.value)} rows={3} required />
 			</div>
+
 			<Button type='submit' disabled={isLoading}>
 				{isLoading ? 'Сохранение...' : 'Сохранить настройки footer'}
 			</Button>

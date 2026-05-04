@@ -18,6 +18,12 @@ export interface ReturnActionType {
 	user: IUser
 	message: string
 	failure: string
+	/** Dev rejimda OTP yuborish javobida (SMS sozlanmagan). */
+	otp?: string
+	/** Kirish OTP tasdiqlangach. */
+	userId?: string
+	/** Masalan OTP SMS gateway xatosi. */
+	errorCode?: string
 	checkoutUrl: string
 	status: number
 	isNext: boolean
@@ -97,12 +103,14 @@ export type SafeUser = Partial<Omit<IUser, "password" | "favorites">> & {
   phone: string
   name: string
   role: string
+  email?: string | null
   favorites?: IProduct[] | string[]
 }
 
 export interface IUser {
 	phone: string
 	name: string
+	email?: string | null
 	password: string
 	_id: string
 	role: string
