@@ -72,6 +72,8 @@ export interface IProduct {
 	ratingAverage?: number
 	isNew?: boolean
 	cta?: boolean
+	createdAt?: string
+	updatedAt?: string
 }
 
 export interface IProductReview {

@@ -118,13 +118,12 @@ export default function CategoryWithSlider({
             </Link>
           </div>
           {/* Banner image */}
-          <div className="flex min-w-[140px] flex-1 items-end justify-end pb-2 pr-3 md:min-w-[200px] md:pb-2 md:pr-8 lg:pr-10">
+          <div className="relative min-w-[140px] flex-1 md:min-w-[260px]">
             <Image
               src={slide.image}
               alt={slide.alt}
-              width={190}
-              height={180}
-              className="object-contain w-[110px] xs:w-[130px] sm:w-[170px] md:w-[250px] h-auto"
+              fill
+              className="object-cover object-center"
               priority
               unoptimized
             />

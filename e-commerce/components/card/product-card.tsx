@@ -92,6 +92,9 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 			: Array.isArray(product.reviews) && product.reviews.length > 0
 				? product.reviews.reduce((sum, item) => sum + item.rating, 0) / product.reviews.length
 				: 0
+	const createdAtMs = product.createdAt ? new Date(product.createdAt).getTime() : NaN
+	const isNewInAWeek = Number.isFinite(createdAtMs) && Date.now() - createdAtMs <= 7 * 24 * 60 * 60 * 1000
+	const showNewBadge = Boolean(product.isNew && isNewInAWeek)
 
 	return (
 		<div
@@ -106,7 +109,7 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 			>
 				<Card className={cn('group border-0 shadow-none', isGrid && 'h-full')}>
 					<div className='relative rounded-lg bg-muted/30 p-3 sm:p-4'>
-						{product.isNew && (
+						{showNewBadge && (
 							<Badge className='absolute left-2 top-2 z-50 bg-black px-2 py-1 text-[11px] text-white hover:bg-black sm:left-3 sm:top-3'>
 								{t.newBadge}
 							</Badge>
@@ -121,11 +124,11 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 						</div>
 						<div
 							className={cn(
-								'relative mx-auto aspect-square',
-								isGrid ? 'w-full max-w-[200px]' : 'w-[78%] max-w-[180px]',
+								'relative overflow-hidden rounded-md',
+								isGrid ? 'mx-0 aspect-square w-full' : 'mx-auto aspect-square w-full max-w-[180px]',
 							)}
 						>
-							<Image src={imageSrc} alt={product.title} fill className='object-contain' unoptimized />
+							<Image src={imageSrc} alt={product.title} fill className='object-cover object-center' unoptimized />
 						</div>
 						{product.cta && (
 							<Button
@@ -139,7 +142,7 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 					<div className='space-y-1 sm:space-y-2'>
 						<p className='line-clamp-2 text-xs font-medium sm:text-sm'>{product.title}</p>
 						<div className='flex items-center gap-2 sm:gap-3'>
-							<span className='text-sm font-semibold text-red-500'>{formatPrice(product.price)}</span>
+							<span className='text-sm font-semibold text-red-500'>₽ {formatPrice(product.price)}</span>
 						</div>
 						<div className='flex items-center gap-1 sm:gap-2'>
 							<Stars value={ratingAverage} />

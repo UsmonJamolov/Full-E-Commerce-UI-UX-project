@@ -26,7 +26,7 @@ const ShoesProductsPage: FC<Props> = async props => {
 		category: 'Shoes',
 		...(targetGroup ? { targetGroup } : {}),
 		page: `${searchParams.page || '1'}`,
-		pageSize: '12',
+		pageSize: '40',
 	})
 	const products = res?.data?.products || []
 	const isNext = res?.data?.isNext || false
@@ -39,10 +39,10 @@ const ShoesProductsPage: FC<Props> = async props => {
 			<Suspense fallback={<div className='mt-5 h-9' aria-hidden />}>
 				<ShoesTargetGroupFilters />
 			</Suspense>
-			<div className='flex gap-4 overflow-x-auto mt-6'>
+			<div className='mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
 				{products.length === 0 && <p>No products found</p>}
 				{products.map(product => (
-					<ProductCard key={product._id} product={product} />
+					<ProductCard key={product._id} product={product} layout='grid' />
 				))}
 			</div>
 			<Pagination isNext={isNext} pageNumber={currentPage} />
