@@ -102,15 +102,21 @@ export const addFavorite = actionClient.schema(idSchema).action<ReturnActionType
 	return JSON.parse(JSON.stringify(data))
 })
 
-export const updateUser = actionClient.schema(updateUserSchema).action<ReturnActionType>(async ({parsedInput}) => {
+export const updateUser = actionClient.schema(updateUserSchema).action<ReturnActionType>(async ({ parsedInput }) => {
 	const session = await getServerSession(authOptions)
-	if (!session?.currentUser) return {failure: 'You must be logged in to update your profile'}
+	if (!session?.currentUser) return { failure: 'You must be logged in to update your profile' }
 	const token = await generateToken(session?.currentUser?._id)
-	const { data } = await axiosClient.put('/api/user/update-profile', parsedInput, {
-		headers: { Authorization: `Bearer ${token}` },
-	})
-	revalidatePath('/dashboard')
-	return JSON.parse(JSON.stringify(data))
+	try {
+		const { data } = await axiosClient.put('/api/user/update-profile', parsedInput, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		revalidatePath('/dashboard')
+		return JSON.parse(JSON.stringify(data))
+	} catch (error: unknown) {
+		const ax = error as { response?: { data?: { failure?: string; message?: string } } }
+		const msg = ax.response?.data?.failure ?? ax.response?.data?.message ?? 'Server error'
+		return JSON.parse(JSON.stringify({ failure: msg })) as ReturnActionType
+	}
 })
 
 export const updatePassword = actionClient.schema(passwordSchema).action<ReturnActionType>(async ({parsedInput}) => {

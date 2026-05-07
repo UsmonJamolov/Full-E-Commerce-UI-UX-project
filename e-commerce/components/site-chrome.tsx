@@ -23,7 +23,7 @@ type Props = {
 
 function isAuthPath(pathname: string | null) {
 	if (!pathname) return false
-	return pathname === '/sign-in' || pathname === '/sign-up'
+	return pathname === '/sign-in' || pathname === '/sign-up' || pathname === '/admin-sign-up'
 }
 
 export default function SiteChrome({

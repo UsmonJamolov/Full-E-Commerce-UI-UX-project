@@ -38,6 +38,7 @@ const HomePage = async () => {
                 <BrowseCategorySection
                     categoriesLabel={dict.home.categoriesLabel}
                     title={dict.home.browseByCategory}
+                    locale={locale}
                 />
                 <Separator className="my-5" />
                 <BestSellingProductsSection

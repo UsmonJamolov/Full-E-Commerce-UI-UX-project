@@ -18,8 +18,10 @@ export async function proxy(req: NextRequest) {
 	}
 
 	const { pathname } = req.nextUrl;
+	const isAdminSignupPath = pathname === "/admin-sign-up";
 	const isProtectedPath =
-		pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
+		(pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) &&
+		!isAdminSignupPath;
 
 	// Server Action POST + redirect = brauzerda "Failed to fetch" (fetchServerAction).
 	// Himoya server action ichida (getServerSession / token) qilinadi.

@@ -12,9 +12,10 @@ interface Props {
   title: string
   noProducts: string
   viewAllLabel: string
+  viewAllHref?: string
 }
 
-const FlashSalesContent = ({ products, title, noProducts, viewAllLabel }: Props) => {
+const FlashSalesContent = ({ products, title, noProducts, viewAllLabel, viewAllHref = "/shoes-products" }: Props) => {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
 
   const scrollByCards = (dir: "prev" | "next") => {
@@ -58,7 +59,7 @@ const FlashSalesContent = ({ products, title, noProducts, viewAllLabel }: Props)
 
         <div className="flex justify-center mt-8">
           <Button asChild className="bg-red-500 hover:bg-red-600 text-white px-8 h-12 text-base rounded">
-            <Link href="/shoes-products">{viewAllLabel}</Link>
+            <Link href={viewAllHref}>{viewAllLabel}</Link>
           </Button>
         </div>
 

@@ -101,7 +101,7 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 			<div
 				className={cn(
 					'relative z-10 shrink-0',
-					isGrid ? 'w-full max-w-full' : 'w-[170px] xs:w-[195px] sm:w-[230px] md:w-[260px]',
+					isGrid ? 'w-full max-w-full' : 'w-[68vw] min-w-[150px] max-w-[260px] sm:w-[230px] md:w-[260px]',
 				)}
 			>
 				<Card className={cn('group border-0 shadow-none', isGrid && 'h-full')}>
@@ -122,7 +122,7 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 						<div
 							className={cn(
 								'relative mx-auto aspect-square',
-								isGrid ? 'w-full max-w-[200px]' : 'w-[110px] xs:w-[140px] sm:w-[180px]',
+								isGrid ? 'w-full max-w-[200px]' : 'w-[78%] max-w-[180px]',
 							)}
 						>
 							<Image src={imageSrc} alt={product.title} fill className='object-contain' unoptimized />

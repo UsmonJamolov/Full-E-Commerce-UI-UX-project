@@ -18,20 +18,17 @@ const BestSellingProductsSection = async ({
 		page: '1',
 		pageSize: '4',
 	})
-	let products = res?.data?.products || []
-	if (products.length === 0) {
-		const fallbackRes = await getProducts({
-			searchQuery: '',
-			filter: 'newest',
-			category: '',
-			targetGroup: '',
-			page: '1',
-			pageSize: '4',
-		})
-		products = fallbackRes?.data?.products || []
-	}
+	const products = res?.data?.products || []
 
-	return <BestSellingContent products={products} title={title} noProducts={noProducts} viewAllLabel={viewAllLabel} />
+	return (
+		<BestSellingContent
+			products={products}
+			title={title}
+			noProducts={noProducts}
+			viewAllLabel={viewAllLabel}
+			viewAllHref='/shoes-products?targetGroup=Ayol&category=Shoes'
+		/>
+	)
 }
 
 export default BestSellingProductsSection

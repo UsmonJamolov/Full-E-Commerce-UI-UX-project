@@ -31,6 +31,17 @@ import { FC, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 export type AdminCategoryRow = { _id: string; name: string; isDefault?: boolean }
+const FALLBACK_CATEGORIES: AdminCategoryRow[] = [
+	{ _id: 'default-shoes', name: 'Shoes', isDefault: true },
+	{ _id: 'default-tshirts', name: 'T-Shirts', isDefault: true },
+	{ _id: 'default-clothes', name: 'Clothes', isDefault: true },
+	{ _id: 'default-umbrellas', name: 'Umbrellas', isDefault: true },
+	{ _id: 'default-bags', name: 'Bags', isDefault: true },
+	{ _id: 'default-backpacks', name: 'Backpacks', isDefault: true },
+	{ _id: 'default-books', name: 'Books', isDefault: true },
+	{ _id: 'default-accessories', name: 'Accessories', isDefault: true },
+	{ _id: 'default-universal', name: 'Universal', isDefault: true },
+]
 
 interface Props {
 	value: string
@@ -56,7 +67,11 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 				return
 			}
 			const categories = (res?.data as { categories?: AdminCategoryRow[] } | undefined)?.categories
-			if (categories) setList(categories)
+			if (categories?.length) {
+				setList(categories)
+			} else {
+				setList(FALLBACK_CATEGORIES)
+			}
 		} finally {
 			setLoading(false)
 		}

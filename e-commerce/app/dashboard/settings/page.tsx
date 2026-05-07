@@ -37,7 +37,7 @@ const Page = () => {
 
 	async function onDelete() {
 		setIsLoading(true)
-		const res = await updateUser({isDeleted: true, deletedAt: new Date()})
+		const res = await updateUser({ isDeleted: true })
 		if (res?.serverError || res?.validationErrors || !res?.data) {
 			return onError(d.genericError)
 		}

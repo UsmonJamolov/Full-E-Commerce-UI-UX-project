@@ -108,7 +108,7 @@ export const Uploader = ({ value, onChange, onUploaded, setUploading }: Props) =
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setLocalUploading] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_SERVER_URL!;
+  const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || "";
 
   async function handleUpload(file: File) {
     try {
@@ -122,15 +122,21 @@ export const Uploader = ({ value, onChange, onUploaded, setUploading }: Props) =
         }),
       });
 
+      if (!res.ok) {
+        throw new Error("Failed to get upload URL");
+      }
       const data = await res.json();
 
-      await fetch(data.uploadUrl, {
+      const putRes = await fetch(data.uploadUrl, {
         method: "PUT",
         headers: { "Content-Type": file.type },
         body: file,
       });
+      if (!putRes.ok) {
+        throw new Error("Failed to upload file to storage");
+      }
 
-      await fetch(`${API_URL}/api/files`, {
+      const saveRes = await fetch(`${API_URL}/api/files`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -141,6 +147,9 @@ export const Uploader = ({ value, onChange, onUploaded, setUploading }: Props) =
           size: file.size,
         }),
       });
+      if (!saveRes.ok) {
+        throw new Error("Failed to save uploaded file");
+      }
 
       return { url: data.fileUrl, key: data.key };
     } catch (err) {

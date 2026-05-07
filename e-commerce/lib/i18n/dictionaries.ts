@@ -17,7 +17,7 @@ export const locales: Locale[] = ['en', 'ru', 'uz']
 
 export function parseLocale(value: string | undefined): Locale {
 	if (value === 'ru' || value === 'uz' || value === 'en') return value
-	return 'en'
+	return 'ru'
 }
 
 export type Dictionary = {
@@ -193,6 +193,26 @@ export type Dictionary = {
 			submitting: string
 			signInLink: string
 			loading: string
+			toastPasswordMismatch: string
+			toastSuccess: string
+			toastRegisterFailed: string
+		}
+		adminSignUp: {
+			title: string
+			subtitle: string
+			nameLabel: string
+			namePlaceholder: string
+			loginLabel: string
+			loginPlaceholder: string
+			passwordLabel: string
+			passwordPlaceholder: string
+			confirmLabel: string
+			confirmPlaceholder: string
+			adminKeyLabel: string
+			adminKeyPlaceholder: string
+			submit: string
+			submitting: string
+			signInLink: string
 			toastPasswordMismatch: string
 			toastSuccess: string
 			toastRegisterFailed: string
@@ -504,6 +524,26 @@ const en: Dictionary = {
 			toastSuccess: 'Account created. You are signed in.',
 			toastRegisterFailed: 'Could not create account',
 		},
+		adminSignUp: {
+			title: 'Admin sign up',
+			subtitle: 'Create an admin account with email or phone, password and admin key',
+			nameLabel: 'Name',
+			namePlaceholder: 'Admin name',
+			loginLabel: 'Email or phone',
+			loginPlaceholder: 'admin@example.com or +79991234567',
+			passwordLabel: 'Password',
+			passwordPlaceholder: 'At least 8 characters, a letter and a number',
+			confirmLabel: 'Confirm password',
+			confirmPlaceholder: 'Repeat password',
+			adminKeyLabel: 'Admin key',
+			adminKeyPlaceholder: 'Secret admin registration key',
+			submit: 'Create admin account',
+			submitting: 'Creating…',
+			signInLink: 'Already have an account? Sign in',
+			toastPasswordMismatch: 'Passwords do not match',
+			toastSuccess: 'Admin account created.',
+			toastRegisterFailed: 'Could not create admin account',
+		},
 	},
 	filter: {
 		searchPlaceholder: 'Search',
@@ -812,6 +852,26 @@ const ru: Dictionary = {
 			toastSuccess: 'Аккаунт создан. Вы вошли.',
 			toastRegisterFailed: 'Не удалось зарегистрироваться',
 		},
+		adminSignUp: {
+			title: 'Регистрация администратора',
+			subtitle: 'Создайте аккаунт администратора по email или телефону, паролю и ключу администратора',
+			nameLabel: 'Имя',
+			namePlaceholder: 'Имя администратора',
+			loginLabel: 'Email или телефон',
+			loginPlaceholder: 'admin@example.com или +79991234567',
+			passwordLabel: 'Пароль',
+			passwordPlaceholder: 'Не менее 8 символов, буква и цифра',
+			confirmLabel: 'Повторите пароль',
+			confirmPlaceholder: 'Пароль ещё раз',
+			adminKeyLabel: 'Ключ администратора',
+			adminKeyPlaceholder: 'Секретный ключ для регистрации',
+			submit: 'Создать admin аккаунт',
+			submitting: 'Создание…',
+			signInLink: 'Уже есть аккаунт? Войти',
+			toastPasswordMismatch: 'Пароли не совпадают',
+			toastSuccess: 'Админ аккаунт создан.',
+			toastRegisterFailed: 'Не удалось создать админ аккаунт',
+		},
 	},
 	filter: {
 		searchPlaceholder: 'Поиск',
@@ -963,7 +1023,7 @@ const uz: Dictionary = {
 		browseByCategory: 'Kategoriya bo`yicha tanlang',
 		noProducts: 'Mahsulotlar yo`q',
 		viewAllProducts: 'Barcha mahsulotlar',
-		buyNowTag: "Bugungi so`z",
+		buyNowTag: 'Bugungi tanlov',
 		buyNowTitle: 'Sifatli va arzon mahsulot',
 		buyNowCta: 'Buy Now!',
 		shopNow: 'Xarid qilish',
@@ -1120,6 +1180,26 @@ const uz: Dictionary = {
 			toastSuccess: 'Akkaunt yaratildi. Siz tizimga kirdingiz.',
 			toastRegisterFailed: 'Ro‘yxatdan o‘tib bo‘lmadi',
 		},
+		adminSignUp: {
+			title: 'Admin ro‘yxatdan o‘tish',
+			subtitle: 'Email yoki telefon, parol va admin kalit bilan admin akkaunt yarating',
+			nameLabel: 'Ism',
+			namePlaceholder: 'Admin ismi',
+			loginLabel: 'Email yoki telefon',
+			loginPlaceholder: 'admin@example.com yoki +998901234567',
+			passwordLabel: 'Parol',
+			passwordPlaceholder: 'Kamida 8 belgi, harf va raqam',
+			confirmLabel: 'Parolni tasdiqlang',
+			confirmPlaceholder: 'Parolni qayta kiriting',
+			adminKeyLabel: 'Admin kalit',
+			adminKeyPlaceholder: 'Maxfiy admin ro‘yxat kaliti',
+			submit: 'Admin akkaunt yaratish',
+			submitting: 'Yaratilmoqda…',
+			signInLink: 'Akkauntingiz bormi? Kirish',
+			toastPasswordMismatch: 'Parollar mos emas',
+			toastSuccess: 'Admin akkaunt yaratildi.',
+			toastRegisterFailed: 'Admin akkaunt yaratib bo‘lmadi',
+		},
 	},
 	filter: {
 		searchPlaceholder: 'Qidirish',
@@ -1195,5 +1275,5 @@ const uz: Dictionary = {
 const map: Record<Locale, Dictionary> = { en, ru, uz }
 
 export function getDictionary(locale: Locale): Dictionary {
-	return map[locale] ?? en
+	return map[locale] ?? ru
 }

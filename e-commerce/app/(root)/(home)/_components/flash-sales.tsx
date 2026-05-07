@@ -19,5 +19,13 @@ export default async function FlashSalesSection({ title, noProducts, viewAllLabe
 	})
 	const products = res?.data?.products || []
 
-	return <FlashSalesContent products={products} title={title} noProducts={noProducts} viewAllLabel={viewAllLabel} />
+	return (
+		<FlashSalesContent
+			products={products}
+			title={title}
+			noProducts={noProducts}
+			viewAllLabel={viewAllLabel}
+			viewAllHref='/shoes-products?targetGroup=Erkak&category=Shoes'
+		/>
+	)
 }

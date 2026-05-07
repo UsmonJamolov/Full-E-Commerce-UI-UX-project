@@ -67,6 +67,10 @@ export const registerSchema = z
 		path: ['confirmPassword'],
 	})
 
+export const adminRegisterSchema = registerSchema.extend({
+	adminKey: z.string().min(1, 'Admin kalitni kiriting'),
+})
+
 export const fullNameSchema = z.object({
 	fullName: z.string().min(3, { message: 'Full name must be at least 3 characters' }),
 })
@@ -189,7 +193,8 @@ export const updateUserSchema = z.object({
 	avatar: z.string().optional(),
 	avatarKey: z.string().optional(),
 	isDeleted: z.boolean().optional(),
-	deletedAt: z.date().optional(),
+	/** Server action JSON: Date → string; z.date() rad qiladi, shuning uchun coerce. */
+	deletedAt: z.coerce.date().optional(),
 })
 
 export const updateStatusSchema = z.object({ status: z.string() }).merge(idSchema)

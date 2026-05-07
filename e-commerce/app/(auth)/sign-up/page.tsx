@@ -75,13 +75,25 @@ const SignUpPage = () => {
 			})
 
 			if (registerRes?.validationErrors) {
-				const msg = pickFirstValidationMessage(registerRes.validationErrors) ?? t.toastRegisterFailed
-				toast.error(msg)
+				const msg = pickFirstValidationMessage(registerRes.validationErrors)
+				toast.error(
+					msg ??
+						(typeof registerRes.validationErrors === 'object' &&
+						registerRes.validationErrors !== null &&
+						'root' in registerRes.validationErrors &&
+						Array.isArray((registerRes.validationErrors as { root?: string[] }).root)
+							? (registerRes.validationErrors as { root: string[] }).root[0]
+							: null) ??
+						t.toastRegisterFailed,
+				)
 				return
 			}
 
 			if (registerRes?.serverError || !registerRes?.data) {
-				toast.error(t.toastRegisterFailed)
+				const se = registerRes?.serverError
+				toast.error(
+					typeof se === 'string' && se ? se : se != null ? String(se) : t.toastRegisterFailed,
+				)
 				return
 			}
 

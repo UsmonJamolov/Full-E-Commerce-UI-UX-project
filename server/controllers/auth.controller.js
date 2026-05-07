@@ -106,10 +106,25 @@ async login(req, res, next) {
 //   }
 // };
 
-async register(req, res) {
+async registerWithRole(req, res, role = 'user', requireAdminKey = false) {
   try {
-    const { name, login, password, phone } = req.body;
+    const { name, login, password, phone, adminKey } = req.body;
     const rawLogin = login ?? phone;
+
+    if (requireAdminKey) {
+      if (!process.env.ADMIN_SIGNUP_KEY) {
+        return res.status(503).json({
+          success: false,
+          message: "Admin ro‘yxatdan o‘tish vaqtincha o‘chiq",
+        });
+      }
+      if (adminKey !== process.env.ADMIN_SIGNUP_KEY) {
+        return res.status(403).json({
+          success: false,
+          message: "Admin kalit noto‘g‘ri",
+        });
+      }
+    }
 
     if (!name || !String(name).trim() || !rawLogin || !password) {
       return res.status(400).json({
@@ -127,12 +142,29 @@ async register(req, res) {
     const userPayload = {
       name: String(name).trim(),
       password: await bcrypt.hash(password, 10),
+      role,
     };
 
     if (trimmed.includes("@")) {
       const email = trimmed.toLowerCase();
-      const emailTaken = await User.findOne({ email });
-      if (emailTaken) {
+      const emailUser = await User.findOne({ email });
+      if (emailUser) {
+        if (emailUser.isDeleted) {
+          emailUser.name = String(name).trim();
+          emailUser.password = await bcrypt.hash(password, 10);
+          emailUser.isDeleted = false;
+          emailUser.deletedAt = undefined;
+          emailUser.role = role;
+          await emailUser.save();
+          const userObj = emailUser.toObject();
+          delete userObj.password;
+          userObj.favorites = await getFavoriteProductIds(emailUser._id);
+          return res.status(200).json({
+            success: true,
+            message: "Akkaunt tiklandi",
+            user: userObj,
+          });
+        }
         return res.status(400).json({
           success: false,
           message: "Email band",
@@ -150,6 +182,22 @@ async register(req, res) {
       const fullPhone = "+" + digits;
       const existingUser = await User.findOne({ phone: fullPhone });
       if (existingUser) {
+        if (existingUser.isDeleted) {
+          existingUser.name = String(name).trim();
+          existingUser.password = await bcrypt.hash(password, 10);
+          existingUser.isDeleted = false;
+          existingUser.deletedAt = undefined;
+          existingUser.role = role;
+          await existingUser.save();
+          const userObj = existingUser.toObject();
+          delete userObj.password;
+          userObj.favorites = await getFavoriteProductIds(existingUser._id);
+          return res.status(200).json({
+            success: true,
+            message: "Akkaunt tiklandi",
+            user: userObj,
+          });
+        }
         return res.status(400).json({
           success: false,
           message: "User mavjud",
@@ -188,6 +236,14 @@ async register(req, res) {
       message: "Server error",
     });
   }
+}
+
+async register(req, res) {
+  return this.registerWithRole(req, res, 'user', false);
+}
+
+async registerAdmin(req, res) {
+  return this.registerWithRole(req, res, 'admin', true);
 }
 }
 

@@ -1,7 +1,15 @@
+import type { Locale } from '@/lib/i18n/dictionaries'
+
+const locationFallbackByLocale: Record<Locale, string> = {
+	en: 'Tashkent',
+	ru: 'Ташкент',
+	uz: 'Toshkent',
+}
+
 /** Bosh sahifa / layout uchun header sozlamalari (joylashuv) */
-export async function getPublicHeaderSettings(): Promise<{ locationLabel: string }> {
+export async function getPublicHeaderSettings(locale: Locale): Promise<{ locationLabel: string }> {
 	const base = process.env.NEXT_PUBLIC_SERVER_URL
-	const fallback = { locationLabel: 'Tashkent' }
+	const fallback = { locationLabel: locationFallbackByLocale[locale] }
 	if (!base) return fallback
 	try {
 		const res = await fetch(`${base}/api/user/header-settings`, { cache: 'no-store' })

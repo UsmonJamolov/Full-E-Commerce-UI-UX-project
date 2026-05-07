@@ -15,10 +15,11 @@ import { getDictionary, parseLocale } from '@/lib/i18n/dictionaries'
 import { ChildProps } from '@/types'
 
 const RootLayout = async ({ children }: ChildProps) => {
-  const [session, cookieStore, headerSettings, footerSettings, productsRes] = await Promise.all([
+  const cookieStore = await cookies()
+  const locale = parseLocale(cookieStore.get('locale')?.value)
+  const [session, headerSettings, footerSettings, productsRes] = await Promise.all([
     getServerSession(authOptions),
-    cookies(),
-    getPublicHeaderSettings(),
+    getPublicHeaderSettings(locale),
     getPublicFooterSettings(),
     getProducts({
       searchQuery: '',
@@ -29,7 +30,6 @@ const RootLayout = async ({ children }: ChildProps) => {
       pageSize: '40',
     }),
   ])
-  const locale = parseLocale(cookieStore.get('locale')?.value)
   const dictionary = getDictionary(locale)
   const searchItems = productsRes?.data?.products || []
 

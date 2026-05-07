@@ -11,11 +11,13 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { useRouter } from "next/navigation";
+import type { Locale } from "@/lib/i18n/dictionaries";
 
 type Category = {
   label: string;
   icon: React.ReactNode;
 };
+type CategoryKey = "shoes" | "tshirts" | "jackets" | "umbrellas" | "bags" | "backpacks";
 
 const JacketIcon = () => (
   <svg
@@ -44,17 +46,52 @@ const JacketIcon = () => (
   </svg>
 );
 
-const categories: Category[] = [
-  { label: "Oyoq kiyim", icon: <Footprints size={40} /> },
-  { label: "Futbolka", icon: <Shirt size={40} /> },
-  { label: "Kurtka", icon: <JacketIcon /> },
-  { label: "Zontik", icon: <Umbrella size={40} /> },
-  { label: "Sumka", icon: <Handbag size={40} /> },
-  { label: "Ryukzak", icon: <Backpack size={40} /> },
-];
+const categoryLabelsByLocale: Record<Locale, Record<CategoryKey, string>> = {
+  en: {
+    shoes: "Footwear",
+    tshirts: "T-shirts",
+    jackets: "Jackets",
+    umbrellas: "Umbrellas",
+    bags: "Bags",
+    backpacks: "Backpacks",
+  },
+  ru: {
+    shoes: "Обувь",
+    tshirts: "Футболки",
+    jackets: "Куртки",
+    umbrellas: "Зонты",
+    bags: "Сумки",
+    backpacks: "Рюкзаки",
+  },
+  uz: {
+    shoes: "Oyoq kiyim",
+    tshirts: "Futbolka",
+    jackets: "Kurtka",
+    umbrellas: "Soyabon",
+    bags: "Sumka",
+    backpacks: "Ryukzak",
+  },
+};
 
-export default function BrowseCategorySection({ categoriesLabel, title }: { categoriesLabel: string; title: string }) {
+export default function BrowseCategorySection({
+  categoriesLabel,
+  title,
+  locale,
+}: {
+  categoriesLabel: string;
+  title: string;
+  locale: Locale;
+}) {
   const router = useRouter();
+  const labels = categoryLabelsByLocale[locale];
+  const categories: Category[] = [
+    { label: labels.shoes, icon: <Footprints size={40} /> },
+    { label: labels.tshirts, icon: <Shirt size={40} /> },
+    { label: labels.jackets, icon: <JacketIcon /> },
+    { label: labels.umbrellas, icon: <Umbrella size={40} /> },
+    { label: labels.bags, icon: <Handbag size={40} /> },
+    { label: labels.backpacks, icon: <Backpack size={40} /> },
+  ];
 
   const onCategoryClick = (index: number) => {
     router.push(index === 0 ? "/shoes-products" : "/explore-products");

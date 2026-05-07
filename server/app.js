@@ -8,6 +8,8 @@ const errorMiddleware = require('./middlewares/error.middleware')
 const rateLimit = require('express-rate-limit')
 
 const app = express()
+// Nginx/proxy ortida haqiqiy client IP ni to'g'ri aniqlash (rate-limit uchun ham kerak).
+app.set('trust proxy', 1)
 
 // Middleware
 app.use(rateLimit({

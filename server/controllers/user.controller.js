@@ -206,6 +206,26 @@ class UserController {
 				}
 			}
 
+			// Soft delete — faqat o‘z profilida. Frontend faqat { isDeleted: true } yuborishi mumkin.
+			if (typeof req.body.isDeleted === 'boolean') {
+				$set.isDeleted = req.body.isDeleted
+				if (req.body.isDeleted === true) {
+					let dt = null
+					if (req.body.deletedAt != null && req.body.deletedAt !== '') {
+						dt = new Date(req.body.deletedAt)
+					}
+					$set.deletedAt = dt && !isNaN(dt.getTime()) ? dt : new Date()
+				}
+			} else if (req.body.deletedAt !== undefined) {
+				const raw = req.body.deletedAt
+				const dt = raw ? new Date(raw) : null
+				if (dt && !isNaN(dt.getTime())) {
+					$set.deletedAt = dt
+				} else if (!raw) {
+					$unset.deletedAt = ''
+				}
+			}
+
 			const updateDoc = {}
 			if (Object.keys($set).length) updateDoc.$set = $set
 			if (Object.keys($unset).length) updateDoc.$unset = $unset

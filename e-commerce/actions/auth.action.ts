@@ -3,6 +3,7 @@
 import { axiosClient } from "@/http/axios";
 import { actionClient } from "@/lib/safe-action";
 import {
+  adminRegisterSchema,
   loginSchema,
   registerSchema,
   verifyOtpSchema,
@@ -38,6 +39,34 @@ export const register = actionClient
     const { confirmPassword: _omit, ...payload } = parsedInput;
     try {
       const { data } = await axiosClient.post("/api/auth/register", payload);
+      try {
+        return JSON.parse(JSON.stringify(data)) as ReturnActionType;
+      } catch {
+        return { success: false, message: "Invalid server response" } as unknown as ReturnActionType;
+      }
+    } catch (error: unknown) {
+      const d = (error as { response?: { data?: unknown } })?.response?.data;
+      if (d && typeof d === "object") {
+        try {
+          return JSON.parse(JSON.stringify(d)) as ReturnActionType;
+        } catch {
+          return { success: false, message: "Server error" } as unknown as ReturnActionType;
+        }
+      }
+      const msg = (error as { message?: string })?.message;
+      return {
+        success: false,
+        message: typeof msg === "string" && msg ? msg : "Server error",
+      } as unknown as ReturnActionType;
+    }
+  });
+
+export const registerAdmin = actionClient
+  .schema(adminRegisterSchema)
+  .action<ReturnActionType>(async ({ parsedInput }) => {
+    const { confirmPassword: _omit, ...payload } = parsedInput;
+    try {
+      const { data } = await axiosClient.post("/api/auth/register-admin", payload);
       return JSON.parse(JSON.stringify(data));
     } catch (error: unknown) {
       const d = (error as { response?: { data?: unknown } })?.response?.data;

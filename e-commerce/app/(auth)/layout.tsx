@@ -31,7 +31,7 @@ import { FC } from 'react'
 
 const AuthLayout: FC<ChildProps> = ({ children }) => {
 	return (
-		<section className='flex min-h-[calc(100vh-120px)] w-full items-start justify-center bg-gradient-to-b from-background via-background to-muted/40 px-4 pb-10 pt-8 md:pt-12 md:pb-14'>
+		<section className='flex min-h-[calc(100vh-64px)] w-full items-start justify-center bg-gradient-to-b from-background via-background to-muted/40 px-4 pb-6 pt-4 md:pb-8 md:pt-6'>
 			<div className='w-full max-w-xl'>{children}</div>
 		</section>
 	)
