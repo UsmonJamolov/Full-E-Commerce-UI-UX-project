@@ -1,12 +1,11 @@
 /**
- * Admin mahsulot rasmi: bir xil sayt orqali /api/upload-product-image (Next → Express → S3).
- * To‘g‘ridan S3 presigned PUT ishlatilmaydi — bucket CORSsiz mobil/brauzerda "Failed to fetch".
+ * Admin mahsulot rasmi: `/api/auth/...` — nginx allaqachon Next ga yo‘naltiradi (maxsus location kerak emas).
  */
 export async function uploadProductImageClient(file: File): Promise<{ url: string; key: string }> {
 	const form = new FormData()
 	form.append('file', file)
 
-	const res = await fetch('/api/upload-product-image', {
+	const res = await fetch('/api/auth/upload-product-image', {
 		method: 'POST',
 		body: form,
 		credentials: 'include',

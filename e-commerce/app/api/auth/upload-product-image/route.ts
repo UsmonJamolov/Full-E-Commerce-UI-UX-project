@@ -12,7 +12,7 @@ function adminBearerToken(userId: string): string {
 	return jwt.sign({ userId }, secret, { expiresIn: '15m' })
 }
 
-/** Brauzer → Next (cookie sessiya) → Express (Bearer) → S3. S3 ga to‘g‘ridan-to‘g‘ri PUT CORS talab qiladi. */
+/** `/api/auth/*` nginx orqali Next ga boradi. Brauzer → Next (sessiya) → Express → S3. */
 export async function POST(req: Request) {
 	try {
 		const session = await getServerSession(authOptions)
