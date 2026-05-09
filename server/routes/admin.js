@@ -8,6 +8,12 @@ const footerSettingsController = require('../controllers/footer-settings.control
 const homeSliderSettingsController = require('../controllers/home-slider-settings.controller')
 
 const router = require('express').Router()
+const multer = require('multer')
+
+const uploadProductImageMulter = multer({
+	storage: multer.memoryStorage(),
+	limits: { fileSize: 50 * 1024 * 1024 },
+})
 
 router.get('/categories', categoryController.getCategories)
 router.post('/categories', categoryController.createCategory)
@@ -15,6 +21,11 @@ router.put('/categories/:id', categoryController.updateCategory)
 router.delete('/categories/:id', categoryController.deleteCategory)
 
 router.get('/products', adminController.getProducts)
+router.post(
+	'/upload-product-image',
+	uploadProductImageMulter.single('file'),
+	adminController.uploadProductImage,
+)
 router.post('/create-product', adminController.createProduct)
 router.put('/update-product/:id', adminController.updateProduct)
 router.delete('/delete-product/:id', adminController.deleteProduct)

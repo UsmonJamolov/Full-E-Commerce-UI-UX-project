@@ -1,8 +1,9 @@
 const userModel = require('../models/user.model')
 const productModel = require('../models/product.model')
 const favoriteModel = require('../models/favorite.model')
-const { DeleteObjectCommand } = require('@aws-sdk/client-s3')
+const { DeleteObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3')
 const s3 = require('../config/s3') // agar alohida qilgan bo‘lsang
+const { buildFileKey, getPublicFileUrl, allowedMimeTypes } = require('../utils/upload')
 
 class AdminController {
 	constructor() {
@@ -14,6 +15,7 @@ class AdminController {
 		this.getProductReviews = this.getProductReviews.bind(this)
 		this.updateProductReview = this.updateProductReview.bind(this)
 		this.deleteProductReview = this.deleteProductReview.bind(this)
+		this.uploadProductImage = this.uploadProductImage.bind(this)
 	}
 	// [GET] /admin/products
 	async getProducts(req, res, next) {
@@ -90,6 +92,34 @@ class AdminController {
 			next(error)
 		}
 	}
+
+	/** [POST] /admin/upload-product-image — multipart (server → S3, brauzer CORS yo‘q) */
+	async uploadProductImage(req, res, next) {
+		try {
+			const file = req.file
+			if (!file || !file.buffer) {
+				return res.status(400).json({ failure: 'Fayl kerak' })
+			}
+			const mime = file.mimetype || 'application/octet-stream'
+			if (!allowedMimeTypes.includes(mime)) {
+				return res.status(400).json({ failure: 'Ruxsat etilmagan fayl turi' })
+			}
+			const key = buildFileKey(file.originalname || 'photo.jpg', 'uploads')
+			await s3.send(
+				new PutObjectCommand({
+					Bucket: process.env.S3_BUCKET_NAME,
+					Key: key,
+					Body: file.buffer,
+					ContentType: mime,
+				}),
+			)
+			const fileUrl = getPublicFileUrl(key)
+			return res.status(200).json({ url: fileUrl, key })
+		} catch (error) {
+			next(error)
+		}
+	}
+
 	// [PUT] /admin/update-product/:id
 	async updateProduct(req, res, next) {
 		try {
