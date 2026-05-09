@@ -254,27 +254,49 @@ export const uploadFile = actionClient
       }
     } catch (err) {
       console.error('uploadFile', err)
-      throw new Error('File upload failed')
+      const ax = err as { response?: { data?: { message?: string; error?: string } }; message?: string }
+      const msg =
+        ax?.response?.data?.message ||
+        ax?.response?.data?.error ||
+        (typeof ax?.message === 'string' ? ax.message : null) ||
+        'File upload failed'
+      throw new Error(msg)
     }
   })
 
 export const createProduct = actionClient.schema(productSchema).action<ReturnActionType>(async ({ parsedInput }) => {
-	const session = await getServerSession(authOptions)
-	const token = await generateToken(session?.currentUser?._id)
 	try {
+		const session = await getServerSession(authOptions)
+		const userId = session?.currentUser?._id ?? session?.user?.id
+		const role = session?.currentUser?.role ?? session?.user?.role
+		if (!userId || String(role).toLowerCase() !== 'admin') {
+			throw new Error('Kirish muddati tugagan yoki admin huquqi yo‘q. Qayta kiring.')
+		}
+		const token = await generateToken(userId)
+		const price = parseFloat(String(parsedInput.price).replace(',', '.'))
+		if (Number.isNaN(price) || price <= 0) {
+			throw new Error('Narx noto‘g‘ri')
+		}
 		const { data } = await axiosClient.post(
 			'/api/admin/create-product',
-			{ ...parsedInput, price: parseFloat(parsedInput.price) },
+			{ ...parsedInput, price },
 			{ headers: { Authorization: `Bearer ${token}` } },
 		)
 		revalidatePath('/admin/products')
 		revalidatePath('/', 'layout')
+		if (data == null) {
+			throw new Error('Server bo‘sh javob qaytardi')
+		}
 		return JSON.parse(JSON.stringify(data)) as ReturnActionType
 	} catch (e: unknown) {
-		const err = e as { response?: { data?: { failure?: string; message?: string } }; message?: string }
+		const err = e as {
+			response?: { data?: { failure?: string; message?: string; error?: string } }
+			message?: string
+		}
 		const msg =
 			err?.response?.data?.failure ||
 			err?.response?.data?.message ||
+			err?.response?.data?.error ||
 			(typeof err?.message === 'string' ? err.message : null) ||
 			'Could not create product'
 		throw new Error(msg)
@@ -282,22 +304,39 @@ export const createProduct = actionClient.schema(productSchema).action<ReturnAct
 })
 
 export const updateProduct = actionClient.schema(updateProductSchema).action<ReturnActionType>(async ({ parsedInput }) => {
-	const session = await getServerSession(authOptions)
-	const token = await generateToken(session?.currentUser?._id)
 	try {
+		const session = await getServerSession(authOptions)
+		const userId = session?.currentUser?._id ?? session?.user?.id
+		const role = session?.currentUser?.role ?? session?.user?.role
+		if (!userId || String(role).toLowerCase() !== 'admin') {
+			throw new Error('Kirish muddati tugagan yoki admin huquqi yo‘q. Qayta kiring.')
+		}
+		const token = await generateToken(userId)
+		const price = parseFloat(String(parsedInput.price).replace(',', '.'))
+		if (Number.isNaN(price) || price <= 0) {
+			throw new Error('Narx noto‘g‘ri')
+		}
+		const { id, ...rest } = parsedInput
 		const { data } = await axiosClient.put(
-			`/api/admin/update-product/${parsedInput.id}`,
-			{ ...parsedInput, price: parseFloat(parsedInput.price) },
+			`/api/admin/update-product/${id}`,
+			{ ...rest, price },
 			{ headers: { Authorization: `Bearer ${token}` } },
 		)
 		revalidatePath('/admin/products')
 		revalidatePath('/', 'layout')
+		if (data == null) {
+			throw new Error('Server bo‘sh javob qaytardi')
+		}
 		return JSON.parse(JSON.stringify(data)) as ReturnActionType
 	} catch (e: unknown) {
-		const err = e as { response?: { data?: { failure?: string; message?: string } }; message?: string }
+		const err = e as {
+			response?: { data?: { failure?: string; message?: string; error?: string } }
+			message?: string
+		}
 		const msg =
 			err?.response?.data?.failure ||
 			err?.response?.data?.message ||
+			err?.response?.data?.error ||
 			(typeof err?.message === 'string' ? err.message : null) ||
 			'Could not update product'
 		throw new Error(msg)

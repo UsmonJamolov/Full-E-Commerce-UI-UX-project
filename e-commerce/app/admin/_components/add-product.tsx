@@ -36,6 +36,20 @@ function firstValidationMessage(validationErrors: unknown): string | null {
 	return null
 }
 
+function formatServerActionError(serverError: unknown, fallback: string): string {
+	if (typeof serverError === 'string' && serverError.trim()) return serverError
+	if (serverError && typeof serverError === 'object' && 'message' in serverError) {
+		const m = (serverError as { message?: unknown }).message
+		if (typeof m === 'string' && m.trim()) return m
+	}
+	try {
+		if (serverError != null) return JSON.stringify(serverError)
+	} catch {
+		/* */
+	}
+	return fallback
+}
+
 const AddProduct = () => {
 	const { dictionary } = useI18n()
 	const a = dictionary.admin
@@ -114,8 +128,7 @@ const AddProduct = () => {
 			return onError(msg || a.productFormValidationFailed)
 		}
 		if (res?.serverError || !res?.data) {
-			const se = res?.serverError
-			return onError(typeof se === 'string' && se ? se : a.productFormGenericError)
+			return onError(formatServerActionError(res?.serverError, a.productFormGenericError))
 		}
 
 		if (res.data.failure) {
@@ -137,7 +150,8 @@ const AddProduct = () => {
 
 	} catch (err) {
 		console.error(err)
-		toast.error(a.productFormGenericError)
+		const msg = err instanceof Error && err.message ? err.message : a.productFormGenericError
+		toast.error(msg)
 	} finally {
 		setIsLoading(false)
 	}

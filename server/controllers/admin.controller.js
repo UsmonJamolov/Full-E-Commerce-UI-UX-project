@@ -50,15 +50,43 @@ class AdminController {
 	// [POST] /admin/create-product
 	async createProduct(req, res, next) {
 		try {
-			const data = req.body
-			
+			const b = req.body || {}
+			const title = String(b.title || '').trim()
+			const description = String(b.description || '').trim()
+			const category = String(b.category || '').trim()
+			const targetGroup = ['Erkak', 'Ayol', 'Bola'].includes(b.targetGroup) ? b.targetGroup : 'Erkak'
+			const price = Number(b.price)
+			const image = b.image != null ? String(b.image) : ''
+			const imageKey = b.imageKey != null ? String(b.imageKey) : ''
+
+			if (!title || !description || !category || !image) {
+				return res.status(400).json({ failure: 'title, description, category va image majburiy' })
+			}
+			if (!Number.isFinite(price) || price <= 0) {
+				return res.status(400).json({ failure: 'Narx musbat son bo‘lishi kerak' })
+			}
+
+			const isNew = typeof b.isNew === 'boolean' ? b.isNew : true
+
 			const newProduct = await productModel.create({
-				...data,
-				isNew: typeof data.isNew === 'boolean' ? data.isNew : true,
+				title,
+				description,
+				category,
+				targetGroup,
+				price,
+				image,
+				imageKey,
+				isNew,
 			})
-			if (!newProduct) return res.json({ failure: 'Failed while creating product' })
-			return res.json({ status: 201, product: newProduct })
+			if (!newProduct) return res.status(500).json({ failure: 'Failed while creating product' })
+			return res.status(201).json({ status: 201, product: newProduct })
 		} catch (error) {
+			if (error.name === 'ValidationError') {
+				const msgs = Object.values(error.errors || {})
+					.map((e) => e.message)
+					.join('; ')
+				return res.status(400).json({ failure: msgs || error.message })
+			}
 			next(error)
 		}
 	}
