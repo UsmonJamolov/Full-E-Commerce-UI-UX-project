@@ -25,6 +25,9 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { useI18n } from '@/components/providers/i18n-provider'
+import type { Locale } from '@/lib/i18n/dictionaries'
+import { categoryFromCatalog } from '@/lib/i18n/catalog-labels'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { FC, useCallback, useState } from 'react'
@@ -37,6 +40,12 @@ export type AdminCategoryRow = {
 	nameRu?: string
 	nameEn?: string
 	isDefault?: boolean
+}
+
+function categoryRowLabel(cat: AdminCategoryRow, loc: Locale): string {
+	if (loc === 'uz') return cat.nameUz || cat.nameRu || cat.nameEn || cat.name
+	if (loc === 'ru') return cat.nameRu || cat.nameEn || cat.nameUz || cat.name
+	return cat.nameEn || cat.nameRu || cat.nameUz || cat.name
 }
 const FALLBACK_CATEGORIES: AdminCategoryRow[] = [
 	{ _id: 'default-shoes', name: 'Shoes', isDefault: true },
@@ -57,6 +66,8 @@ interface Props {
 }
 
 const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
+	const { dictionary, locale } = useI18n()
+	const a = dictionary.admin
 	const [open, setOpen] = useState(false)
 	const [list, setList] = useState<AdminCategoryRow[]>([])
 	const [loading, setLoading] = useState(false)
@@ -111,10 +122,10 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 		const nameUz = newNameUz.trim()
 		const nameRu = newNameRu.trim()
 		const nameEn = newNameEn.trim()
-		if (!nameUz || !nameRu || !nameEn) return toast.error('Kategoriya nomini 3 tilda kiriting')
+		if (!nameUz || !nameRu || !nameEn) return toast.error(a.toastCategoryNames3)
 		const res = await createAdminCategory({ nameUz, nameRu, nameEn })
 		if (res?.serverError || res?.validationErrors) {
-			toast.error("Qo'shib bo'lmadi")
+			toast.error(a.toastCategoryFailed)
 			return
 		}
 		const data = res?.data as { failure?: string; status?: number } | undefined
@@ -122,7 +133,7 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 			toast.error(data.failure)
 			return
 		}
-		toast.success("Kategoriya qo'shildi")
+		toast.success(a.toastCategoryAdded)
 		setNewNameUz('')
 		setNewNameRu('')
 		setNewNameEn('')
@@ -148,10 +159,10 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 		const nameUz = editNameUz.trim()
 		const nameRu = editNameRu.trim()
 		const nameEn = editNameEn.trim()
-		if (!nameUz || !nameRu || !nameEn) return toast.error('Nomlarni 3 tilda kiriting')
+		if (!nameUz || !nameRu || !nameEn) return toast.error(a.toastCategoryNames3)
 		const res = await updateAdminCategory({ id: editingId, nameUz, nameRu, nameEn })
 		if (res?.serverError || res?.validationErrors) {
-			toast.error('Saqlanmadi')
+			toast.error(a.toastSaveFailed)
 			return
 		}
 		const data = res?.data as { failure?: string } | undefined
@@ -161,7 +172,7 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 		}
 		const prev = list.find((c) => c._id === editingId)?.name
 		if (prev && value === prev) onChange(nameEn)
-		toast.success('Yangilandi')
+		toast.success(a.toastCategoryUpdated)
 		cancelEdit()
 		await load()
 	}
@@ -170,7 +181,7 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 		if (!deleteTarget) return
 		const res = await deleteAdminCategory({ id: deleteTarget._id })
 		if (res?.serverError || res?.validationErrors) {
-			toast.error("O'chirilmadi")
+			toast.error(a.toastCategoryDeleteFailed)
 			return
 		}
 		const data = res?.data as { failure?: string } | undefined
@@ -180,10 +191,17 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 			return
 		}
 		if (value === deleteTarget.name) onChange('Universal')
-		toast.success("Kategoriya o'chirildi")
+		toast.success(a.toastCategoryDeleted)
 		setDeleteTarget(null)
 		await load()
 	}
+
+	const selectedRow = list.find((c) => c.name === value)
+	const triggerLabel = value
+		? selectedRow
+			? categoryRowLabel(selectedRow, locale)
+			: categoryFromCatalog(dictionary.catalog, value)
+		: a.pickCategory
 
 	return (
 		<>
@@ -191,25 +209,22 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 				type="button"
 				variant="outline"
 				disabled={disabled}
-				className={cn('h-10 w-full justify-between bg-secondary font-normal')}
+				className={cn('h-10 w-full min-w-0 justify-between bg-secondary font-normal')}
 				onClick={() => onOpenChange(true)}
 			>
-				<span className="truncate">{value || 'Kategoriyani tanlang'}</span>
+				<span className="min-w-0 truncate text-left">{triggerLabel}</span>
 				<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 
 			<Dialog open={open} onOpenChange={onOpenChange}>
 				<DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
 					<DialogHeader>
-						<DialogTitle>Kategoriya</DialogTitle>
-						<DialogDescription>
-							Tanlang, tahrirlang yoki o‘chiring. Yangi kategoriya &quot;Universal&quot;dan keyin
-							qo‘shiladi.
-						</DialogDescription>
+						<DialogTitle>{a.categoryDialogTitle}</DialogTitle>
+						<DialogDescription>{a.categoryDialogDesc}</DialogDescription>
 					</DialogHeader>
 
 					{loading ? (
-						<p className="text-sm text-muted-foreground">Yuklanmoqda...</p>
+						<p className="text-sm text-muted-foreground">{a.categoryLoading}</p>
 					) : (
 						<ul className="space-y-1 border rounded-md p-1">
 							{list.map((cat) => (
@@ -226,20 +241,20 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 												value={editNameUz}
 												onChange={(e) => setEditNameUz(e.target.value)}
 												className="h-8 flex-1 text-sm"
-												placeholder="Nom (UZ)"
+												placeholder={a.categoryPlaceholderUz}
 												autoFocus
 											/>
 											<Input
 												value={editNameRu}
 												onChange={(e) => setEditNameRu(e.target.value)}
 												className="h-8 flex-1 text-sm"
-												placeholder="Nom (RU)"
+												placeholder={a.categoryPlaceholderRu}
 											/>
 											<Input
 												value={editNameEn}
 												onChange={(e) => setEditNameEn(e.target.value)}
 												className="h-8 flex-1 text-sm"
-												placeholder="Nom (EN)"
+												placeholder={a.categoryPlaceholderEn}
 											/>
 											<Button
 												type="button"
@@ -267,14 +282,14 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 												className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
 												onClick={() => pick(cat.name)}
 											>
-												{cat.name}
+												{categoryRowLabel(cat, locale)}
 											</button>
 											<Button
 												type="button"
 												size="icon"
 												variant="ghost"
 												className="h-8 w-8 shrink-0"
-												title="Tahrirlash"
+												title={a.categoryEdit}
 												onClick={() => startEdit(cat)}
 											>
 												<Pencil className="h-4 w-4" />
@@ -285,7 +300,7 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 													size="icon"
 													variant="ghost"
 													className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
-													title="O‘chirish"
+													title={a.categoryRemove}
 													onClick={() => setDeleteTarget(cat)}
 												>
 													<Trash2 className="h-4 w-4" />
@@ -299,23 +314,23 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 					)}
 
 					<div className="space-y-2 border-t pt-3">
-						<p className="text-xs font-medium text-muted-foreground">Yangi kategoriya</p>
+						<p className="text-xs font-medium text-muted-foreground">{a.categoryNewHeading}</p>
 						<div className="grid grid-cols-1 gap-2">
 							<Input
-								placeholder="Masalan: Oyoq kiyim (UZ)"
+								placeholder={a.categoryExampleUz}
 								value={newNameUz}
 								onChange={(e) => setNewNameUz(e.target.value)}
 								className="bg-secondary"
 							/>
 							<Input
-								placeholder="Например: Обувь (RU)"
+								placeholder={a.categoryExampleRu}
 								value={newNameRu}
 								onChange={(e) => setNewNameRu(e.target.value)}
 								className="bg-secondary"
 							/>
 							<div className="flex gap-2">
 								<Input
-									placeholder="Example: Shoes (EN)"
+									placeholder={a.categoryExampleEn}
 									value={newNameEn}
 									onChange={(e) => setNewNameEn(e.target.value)}
 									className="bg-secondary"
@@ -332,15 +347,14 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 			<AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Kategoriyani o‘chirish?</AlertDialogTitle>
+						<AlertDialogTitle>{a.categoryDeleteTitle}</AlertDialogTitle>
 						<AlertDialogDescription>
-							&quot;{deleteTarget?.name}&quot; o‘chirilsa, shu kategoriyadagi mahsulotlar &quot;Universal&quot;ga
-							o‘tkaziladi.
+							{deleteTarget?.name ? `«${deleteTarget.name}». ${a.categoryDeleteDesc}` : a.categoryDeleteDesc}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Bekor qilish</AlertDialogCancel>
-						<AlertDialogAction onClick={() => void confirmDelete()}>O‘chirish</AlertDialogAction>
+						<AlertDialogCancel>{a.cancel}</AlertDialogCancel>
+						<AlertDialogAction onClick={() => void confirmDelete()}>{a.delete}</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>

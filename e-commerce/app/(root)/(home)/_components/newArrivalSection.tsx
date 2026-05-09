@@ -1,13 +1,71 @@
+'use client'
+
 import Image from 'next/image'
+import { useState } from 'react'
 
 import { buildNewArrivalFallbackCards, type PublicArrivalCard } from '@/lib/new-arrival-public'
 import type { Locale } from '@/lib/i18n/dictionaries'
+import { cn } from '@/lib/utils'
 
 type Props = {
 	initialCards: PublicArrivalCard[]
 	locale: Locale
 	featuredLabel: string
 	titleLabel: string
+}
+
+function NewArrivalTile({
+	image,
+	title,
+	sizes,
+	wrapperClassName,
+	overlayClassName,
+	contentClassName,
+	titleClassName,
+	priority,
+}: {
+	image: string
+	title: string
+	sizes: string
+	wrapperClassName: string
+	overlayClassName: string
+	contentClassName: string
+	titleClassName: string
+	priority?: boolean
+}) {
+	const [active, setActive] = useState(false)
+
+	return (
+		<div
+			className={cn(
+				'new-arrival-tile relative flex items-end overflow-hidden bg-black',
+				wrapperClassName,
+			)}
+			data-active={active ? '' : undefined}
+			onMouseEnter={() => setActive(true)}
+			onMouseLeave={() => setActive(false)}
+		>
+			<div className='new-arrival-tile__media absolute inset-0 z-0 overflow-hidden'>
+				<Image
+					src={image}
+					alt={title}
+					fill
+					sizes={sizes}
+					priority={priority}
+					className='new-arrival-tile__img select-none object-cover object-center'
+				/>
+			</div>
+			<div
+				className={cn(
+					'new-arrival-tile__overlay pointer-events-none absolute inset-0 z-10 bg-gradient-to-t',
+					overlayClassName,
+				)}
+			/>
+			<div className={cn('new-arrival-tile__title relative z-20', contentClassName)}>
+				<h3 className={titleClassName}>{title}</h3>
+			</div>
+		</div>
+	)
 }
 
 export default function NewArrivalSection({ initialCards, locale, featuredLabel, titleLabel }: Props) {
@@ -24,63 +82,47 @@ export default function NewArrivalSection({ initialCards, locale, featuredLabel,
 					<h2 className='mt-4 mb-2 text-3xl font-bold tracking-tight md:text-4xl'>{titleLabel}</h2>
 				</div>
 				<div className='grid grid-cols-1 grid-rows-3 gap-6 md:h-[510px] md:grid-cols-3 md:grid-rows-2'>
-					<div className='relative row-span-2 flex min-h-[230px] items-end overflow-hidden bg-black md:col-span-2 md:row-span-2 md:min-h-0'>
-						<Image
-							src={cards[0].image}
-							alt={cards[0].title}
-							fill
-							className='pointer-events-none z-0 select-none object-cover object-center'
-							sizes='(max-width: 768px) 100vw, 800px'
-							priority
-						/>
-						<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/60 to-transparent' />
-						<div className='relative z-20 px-6 pb-8 pt-10 md:pb-12'>
-							<h3 className='text-xl font-bold text-white md:text-2xl'>{cards[0].title}</h3>
-						</div>
-					</div>
-					<div className='relative flex min-h-[140px] items-end overflow-hidden bg-black'>
-						<Image
-							src={cards[1].image}
-							alt={cards[1].title}
-							fill
-							className='pointer-events-none z-0 select-none object-cover object-center'
-							sizes='(max-width: 768px) 100vw, 400px'
-							priority
-						/>
-						<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent' />
-						<div className='relative z-20 w-full px-5 pb-7 pt-8'>
-							<h3 className='text-lg font-semibold text-white'>{cards[1].title}</h3>
-						</div>
-					</div>
+					<NewArrivalTile
+						image={cards[0].image}
+						title={cards[0].title}
+						sizes='(max-width: 768px) 100vw, 800px'
+						wrapperClassName='row-span-2 min-h-[230px] md:col-span-2 md:row-span-2 md:min-h-0'
+						overlayClassName='from-black/95 via-black/60 to-transparent'
+						contentClassName='pointer-events-none px-6 pb-8 pt-10 md:pb-12'
+						titleClassName='text-xl font-bold text-white md:text-2xl'
+						priority
+					/>
+					<NewArrivalTile
+						image={cards[1].image}
+						title={cards[1].title}
+						sizes='(max-width: 768px) 100vw, 400px'
+						wrapperClassName='min-h-[140px]'
+						overlayClassName='from-black/90 via-black/60 to-transparent'
+						contentClassName='pointer-events-none w-full px-5 pb-7 pt-8'
+						titleClassName='text-lg font-semibold text-white'
+						priority
+					/>
 					<div className='grid grid-cols-2 gap-6'>
-						<div className='relative flex min-h-[120px] items-end overflow-hidden bg-black'>
-							<Image
-								src={cards[2].image}
-								alt={cards[2].title}
-								fill
-								className='pointer-events-none z-0 select-none object-cover object-center'
-								sizes='(max-width: 768px) 100vw, 200px'
-								priority
-							/>
-							<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent' />
-							<div className='relative z-20 px-4 pb-7 pt-6'>
-								<h3 className='text-base font-semibold text-white'>{cards[2].title}</h3>
-							</div>
-						</div>
-						<div className='relative flex min-h-[120px] items-end overflow-hidden bg-black'>
-							<Image
-								src={cards[3].image}
-								alt={cards[3].title}
-								fill
-								className='pointer-events-none z-0 select-none object-cover object-center'
-								sizes='(max-width: 768px) 100vw, 200px'
-								priority
-							/>
-							<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent' />
-							<div className='relative z-20 px-4 pb-7 pt-6'>
-								<h3 className='text-base font-semibold text-white'>{cards[3].title}</h3>
-							</div>
-						</div>
+						<NewArrivalTile
+							image={cards[2].image}
+							title={cards[2].title}
+							sizes='(max-width: 768px) 100vw, 200px'
+							wrapperClassName='min-h-[120px]'
+							overlayClassName='from-black/90 via-black/60 to-transparent'
+							contentClassName='pointer-events-none px-4 pb-7 pt-6'
+							titleClassName='text-base font-semibold text-white'
+							priority
+						/>
+						<NewArrivalTile
+							image={cards[3].image}
+							title={cards[3].title}
+							sizes='(max-width: 768px) 100vw, 200px'
+							wrapperClassName='min-h-[120px]'
+							overlayClassName='from-black/90 via-black/60 to-transparent'
+							contentClassName='pointer-events-none px-4 pb-7 pt-6'
+							titleClassName='text-base font-semibold text-white'
+							priority
+						/>
 					</div>
 				</div>
 			</div>

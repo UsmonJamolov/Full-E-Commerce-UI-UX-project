@@ -287,6 +287,53 @@ export type Dictionary = {
 		paymentsColPrice: string
 		paymentsProviderClick: string
 	}
+	/** Admin panel (mahsulotlar va kategoriyalar). */
+	admin: {
+		productsTitle: string
+		productsLead: string
+		addProduct: string
+		productsEmpty: string
+		pickCategory: string
+		categoryDialogTitle: string
+		categoryDialogDesc: string
+		categoryLoading: string
+		categoryNewHeading: string
+		categoryPlaceholderUz: string
+		categoryPlaceholderRu: string
+		categoryPlaceholderEn: string
+		categoryExampleUz: string
+		categoryExampleRu: string
+		categoryExampleEn: string
+		categoryEdit: string
+		categoryRemove: string
+		categoryDeleteTitle: string
+		categoryDeleteDesc: string
+		cancel: string
+		delete: string
+		toastCategoryNames3: string
+		toastCategoryAdded: string
+		toastCategoryFailed: string
+		toastSaveFailed: string
+		toastCategoryUpdated: string
+		toastCategoryDeleteFailed: string
+		toastCategoryDeleted: string
+		productFormName: string
+		productFormNamePh: string
+		productFormDesc: string
+		productFormDescPh: string
+		productFormCategory: string
+		productFormGroup: string
+		productFormPrice: string
+		productFormPricePh: string
+		productFormNewBadge: string
+		productFormUploading: string
+		productFormSave: string
+		productFormImageRequired: string
+		productFormCreated: string
+		productFormUpdated: string
+		productFormValidationFailed: string
+		productFormGenericError: string
+	}
 	/** Katalogdagi `category` / `targetGroup` qiymatlari (API ingliz/o‘zbek kalitlari). */
 	catalog: {
 		categories: Record<string, string>
@@ -635,6 +682,52 @@ const en: Dictionary = {
 		paymentsColStatus: 'Status',
 		paymentsColPrice: 'Price',
 		paymentsProviderClick: 'Click',
+	},
+	admin: {
+		productsTitle: 'Products',
+		productsLead: 'Search, filter and manage products.',
+		addProduct: 'Add product',
+		productsEmpty: 'No products found.',
+		pickCategory: 'Select category',
+		categoryDialogTitle: 'Category',
+		categoryDialogDesc: 'Select, edit or delete. New categories use the English name as the catalog key.',
+		categoryLoading: 'Loading…',
+		categoryNewHeading: 'New category',
+		categoryPlaceholderUz: 'Name (UZ)',
+		categoryPlaceholderRu: 'Name (RU)',
+		categoryPlaceholderEn: 'Name (EN)',
+		categoryExampleUz: 'e.g. Oyoq kiyim (UZ)',
+		categoryExampleRu: 'e.g. Обувь (RU)',
+		categoryExampleEn: 'e.g. Shoes (EN)',
+		categoryEdit: 'Edit',
+		categoryRemove: 'Delete',
+		categoryDeleteTitle: 'Delete category?',
+		categoryDeleteDesc: 'Products in this category will be moved to “Universal”.',
+		cancel: 'Cancel',
+		delete: 'Delete',
+		toastCategoryNames3: 'Enter the name in all three languages.',
+		toastCategoryAdded: 'Category added.',
+		toastCategoryFailed: 'Could not add category.',
+		toastSaveFailed: 'Could not save.',
+		toastCategoryUpdated: 'Updated.',
+		toastCategoryDeleteFailed: 'Could not delete.',
+		toastCategoryDeleted: 'Category deleted.',
+		productFormName: 'Name',
+		productFormNamePh: 'e.g. Adidas shoes',
+		productFormDesc: 'Description',
+		productFormDescPh: 'Short product description',
+		productFormCategory: 'Category',
+		productFormGroup: 'Group (Men / Women / Kids)',
+		productFormPrice: 'Price',
+		productFormPricePh: 'Amount',
+		productFormNewBadge: 'Show “New” badge',
+		productFormUploading: 'Uploading image…',
+		productFormSave: 'Save',
+		productFormImageRequired: 'Please upload an image',
+		productFormCreated: 'Product created',
+		productFormUpdated: 'Product updated',
+		productFormValidationFailed: 'Validation failed',
+		productFormGenericError: 'Something went wrong',
 	},
 	catalog: {
 		categories: {
@@ -993,6 +1086,52 @@ const ru: Dictionary = {
 		paymentsColPrice: 'Цена',
 		paymentsProviderClick: 'Клик',
 	},
+	admin: {
+		productsTitle: 'Товары',
+		productsLead: 'Ищите, фильтруйте и управляйте товарами.',
+		addProduct: 'Добавить товар',
+		productsEmpty: 'Товары не найдены.',
+		pickCategory: 'Выберите категорию',
+		categoryDialogTitle: 'Категория',
+		categoryDialogDesc: 'Выберите, измените или удалите. Новая категория сохраняется с английским ключом.',
+		categoryLoading: 'Загрузка…',
+		categoryNewHeading: 'Новая категория',
+		categoryPlaceholderUz: 'Название (UZ)',
+		categoryPlaceholderRu: 'Название (RU)',
+		categoryPlaceholderEn: 'Название (EN)',
+		categoryExampleUz: 'Например: Oyoq kiyim (UZ)',
+		categoryExampleRu: 'Например: Обувь (RU)',
+		categoryExampleEn: 'Например: Shoes (EN)',
+		categoryEdit: 'Изменить',
+		categoryRemove: 'Удалить',
+		categoryDeleteTitle: 'Удалить категорию?',
+		categoryDeleteDesc: 'Товары этой категории будут перенесены в «Universal».',
+		cancel: 'Отмена',
+		delete: 'Удалить',
+		toastCategoryNames3: 'Введите название на трёх языках.',
+		toastCategoryAdded: 'Категория добавлена.',
+		toastCategoryFailed: 'Не удалось добавить категорию.',
+		toastSaveFailed: 'Не удалось сохранить.',
+		toastCategoryUpdated: 'Обновлено.',
+		toastCategoryDeleteFailed: 'Не удалось удалить.',
+		toastCategoryDeleted: 'Категория удалена.',
+		productFormName: 'Название',
+		productFormNamePh: 'Например: Adidas shoes',
+		productFormDesc: 'Описание',
+		productFormDescPh: 'Краткое описание товара',
+		productFormCategory: 'Категория',
+		productFormGroup: 'Группа (мужчины / женщины / дети)',
+		productFormPrice: 'Цена',
+		productFormPricePh: 'Сумма',
+		productFormNewBadge: 'Показывать бейдж New',
+		productFormUploading: 'Загрузка изображения…',
+		productFormSave: 'Сохранить',
+		productFormImageRequired: 'Загрузите изображение',
+		productFormCreated: 'Товар создан',
+		productFormUpdated: 'Товар обновлён',
+		productFormValidationFailed: 'Проверьте поля формы',
+		productFormGenericError: 'Что-то пошло не так',
+	},
 	catalog: {
 		categories: {
 			Shoes: 'Обувь',
@@ -1349,6 +1488,52 @@ const uz: Dictionary = {
 		paymentsColStatus: 'Holat',
 		paymentsColPrice: 'Narx',
 		paymentsProviderClick: 'Click',
+	},
+	admin: {
+		productsTitle: 'Mahsulotlar',
+		productsLead: 'Qidiring, filtrlang va mahsulotlarni boshqaring.',
+		addProduct: 'Mahsulot qo‘shish',
+		productsEmpty: 'Mahsulot topilmadi.',
+		pickCategory: 'Kategoriyani tanlang',
+		categoryDialogTitle: 'Kategoriya',
+		categoryDialogDesc: 'Tanlang, tahrirlang yoki o‘chiring. Yangi kategoriya inglizcha kalit bilan saqlanadi.',
+		categoryLoading: 'Yuklanmoqda…',
+		categoryNewHeading: 'Yangi kategoriya',
+		categoryPlaceholderUz: 'Nom (UZ)',
+		categoryPlaceholderRu: 'Nom (RU)',
+		categoryPlaceholderEn: 'Nom (EN)',
+		categoryExampleUz: 'Masalan: Oyoq kiyim (UZ)',
+		categoryExampleRu: 'Masalan: Обувь (RU)',
+		categoryExampleEn: 'Masalan: Shoes (EN)',
+		categoryEdit: 'Tahrirlash',
+		categoryRemove: 'O‘chirish',
+		categoryDeleteTitle: 'Kategoriya o‘chirilsinmi?',
+		categoryDeleteDesc: 'Bu kategoriyadagi mahsulotlar «Universal»ga ko‘chiriladi.',
+		cancel: 'Bekor qilish',
+		delete: 'O‘chirish',
+		toastCategoryNames3: 'Nomni 3 tilda kiriting.',
+		toastCategoryAdded: 'Kategoriya qo‘shildi.',
+		toastCategoryFailed: 'Qo‘shib bo‘lmadi.',
+		toastSaveFailed: 'Saqlanmadi.',
+		toastCategoryUpdated: 'Yangilandi.',
+		toastCategoryDeleteFailed: 'O‘chirilmadi.',
+		toastCategoryDeleted: 'Kategoriya o‘chirildi.',
+		productFormName: 'Nomi',
+		productFormNamePh: 'Masalan: Adidas shoes',
+		productFormDesc: 'Tavsif',
+		productFormDescPh: 'Qisqa tavsif',
+		productFormCategory: 'Kategoriya',
+		productFormGroup: 'Guruh (erkaklar / ayollar / bolalar)',
+		productFormPrice: 'Narx',
+		productFormPricePh: 'Summa',
+		productFormNewBadge: '«New» nishonchasini ko‘rsatish',
+		productFormUploading: 'Rasm yuklanmoqda…',
+		productFormSave: 'Saqlash',
+		productFormImageRequired: 'Rasm yuklang',
+		productFormCreated: 'Mahsulot yaratildi',
+		productFormUpdated: 'Mahsulot yangilandi',
+		productFormValidationFailed: 'Formani tekshiring',
+		productFormGenericError: 'Xatolik yuz berdi',
 	},
 	catalog: {
 		categories: {

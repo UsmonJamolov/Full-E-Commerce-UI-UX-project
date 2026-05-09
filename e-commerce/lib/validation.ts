@@ -113,7 +113,7 @@ export const productSchema = z.object({
 			return !Number.isNaN(n) && n > 0
 		}, { message: 'Enter a valid price' }),
 	description: z.string().min(10, { message: 'Description must be at least 10 characters' }),
-	category: z.string(),
+	category: z.string().min(1, { message: 'Select a category' }),
 	targetGroup: z.enum(['Erkak', 'Ayol', 'Bola']),
 	image: z.string(),
 	imageKey: z.string(),

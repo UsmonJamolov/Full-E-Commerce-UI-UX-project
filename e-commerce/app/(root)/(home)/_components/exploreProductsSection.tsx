@@ -21,8 +21,7 @@ const ExploreProductsSection = async ({
 		page: '1',
 		pageSize: '40',
 	})
-	const blocked = new Set(['erkak', 'ayol', 'shoes'])
-	const products = (res?.data?.products || []).filter(product => !blocked.has((product.category || '').toLowerCase())).slice(0, 8)
+	const products = (res?.data?.products || []).slice(0, 8)
 
 	return (
 		<section className='w-full py-8 md:py-12'>

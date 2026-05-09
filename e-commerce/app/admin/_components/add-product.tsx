@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
+import { useI18n } from '@/components/providers/i18n-provider'
 import { useAction } from "@/hooks/use-action";
 import { useProduct } from '@/hooks/use-product'
 import AdminCategoryField from './admin-category-field'
@@ -36,19 +37,18 @@ function firstValidationMessage(validationErrors: unknown): string | null {
 }
 
 const AddProduct = () => {
+	const { dictionary } = useI18n()
+	const a = dictionary.admin
+	const tg = dictionary.catalog.targetGroups
 	const { isLoading, onError, setIsLoading } = useAction()
 	const { open, setOpen, product, setProduct } = useProduct()
 	const [uploading, setUploading] = useState(false)
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-	console.log("SELECTED FILE:", selectedFile)
-
 	const form = useForm<z.infer<typeof productSchema>>({
 		resolver: zodResolver(productSchema),
 		defaultValues: { title: '', description: '', category: '', targetGroup: 'Erkak', price: '', image: '', imageKey: '', isNew: true },
 	})
-
-	console.log('Form getValues: ', form.getValues());
 	
 	
 	async function onSubmit(values: z.infer<typeof productSchema>) {
@@ -85,7 +85,8 @@ const AddProduct = () => {
 
 		// 🔥 AGAR create bo‘lsa → image majburiy
 		if (!product && !imageUrl) {
-		return toast("Please upload an image")
+			toast.error(a.productFormImageRequired)
+			return
 		}
 
 		let res
@@ -110,11 +111,11 @@ const AddProduct = () => {
 		// ❌ ERROR handling
 		if (res?.validationErrors) {
 			const msg = firstValidationMessage(res.validationErrors)
-			return onError(msg || 'Validation failed')
+			return onError(msg || a.productFormValidationFailed)
 		}
 		if (res?.serverError || !res?.data) {
 			const se = res?.serverError
-			return onError(typeof se === 'string' && se ? se : 'Something went wrong')
+			return onError(typeof se === 'string' && se ? se : a.productFormGenericError)
 		}
 
 		if (res.data.failure) {
@@ -123,19 +124,20 @@ const AddProduct = () => {
 
 		// ✅ SUCCESS
 		if (res.data.status === 201) {
-		toast.success("Product created successfully")
+			toast.success(a.productFormCreated)
 		}
 
 		if (res.data.status === 200) {
-		toast("Product updated successfully")
+			toast.success(a.productFormUpdated)
 		}
 
 		setOpen(false)
 		form.reset()
+		setSelectedFile(null)
 
 	} catch (err) {
 		console.error(err)
-		toast("Something went wrong")
+		toast.error(a.productFormGenericError)
 	} finally {
 		setIsLoading(false)
 	}
@@ -147,16 +149,25 @@ const AddProduct = () => {
 	}
 
 	useEffect(() => {
-		if (product) {
-			form.reset({...product, price: product.price.toString()})
-		}
+		if (!product) return
+		const isNew = !product._id
+		form.reset({
+			title: product.title ?? '',
+			description: product.description ?? '',
+			category: product.category ?? '',
+			targetGroup: product.targetGroup ?? 'Erkak',
+			image: product.image ?? '',
+			imageKey: product.imageKey ?? '',
+			isNew: product.isNew ?? true,
+			price: isNew ? '' : String(product.price ?? ''),
+		})
 	}, [product, form])
 	
 	return (
 		<>
-			<Button size={'sm'} onClick={onOpen}>
-				<span>Add Product</span>
-				<PlusCircle />
+			<Button size={'sm'} className='w-full gap-1 md:w-auto' onClick={onOpen}>
+				{a.addProduct}
+				<PlusCircle className='h-4 w-4' />
 			</Button>
 			<Sheet open={open} onOpenChange={setOpen}>
 				<SheetContent className='flex w-full max-w-full flex-col overflow-y-auto sm:max-w-md'>
@@ -174,9 +185,9 @@ const AddProduct = () => {
 								name='title'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Название</Label>
+										<Label className='text-xs'>{a.productFormName}</Label>
 										<FormControl>
-											<Input placeholder='Например: Adidas shoes' className='bg-secondary' disabled={isLoading} {...field} />
+											<Input placeholder={a.productFormNamePh} className='bg-secondary' disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -187,9 +198,9 @@ const AddProduct = () => {
 								name='description'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Описание</Label>
+										<Label className='text-xs'>{a.productFormDesc}</Label>
 										<FormControl>
-											<Textarea placeholder='Краткое описание товара' disabled={isLoading} className='bg-secondary' {...field} />
+											<Textarea placeholder={a.productFormDescPh} disabled={isLoading} className='bg-secondary' {...field} />
 										</FormControl>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -200,7 +211,7 @@ const AddProduct = () => {
 								name='category'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Категория</Label>
+										<Label className='text-xs'>{a.productFormCategory}</Label>
 										<FormControl>
 											<AdminCategoryField
 												value={field.value}
@@ -217,16 +228,16 @@ const AddProduct = () => {
 								name='targetGroup'
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
-										<Label className='text-xs'>Группа (Мужчины/Женщины/Дети)</Label>
+										<Label className='text-xs'>{a.productFormGroup}</Label>
 										<FormControl>
 											<Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
-												<SelectTrigger className='bg-secondary'>
+												<SelectTrigger className='w-full min-w-0 bg-secondary'>
 													<SelectValue />
 												</SelectTrigger>
 												<SelectContent>
-													<SelectItem value='Erkak'>Erkak</SelectItem>
-													<SelectItem value='Ayol'>Ayol</SelectItem>
-													<SelectItem value='Bola'>Bola</SelectItem>
+													<SelectItem value='Erkak'>{tg.Erkak}</SelectItem>
+													<SelectItem value='Ayol'>{tg.Ayol}</SelectItem>
+													<SelectItem value='Bola'>{tg.Bola}</SelectItem>
 												</SelectContent>
 											</Select>
 										</FormControl>
@@ -240,10 +251,12 @@ const AddProduct = () => {
 								render={({ field }) => (
 									<FormItem className='space-y-0'>
 										<Label className='text-xs'>
-											{!form.watch('price') ? 'Price' : `Price ${formatPrice(Number(form.watch('price')))} `}
+											{!form.watch('price')
+												? a.productFormPrice
+												: `${a.productFormPrice} ${formatPrice(Number(form.watch('price')))}`}
 										</Label>
 										<FormControl>
-											<Input placeholder='100.000 UZS' type='number' className='bg-secondary' disabled={isLoading} {...field} />
+											<Input placeholder={a.productFormPricePh} type='number' className='bg-secondary' disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -261,7 +274,7 @@ const AddProduct = () => {
 												onChange={e => field.onChange(e.target.checked)}
 												disabled={isLoading}
 											/>
-											Показывать бейдж New
+											{a.productFormNewBadge}
 										</Label>
 										<FormMessage className='text-xs text-red-500' />
 									</FormItem>
@@ -308,9 +321,9 @@ const AddProduct = () => {
 							</div>
 							)}
 							
-							{uploading && <p>Загрузка изображения...</p>}
+							{uploading && <p className='text-sm text-muted-foreground'>{a.productFormUploading}</p>}
 							<Button type='submit' disabled={isLoading} className='w-full'>
-								Сохранить {isLoading && <Loader2 className='animate-spin' />}
+								{a.productFormSave} {isLoading && <Loader2 className='ml-2 inline h-4 w-4 animate-spin' />}
 							</Button>
 						</form>
 					</Form>

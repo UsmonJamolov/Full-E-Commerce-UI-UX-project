@@ -261,27 +261,47 @@ export const uploadFile = actionClient
 export const createProduct = actionClient.schema(productSchema).action<ReturnActionType>(async ({ parsedInput }) => {
 	const session = await getServerSession(authOptions)
 	const token = await generateToken(session?.currentUser?._id)
-	const { data } = await axiosClient.post(
-		'/api/admin/create-product',
-		{ ...parsedInput, price: parseFloat(parsedInput.price) },
-		{ headers: { Authorization: `Bearer ${token}` } }
-	)
-	console.log("CREATE PRODUCT INPUT:", data)
-	
-	revalidatePath('/admin/products')
-	return JSON.parse(JSON.stringify(data))
+	try {
+		const { data } = await axiosClient.post(
+			'/api/admin/create-product',
+			{ ...parsedInput, price: parseFloat(parsedInput.price) },
+			{ headers: { Authorization: `Bearer ${token}` } },
+		)
+		revalidatePath('/admin/products')
+		revalidatePath('/', 'layout')
+		return JSON.parse(JSON.stringify(data)) as ReturnActionType
+	} catch (e: unknown) {
+		const err = e as { response?: { data?: { failure?: string; message?: string } }; message?: string }
+		const msg =
+			err?.response?.data?.failure ||
+			err?.response?.data?.message ||
+			(typeof err?.message === 'string' ? err.message : null) ||
+			'Could not create product'
+		throw new Error(msg)
+	}
 })
 
 export const updateProduct = actionClient.schema(updateProductSchema).action<ReturnActionType>(async ({ parsedInput }) => {
 	const session = await getServerSession(authOptions)
 	const token = await generateToken(session?.currentUser?._id)
-	const { data } = await axiosClient.put(
-		`/api/admin/update-product/${parsedInput.id}`,
-		{ ...parsedInput, price: parseFloat(parsedInput.price) },
-		{ headers: { Authorization: `Bearer ${token}` } }
-	)
-	revalidatePath('/admin/products')
-	return JSON.parse(JSON.stringify(data))
+	try {
+		const { data } = await axiosClient.put(
+			`/api/admin/update-product/${parsedInput.id}`,
+			{ ...parsedInput, price: parseFloat(parsedInput.price) },
+			{ headers: { Authorization: `Bearer ${token}` } },
+		)
+		revalidatePath('/admin/products')
+		revalidatePath('/', 'layout')
+		return JSON.parse(JSON.stringify(data)) as ReturnActionType
+	} catch (e: unknown) {
+		const err = e as { response?: { data?: { failure?: string; message?: string } }; message?: string }
+		const msg =
+			err?.response?.data?.failure ||
+			err?.response?.data?.message ||
+			(typeof err?.message === 'string' ? err.message : null) ||
+			'Could not update product'
+		throw new Error(msg)
+	}
 })
 
 export const deleteProduct = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {

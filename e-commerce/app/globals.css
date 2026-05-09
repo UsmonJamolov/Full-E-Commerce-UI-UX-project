@@ -135,3 +135,41 @@ body:has([data-admin-layout]) .site-main-content {
   width: 100%;
   padding: 0;
 }
+
+/*
+ * New Arrival kataklari: katta ekranda zoom + overlay/sarlavha yo‘qolishi.
+ * `(hover: hover)` ishlatilmaydi — ba’zi noutbuk/brauzerlarda false bo‘lib, effekt umuman chiqmay qoladi.
+ * `data-active` — onMouseEnter/Leave bilan (sichqoncha uchun qo‘shimcha ishonchlilik).
+ */
+@media (min-width: 768px) {
+  .new-arrival-tile:hover .new-arrival-tile__media,
+  .new-arrival-tile[data-active] .new-arrival-tile__media {
+    transform: scale(1.1);
+  }
+  .new-arrival-tile:hover .new-arrival-tile__img,
+  .new-arrival-tile[data-active] .new-arrival-tile__img {
+    filter: brightness(1.12);
+  }
+  .new-arrival-tile:hover .new-arrival-tile__overlay,
+  .new-arrival-tile[data-active] .new-arrival-tile__overlay {
+    opacity: 0;
+  }
+  .new-arrival-tile:hover .new-arrival-tile__title,
+  .new-arrival-tile[data-active] .new-arrival-tile__title {
+    opacity: 0;
+  }
+}
+
+.new-arrival-tile__media {
+  transition: transform 0.5s ease-out;
+  will-change: transform;
+}
+
+.new-arrival-tile__img {
+  transition: filter 0.5s ease-out;
+}
+
+.new-arrival-tile__overlay,
+.new-arrival-tile__title {
+  transition: opacity 0.45s ease-out;
+}
