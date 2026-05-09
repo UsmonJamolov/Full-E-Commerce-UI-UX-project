@@ -108,7 +108,7 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 				)}
 			>
 				<Card className={cn('group border-0 shadow-none', isGrid && 'h-full')}>
-					<div className='relative rounded-lg bg-muted/30 p-3 sm:p-4'>
+					<div className='relative rounded-lg p-1 sm:p-2'>
 						{showNewBadge && (
 							<Badge className='absolute left-2 top-2 z-50 bg-black px-2 py-1 text-[11px] text-white hover:bg-black sm:left-3 sm:top-3'>
 								{t.newBadge}
@@ -125,10 +125,10 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 						<div
 							className={cn(
 								'relative overflow-hidden rounded-md',
-								isGrid ? 'mx-0 aspect-square w-full' : 'mx-auto aspect-square w-full max-w-[180px]',
+								isGrid ? 'mx-0 aspect-square w-full' : 'mx-auto aspect-square w-full',
 							)}
 						>
-							<Image src={imageSrc} alt={product.title} fill className='object-cover object-center' unoptimized />
+							<Image src={imageSrc} alt={product.title} fill className='object-cover object-center' />
 						</div>
 						{product.cta && (
 							<Button

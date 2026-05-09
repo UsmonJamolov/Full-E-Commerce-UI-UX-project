@@ -24,6 +24,17 @@ import { toast } from "sonner";
 import { z } from 'zod'
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
+function firstValidationMessage(validationErrors: unknown): string | null {
+	if (!validationErrors || typeof validationErrors !== 'object') return null
+	const fe = (validationErrors as { fieldErrors?: Record<string, string[] | undefined> }).fieldErrors
+	if (fe) {
+		for (const v of Object.values(fe)) {
+			if (v?.[0]) return v[0]
+		}
+	}
+	return null
+}
+
 const AddProduct = () => {
 	const { isLoading, onError, setIsLoading } = useAction()
 	const { open, setOpen, product, setProduct } = useProduct()
@@ -58,10 +69,14 @@ const AddProduct = () => {
 			fileSize: selectedFile.size,
 		})
 
-		console.log("Uploaded:", uploaded)
+		if (uploaded?.serverError) {
+			toast.error(typeof uploaded.serverError === 'string' ? uploaded.serverError : 'Image upload failed')
+			return
+		}
 
 		if (!uploaded?.data?.url) {
-			return toast("Image upload failed")
+			toast.error('Image upload failed')
+			return
 		}
 
 		imageUrl = uploaded.data.url
@@ -93,8 +108,13 @@ const AddProduct = () => {
 		}
 
 		// ❌ ERROR handling
-		if (res?.serverError || res?.validationErrors || !res?.data) {
-		return onError("Something went wrong")
+		if (res?.validationErrors) {
+			const msg = firstValidationMessage(res.validationErrors)
+			return onError(msg || 'Validation failed')
+		}
+		if (res?.serverError || !res?.data) {
+			const se = res?.serverError
+			return onError(typeof se === 'string' && se ? se : 'Something went wrong')
 		}
 
 		if (res.data.failure) {
@@ -139,7 +159,7 @@ const AddProduct = () => {
 				<PlusCircle />
 			</Button>
 			<Sheet open={open} onOpenChange={setOpen}>
-				<SheetContent>
+				<SheetContent className='flex w-full max-w-full flex-col overflow-y-auto sm:max-w-md'>
 					<VisuallyHidden>
 					<SheetHeader>
 						<SheetTitle>Manage your product</SheetTitle>

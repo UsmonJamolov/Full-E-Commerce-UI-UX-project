@@ -40,14 +40,6 @@ import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import { useI18n } from '@/components/providers/i18n-provider'
 
-function normalizePhoneDigits(value: string) {
-	let cleaned = value.replace(/[^\d+]/g, '')
-	if (cleaned.includes('+')) {
-		cleaned = '+' + cleaned.replace(/\+/g, '')
-	}
-	return cleaned
-}
-
 const SignUpPage = () => {
 	const { dictionary } = useI18n()
 	const t = dictionary.auth.signUp
@@ -159,13 +151,11 @@ const SignUpPage = () => {
 					<label className="text-sm font-medium">{t.loginLabel}</label>
 					<Input
 						type="text"
+						inputMode="email"
 						autoComplete="username"
 						placeholder={t.loginPlaceholder}
 						value={login}
-						onChange={e => {
-							const v = e.target.value
-							setLogin(v.includes('@') ? v : normalizePhoneDigits(v))
-						}}
+						onChange={e => setLogin(e.target.value)}
 					/>
 				</div>
 

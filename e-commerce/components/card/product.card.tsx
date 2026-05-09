@@ -97,7 +97,7 @@ const ProductCard: FC<Props> = ({ product }) => {
 		<div onClick={() => router.push(`/product/${product._id}`)} className='cursor-pointer'>
 			<div className='relative z-10 w-[170px] shrink-0 xs:w-[195px] sm:w-[230px] md:w-[260px]'>
 				<Card className='group border-0 shadow-none'>
-					<div className='relative rounded-lg bg-muted/30 p-3 sm:p-4'>
+					<div className='relative rounded-lg p-1 sm:p-2'>
 						{showNewBadge && (
 							<Badge className='absolute left-2 top-2 z-50 bg-black px-2 py-1 text-[11px] text-white hover:bg-black sm:left-3 sm:top-3'>
 								{t.newBadge}
@@ -111,8 +111,8 @@ const ProductCard: FC<Props> = ({ product }) => {
 								<Eye className='h-4 w-4' />
 							</IconBubble>
 						</div>
-						<div className='relative mx-auto aspect-square w-full max-w-[180px] overflow-hidden rounded-md'>
-							<Image src={imageSrc} alt={product.title} fill className='object-cover object-center' unoptimized />
+						<div className='relative mx-auto aspect-square w-full overflow-hidden rounded-md'>
+							<Image src={imageSrc} alt={product.title} fill className='object-cover object-center' />
 						</div>
 						{product.cta && (
 							<Button

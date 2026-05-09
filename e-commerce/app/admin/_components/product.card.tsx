@@ -14,8 +14,10 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useI18n } from '@/components/providers/i18n-provider'
 import {useAction} from '@/hooks/use-action'
 import { useProduct } from '@/hooks/use-product'
+import { categoryFromCatalog } from '@/lib/i18n/catalog-labels'
 import { formatPrice } from '@/lib/utils'
 import { IProduct } from '@/types'
 import Image from 'next/image'
@@ -26,6 +28,7 @@ interface Props {
 	product: IProduct
 }
 const ProductCard: FC<Props> = ({ product }) => {
+	const { dictionary } = useI18n()
 	const { setOpen, setProduct } = useProduct()
 	const {isLoading, onError, setIsLoading} = useAction()
 
@@ -57,11 +60,11 @@ const ProductCard: FC<Props> = ({ product }) => {
 		<div className='rounded-lg border bg-white p-3'>
 			<div className='flex flex-col gap-3 md:flex-row md:items-center'>
 				<div className='relative h-28 w-full overflow-hidden rounded-md bg-secondary md:w-32'>
-					<Image src={product.image!} fill className='object-contain p-2' alt={product.title!} unoptimized />
+					<Image src={product.image!} fill className='object-contain p-2' alt={product.title!} />
 				</div>
 				<div className='min-w-0 flex-1'>
 					<div className='mb-2 flex flex-wrap items-center gap-2'>
-						<Badge variant='secondary'>{product.category}</Badge>
+						<Badge variant='secondary'>{categoryFromCatalog(dictionary.catalog, product.category || '')}</Badge>
 						<p className='text-sm font-semibold'>{formatPrice(product.price!)}</p>
 					</div>
 					<h1 className='line-clamp-1 text-base font-bold'>{product.title}</h1>

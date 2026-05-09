@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { IProduct } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import type { Dictionary, Locale } from '@/lib/i18n/dictionaries'
+import { categoryFromCatalog } from '@/lib/i18n/catalog-labels'
 
 const STORAGE_V2 = 'ecommerce-search-popular-v2'
 const LEGACY_RECENT_V1 = 'ecommerce-header-search-recent-v1'
@@ -103,12 +104,13 @@ type TargetGroup = 'Erkak' | 'Ayol' | 'Bola'
 interface Props {
 	items: IProduct[]
 	searchPanel: Dictionary['searchPanel']
+	catalog: Dictionary['catalog']
 	locale: Locale
 }
 
 const GROUP_VALUES: TargetGroup[] = ['Erkak', 'Ayol', 'Bola']
 
-export default function HeaderSearchPanel({ items, searchPanel: copy, locale }: Props) {
+export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, locale }: Props) {
 	const [open, setOpen] = useState(false)
 	const [query, setQuery] = useState('')
 	const [selectedCategory, setSelectedCategory] = useState('')
@@ -192,12 +194,20 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, locale }: 
 			</Button>
 
 			{open && (
-				<div className='fixed inset-0 z-[70] bg-black/30' role='presentation' onClick={closePanel}>
+				<div
+					className='fixed inset-0 z-[70] min-h-[100dvh] bg-black/40'
+					role='presentation'
+					onClick={closePanel}
+					onPointerDown={e => {
+						if (e.target === e.currentTarget) closePanel()
+					}}
+				>
 					<div
-						className='w-full bg-white shadow-lg'
+						className='max-h-[min(100dvh,900px)] w-full overflow-y-auto bg-white shadow-lg'
 						role='dialog'
 						aria-label={copy.placeholder}
 						onClick={e => e.stopPropagation()}
+						onPointerDown={e => e.stopPropagation()}
 					>
 						<div className='mx-auto max-w-6xl px-4 py-4'>
 							<div className='mb-4 flex items-center justify-between gap-2'>
@@ -261,7 +271,7 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, locale }: 
 									</div>
 								</div>
 
-								<div className='grid grid-cols-2 gap-3 md:grid-cols-4'>
+								<div className='grid grid-cols-2 gap-3 sm:gap-4'>
 									{visibleItems.map(item => (
 										<Link
 											key={item._id}
@@ -269,13 +279,15 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, locale }: 
 											className='space-y-1'
 											onClick={recordIfQuery}
 										>
-											<div className='relative h-44 overflow-hidden rounded bg-secondary'>
-												<Image src={item.image} alt={item.title} fill className='object-cover' />
+											<div className='relative aspect-square overflow-hidden rounded bg-secondary'>
+												<Image src={item.image} alt={item.title} fill className='object-cover' sizes='(max-width:768px) 45vw, 200px' />
 												<Heart className='absolute right-2 top-2 h-4 w-4 text-white' />
 											</div>
-											<p className='line-clamp-2 text-xs font-medium'>{item.title}</p>
-											<p className='text-[11px] font-semibold'>{formatPrice(item.price)}</p>
-											<p className='text-[10px] text-muted-foreground'>{item.category}</p>
+											<p className='line-clamp-2 text-xs font-medium sm:text-sm'>{item.title}</p>
+											<p className='text-[11px] font-semibold sm:text-xs'>₽ {formatPrice(item.price)}</p>
+											<p className='line-clamp-1 text-[10px] text-muted-foreground sm:text-[11px]'>
+												{categoryFromCatalog(catalog, item.category)}
+											</p>
 										</Link>
 									))}
 									{hasFilters && visibleItems.length === 0 && (

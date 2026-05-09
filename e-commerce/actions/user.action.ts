@@ -4,7 +4,14 @@ import { axiosClient } from '@/http/axios'
 import { authOptions } from '@/lib/auth-options'
 import { generateToken } from '@/lib/generate-token'
 import { actionClient } from '@/lib/safe-action'
-import { idSchema, passwordSchema, productReviewSchema, searchParamsSchema, updateUserSchema } from '@/lib/validation'
+import {
+	adminUpdateReviewSchema,
+	idSchema,
+	passwordSchema,
+	productReviewSchema,
+	searchParamsSchema,
+	updateUserSchema,
+} from '@/lib/validation'
 import { IProduct, ReturnActionType } from '@/types'
 import { getServerSession } from 'next-auth'
 import { revalidatePath } from 'next/cache'
@@ -153,6 +160,25 @@ export const addProductReview = actionClient.schema(productReviewSchema).action<
 	revalidatePath(`/product/${parsedInput.id}`)
 	return JSON.parse(JSON.stringify(data))
 })
+
+export const replyProductReview = actionClient
+	.schema(adminUpdateReviewSchema)
+	.action<ReturnActionType>(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		if (!session?.currentUser) return { failure: 'You must be logged in to reply' }
+		const token = await generateToken(session.currentUser._id)
+		const { data } = await axiosClient.put(
+			`/api/admin/product-reviews/${parsedInput.productId}/${parsedInput.reviewId}`,
+			{
+				comment: parsedInput.comment,
+				rating: parsedInput.rating,
+				adminReply: parsedInput.adminReply || '',
+			},
+			{ headers: { Authorization: `Bearer ${token}` } },
+		)
+		revalidatePath(`/product/${parsedInput.productId}`)
+		return JSON.parse(JSON.stringify(data))
+	})
 
 export const getBuyNowSettings = actionClient.action(async () => {
 	try {

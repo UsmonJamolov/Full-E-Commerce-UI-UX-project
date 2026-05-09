@@ -175,13 +175,14 @@ export default function MusicBannerSection({
     <section className="w-full flex justify-center items-center py-4 xs:py-8 md:py-12 mt-4 md:mt-10 relative z-0">
       <div className={`
         w-full max-w-6xl 
-        bg-black 
         flex flex-col md:flex-row
-        relative overflow-hidden isolate
+        relative overflow-hidden isolate rounded-md
         items-stretch
         shadow-md
         md:aspect-[2.1/1]
       `}>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-zinc-900 to-zinc-800" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_25%,rgba(34,197,94,0.24),transparent_42%),radial-gradient(circle_at_75%_72%,rgba(59,130,246,0.16),transparent_45%)]" />
         {/* LEFT CONTENT */}
         <div className="
           relative z-10 flex-1 flex flex-col justify-center 
@@ -208,15 +209,14 @@ export default function MusicBannerSection({
           </Button>
         </div>
         {/* PRODUCT IMAGE */}
-        <div className="relative z-0 flex-1 flex items-center justify-center px-1 xs:px-2 md:px-8 select-none min-h-[160px] xs:min-h-[220px] md:min-h-0">
+        <div className="relative z-0 flex-1 overflow-hidden select-none min-h-[200px] xs:min-h-[260px] md:min-h-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/70 via-zinc-950/20 to-transparent" />
           <Image 
             src={bannerImage}
             alt="Music Speaker"
-            width={500}
-            height={330}
-            className="object-contain w-full max-w-[320px] xs:max-w-[400px] md:max-w-[480px] drop-shadow-lg pointer-events-none"
+            fill
+            className="object-cover object-center pointer-events-none"
             priority
-            unoptimized
           />
         </div>
       </div>

@@ -45,7 +45,17 @@ class UserController {
 
     async getProduct(req, res, next) {
         try {
-            const product = await productModel.findById(req.params.id); // ✅ const qo‘shildi
+            const product = await productModel.findById(req.params.id).lean()
+			if (!product) return res.json(product)
+			const userIds = (product.reviews || []).map(r => r.user).filter(Boolean)
+			const admins = await userModel
+				.find({ _id: { $in: userIds }, role: 'admin' }, { _id: 1 })
+				.lean()
+			const adminIds = new Set(admins.map(x => String(x._id)))
+			product.reviews = (product.reviews || []).map(r => ({
+				...r,
+				isAdmin: adminIds.has(String(r.user)),
+			}))
             return res.json(product);
         } catch (error) {
             next(error);

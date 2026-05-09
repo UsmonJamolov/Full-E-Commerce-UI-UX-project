@@ -31,14 +31,14 @@ const FlashSalesContent = ({ products, title, noProducts, viewAllLabel, viewAllH
   };
 
   return (
-    <section className="w-full py-6 md:py-10">
+    <section className="w-full py-4 md:py-10">
       <div className="mx-auto w-full max-w-6xl px-2 sm:px-4">
 
         {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <h2 className="text-xl sm:text-2xl md:text-4xl">{title}</h2>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">{title}</h2>
 
-          <div className="flex shrink-0 gap-2 self-end sm:self-auto">
+          <div className="hidden shrink-0 gap-2 sm:self-auto md:flex">
             <Button type="button" size="icon" onClick={() => scrollByCards('prev')} aria-label="Previous">
               <ArrowLeft />
             </Button>
@@ -49,7 +49,7 @@ const FlashSalesContent = ({ products, title, noProducts, viewAllLabel, viewAllH
         </div>
 
         {/* Products */}
-        <div ref={scrollerRef} className="mt-5 flex gap-4 overflow-x-auto no-scrollbar">
+        <div ref={scrollerRef} className="mt-3 flex gap-3 overflow-x-auto no-scrollbar md:mt-5 md:gap-4">
           {products.length === 0 && <p>{noProducts}</p>}
 
           {products.map((p) => (

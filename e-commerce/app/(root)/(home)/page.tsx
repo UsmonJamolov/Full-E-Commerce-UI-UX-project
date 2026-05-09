@@ -20,7 +20,7 @@ const HomePage = async () => {
     const sliderSlides = await getPublicHomeSliderSlides(locale)
     return (
         <>
-            <div className="mb-20 w-full min-w-0">
+            <div className="mb-6 w-full min-w-0 sm:mb-8 md:mb-12">
                 <CategoryWithSlider
                     locale={locale}
                     ctaLabel={dict.home.sliderCta}

@@ -1,6 +1,8 @@
 import { getProducts } from '@/actions/user.action'
 import ProductCard from '@/components/card/product-card'
 import Pagination from '@/components/shared/pagination'
+import { getDictionary, parseLocale } from '@/lib/i18n/dictionaries'
+import { cookies } from 'next/headers'
 import { FC, Suspense } from 'react'
 import { SearchParams } from '@/types'
 import ShoesTargetGroupFilters from './_components/shoes-target-group-filters'
@@ -32,15 +34,24 @@ const ShoesProductsPage: FC<Props> = async props => {
 	const isNext = res?.data?.isNext || false
 	const currentPage = searchParams?.page ? +searchParams.page : 1
 
+	const store = await cookies()
+	const locale = parseLocale(store.get('locale')?.value)
+	const dict = getDictionary(locale)
+	const cat = dict.catalog
+
 	return (
 		<div className='mx-auto w-full max-w-6xl px-2 sm:px-4 py-8'>
-			<h1 className='text-3xl font-bold'>Shoes Products</h1>
-			<p className='text-sm text-muted-foreground mt-1'>Shoes kategoriyasidagi barcha mahsulotlar.</p>
+			<h1 className='text-3xl font-bold tracking-tight'>{cat.shoesPageTitle}</h1>
+			<p className='mt-1 text-sm text-muted-foreground'>{cat.shoesPageDescription}</p>
 			<Suspense fallback={<div className='mt-5 h-9' aria-hidden />}>
-				<ShoesTargetGroupFilters />
+				<ShoesTargetGroupFilters
+					groupLabel={cat.shoesGroupLabel}
+					allFootwear={cat.shoesAllFootwear}
+					targetGroups={cat.targetGroups}
+				/>
 			</Suspense>
 			<div className='mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-				{products.length === 0 && <p>No products found</p>}
+				{products.length === 0 && <p>{cat.shoesNoProducts}</p>}
 				{products.map(product => (
 					<ProductCard key={product._id} product={product} layout='grid' />
 				))}

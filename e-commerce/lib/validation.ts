@@ -105,7 +105,13 @@ export const phoneSchema = z.object({
 
 export const productSchema = z.object({
 	title: z.string().min(3, { message: 'Name must be at least 3 characters' }),
-	price: z.string(),
+	price: z
+		.string()
+		.min(1, { message: 'Price is required' })
+		.refine(s => {
+			const n = parseFloat(String(s).replace(',', '.'))
+			return !Number.isNaN(n) && n > 0
+		}, { message: 'Enter a valid price' }),
 	description: z.string().min(10, { message: 'Description must be at least 10 characters' }),
 	category: z.string(),
 	targetGroup: z.enum(['Erkak', 'Ayol', 'Bola']),
@@ -126,12 +132,16 @@ export const updateProductSchema = z.object({ id: z.string() }).merge(productSch
 export const idSchema = z.object({ id: z.string() })
 
 export const categoryNameSchema = z.object({
-	name: z.string().min(1, 'Nom kiriting').max(80).trim(),
+	nameUz: z.string().min(1, 'O‘zbekcha nom kiriting').max(80).trim(),
+	nameRu: z.string().min(1, 'Ruscha nom kiriting').max(80).trim(),
+	nameEn: z.string().min(1, 'Inglizcha nom kiriting').max(80).trim(),
 })
 
 export const categoryUpdateSchema = z.object({
 	id: z.string(),
-	name: z.string().min(1, 'Nom kiriting').max(80).trim(),
+	nameUz: z.string().min(1, 'O‘zbekcha nom kiriting').max(80).trim(),
+	nameRu: z.string().min(1, 'Ruscha nom kiriting').max(80).trim(),
+	nameEn: z.string().min(1, 'Inglizcha nom kiriting').max(80).trim(),
 })
 
 export const purchaseItemSchema = z.object({

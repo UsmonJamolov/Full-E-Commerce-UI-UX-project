@@ -29,9 +29,8 @@ export default function NewArrivalSection({ initialCards, locale, featuredLabel,
 							src={cards[0].image}
 							alt={cards[0].title}
 							fill
-							className='pointer-events-none z-0 select-none object-contain object-center md:object-left-bottom'
+							className='pointer-events-none z-0 select-none object-cover object-center'
 							sizes='(max-width: 768px) 100vw, 800px'
-							unoptimized
 							priority
 						/>
 						<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/95 via-black/60 to-transparent' />
@@ -44,9 +43,8 @@ export default function NewArrivalSection({ initialCards, locale, featuredLabel,
 							src={cards[1].image}
 							alt={cards[1].title}
 							fill
-							className='pointer-events-none z-0 select-none object-contain object-right-top'
+							className='pointer-events-none z-0 select-none object-cover object-center'
 							sizes='(max-width: 768px) 100vw, 400px'
-							unoptimized
 							priority
 						/>
 						<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent' />
@@ -60,9 +58,8 @@ export default function NewArrivalSection({ initialCards, locale, featuredLabel,
 								src={cards[2].image}
 								alt={cards[2].title}
 								fill
-								className='pointer-events-none z-0 select-none object-contain object-center'
+								className='pointer-events-none z-0 select-none object-cover object-center'
 								sizes='(max-width: 768px) 100vw, 200px'
-								unoptimized
 								priority
 							/>
 							<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent' />
@@ -75,9 +72,8 @@ export default function NewArrivalSection({ initialCards, locale, featuredLabel,
 								src={cards[3].image}
 								alt={cards[3].title}
 								fill
-								className='pointer-events-none z-0 select-none object-contain object-center'
+								className='pointer-events-none z-0 select-none object-cover object-center'
 								sizes='(max-width: 768px) 100vw, 200px'
-								unoptimized
 								priority
 							/>
 							<div className='absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent' />

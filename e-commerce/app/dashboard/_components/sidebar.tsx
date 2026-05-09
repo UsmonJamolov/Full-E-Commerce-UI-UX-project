@@ -34,11 +34,14 @@ const Sidebar = () => {
 						key={item.route}
 						asChild
 						variant={pathname == item.route ? 'secondary' : 'ghost'}
-						className={cn('flex justify-start', pathname == item.route && 'font-bold')}
+						className={cn(
+							'flex h-auto min-h-11 w-full justify-start whitespace-normal py-2.5 text-left [&_span]:text-left',
+							pathname == item.route && 'font-bold',
+						)}
 					>
-						<Link href={item.route}>
-							<item.icon />
-							<span>{navLabel(item.navKey, d)}</span>
+						<Link href={item.route} className='flex w-full items-center gap-2'>
+							<item.icon className='shrink-0' />
+							<span className='break-words'>{navLabel(item.navKey, d)}</span>
 						</Link>
 					</Button>
 				))}

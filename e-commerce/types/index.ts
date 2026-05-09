@@ -80,6 +80,7 @@ export interface IProductReview {
 	_id: string
 	user: string
 	userName: string
+	isAdmin?: boolean
 	rating: number
 	comment: string
 	adminReply?: string

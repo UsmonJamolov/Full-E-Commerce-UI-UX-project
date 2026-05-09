@@ -11,8 +11,16 @@ const bodySchema = z.object({
 const TELEGRAM_MAX = 4096
 
 export async function POST(req: Request) {
-	const token = process.env.TELEGRAM_CONTACT_BOT_TOKEN?.trim()
-	const chatId = process.env.TELEGRAM_CONTACT_CHAT_ID?.trim()
+	const token = (
+		process.env.TELEGRAM_CONTACT_BOT_TOKEN ||
+		process.env.TELEGRAM_BOT_TOKEN ||
+		''
+	).trim()
+	const chatId = (
+		process.env.TELEGRAM_CONTACT_CHAT_ID ||
+		process.env.TELEGRAM_CHAT_ID ||
+		''
+	).trim()
 	/* 200 — terminal / devtools da 503 “xato” ko‘rinmasin; mijoz mailto fallbackni `code` bo‘yicha qiladi */
 	if (!token || !chatId) {
 		return NextResponse.json({ ok: false as const, code: 'NOT_CONFIGURED' as const })

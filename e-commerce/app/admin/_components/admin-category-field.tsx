@@ -30,7 +30,14 @@ import { Check, ChevronsUpDown, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { FC, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-export type AdminCategoryRow = { _id: string; name: string; isDefault?: boolean }
+export type AdminCategoryRow = {
+	_id: string
+	name: string
+	nameUz?: string
+	nameRu?: string
+	nameEn?: string
+	isDefault?: boolean
+}
 const FALLBACK_CATEGORIES: AdminCategoryRow[] = [
 	{ _id: 'default-shoes', name: 'Shoes', isDefault: true },
 	{ _id: 'default-tshirts', name: 'T-Shirts', isDefault: true },
@@ -53,9 +60,13 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 	const [open, setOpen] = useState(false)
 	const [list, setList] = useState<AdminCategoryRow[]>([])
 	const [loading, setLoading] = useState(false)
-	const [newName, setNewName] = useState('')
+	const [newNameUz, setNewNameUz] = useState('')
+	const [newNameRu, setNewNameRu] = useState('')
+	const [newNameEn, setNewNameEn] = useState('')
 	const [editingId, setEditingId] = useState<string | null>(null)
-	const [editName, setEditName] = useState('')
+	const [editNameUz, setEditNameUz] = useState('')
+	const [editNameRu, setEditNameRu] = useState('')
+	const [editNameEn, setEditNameEn] = useState('')
 	const [deleteTarget, setDeleteTarget] = useState<AdminCategoryRow | null>(null)
 
 	const load = useCallback(async () => {
@@ -82,8 +93,12 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 		if (next) void load()
 		if (!next) {
 			setEditingId(null)
-			setEditName('')
-			setNewName('')
+			setEditNameUz('')
+			setEditNameRu('')
+			setEditNameEn('')
+			setNewNameUz('')
+			setNewNameRu('')
+			setNewNameEn('')
 		}
 	}
 
@@ -93,9 +108,11 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 	}
 
 	const handleCreate = async () => {
-		const name = newName.trim()
-		if (!name) return toast.error('Kategoriya nomini kiriting')
-		const res = await createAdminCategory({ name })
+		const nameUz = newNameUz.trim()
+		const nameRu = newNameRu.trim()
+		const nameEn = newNameEn.trim()
+		if (!nameUz || !nameRu || !nameEn) return toast.error('Kategoriya nomini 3 tilda kiriting')
+		const res = await createAdminCategory({ nameUz, nameRu, nameEn })
 		if (res?.serverError || res?.validationErrors) {
 			toast.error("Qo'shib bo'lmadi")
 			return
@@ -106,25 +123,33 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 			return
 		}
 		toast.success("Kategoriya qo'shildi")
-		setNewName('')
+		setNewNameUz('')
+		setNewNameRu('')
+		setNewNameEn('')
 		await load()
 	}
 
 	const startEdit = (cat: AdminCategoryRow) => {
 		setEditingId(cat._id)
-		setEditName(cat.name)
+		setEditNameUz(cat.nameUz || cat.name)
+		setEditNameRu(cat.nameRu || cat.name)
+		setEditNameEn(cat.nameEn || cat.name)
 	}
 
 	const cancelEdit = () => {
 		setEditingId(null)
-		setEditName('')
+		setEditNameUz('')
+		setEditNameRu('')
+		setEditNameEn('')
 	}
 
 	const saveEdit = async () => {
 		if (!editingId) return
-		const name = editName.trim()
-		if (!name) return toast.error('Nom kiriting')
-		const res = await updateAdminCategory({ id: editingId, name })
+		const nameUz = editNameUz.trim()
+		const nameRu = editNameRu.trim()
+		const nameEn = editNameEn.trim()
+		if (!nameUz || !nameRu || !nameEn) return toast.error('Nomlarni 3 tilda kiriting')
+		const res = await updateAdminCategory({ id: editingId, nameUz, nameRu, nameEn })
 		if (res?.serverError || res?.validationErrors) {
 			toast.error('Saqlanmadi')
 			return
@@ -135,7 +160,7 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 			return
 		}
 		const prev = list.find((c) => c._id === editingId)?.name
-		if (prev && value === prev) onChange(name)
+		if (prev && value === prev) onChange(nameEn)
 		toast.success('Yangilandi')
 		cancelEdit()
 		await load()
@@ -198,10 +223,23 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 									{editingId === cat._id ? (
 										<>
 											<Input
-												value={editName}
-												onChange={(e) => setEditName(e.target.value)}
+												value={editNameUz}
+												onChange={(e) => setEditNameUz(e.target.value)}
 												className="h-8 flex-1 text-sm"
+												placeholder="Nom (UZ)"
 												autoFocus
+											/>
+											<Input
+												value={editNameRu}
+												onChange={(e) => setEditNameRu(e.target.value)}
+												className="h-8 flex-1 text-sm"
+												placeholder="Nom (RU)"
+											/>
+											<Input
+												value={editNameEn}
+												onChange={(e) => setEditNameEn(e.target.value)}
+												className="h-8 flex-1 text-sm"
+												placeholder="Nom (EN)"
 											/>
 											<Button
 												type="button"
@@ -262,16 +300,30 @@ const AdminCategoryField: FC<Props> = ({ value, onChange, disabled }) => {
 
 					<div className="space-y-2 border-t pt-3">
 						<p className="text-xs font-medium text-muted-foreground">Yangi kategoriya</p>
-						<div className="flex gap-2">
+						<div className="grid grid-cols-1 gap-2">
 							<Input
-								placeholder="Masalan: Electronics"
-								value={newName}
-								onChange={(e) => setNewName(e.target.value)}
+								placeholder="Masalan: Oyoq kiyim (UZ)"
+								value={newNameUz}
+								onChange={(e) => setNewNameUz(e.target.value)}
 								className="bg-secondary"
 							/>
+							<Input
+								placeholder="Например: Обувь (RU)"
+								value={newNameRu}
+								onChange={(e) => setNewNameRu(e.target.value)}
+								className="bg-secondary"
+							/>
+							<div className="flex gap-2">
+								<Input
+									placeholder="Example: Shoes (EN)"
+									value={newNameEn}
+									onChange={(e) => setNewNameEn(e.target.value)}
+									className="bg-secondary"
+								/>
 							<Button type="button" onClick={() => void handleCreate()} disabled={loading}>
 								<Plus className="h-4 w-4" />
 							</Button>
+							</div>
 						</div>
 					</div>
 				</DialogContent>

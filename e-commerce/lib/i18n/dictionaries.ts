@@ -287,6 +287,28 @@ export type Dictionary = {
 		paymentsColPrice: string
 		paymentsProviderClick: string
 	}
+	/** Katalogdagi `category` / `targetGroup` qiymatlari (API ingliz/o‘zbek kalitlari). */
+	catalog: {
+		categories: Record<string, string>
+		targetGroups: { Erkak: string; Ayol: string; Bola: string }
+		shoesPageTitle: string
+		shoesPageDescription: string
+		shoesGroupLabel: string
+		shoesAllFootwear: string
+		shoesNoProducts: string
+	}
+	productReviews: {
+		title: string
+		placeholder: string
+		submit: string
+		toastSent: string
+		toastReplySaved: string
+		adminReplyPlaceholder: string
+		replySubmit: string
+		emptyList: string
+		adminBadge: string
+		adminReplyPrefix: string
+	}
 }
 
 const en: Dictionary = {
@@ -613,6 +635,35 @@ const en: Dictionary = {
 		paymentsColStatus: 'Status',
 		paymentsColPrice: 'Price',
 		paymentsProviderClick: 'Click',
+	},
+	catalog: {
+		categories: {
+			Shoes: 'Shoes',
+			Clothes: 'Clothes',
+			Bags: 'Bags',
+			Backpacks: 'Backpacks',
+			Umbrellas: 'Umbrellas',
+			All: 'All categories',
+			Watch: 'Watches',
+		},
+		targetGroups: { Erkak: 'Men', Ayol: 'Women', Bola: 'Kids' },
+		shoesPageTitle: 'Shoes',
+		shoesPageDescription: 'All footwear in this category.',
+		shoesGroupLabel: 'Group',
+		shoesAllFootwear: 'All footwear',
+		shoesNoProducts: 'No products found',
+	},
+	productReviews: {
+		title: 'Customer reviews',
+		placeholder: 'Write your review…',
+		submit: 'Send review',
+		toastSent: 'Review submitted',
+		toastReplySaved: 'Reply saved',
+		adminReplyPlaceholder: 'Reply to this review…',
+		replySubmit: 'Save reply',
+		emptyList: 'No reviews yet.',
+		adminBadge: 'Admin',
+		adminReplyPrefix: 'Admin reply:',
 	},
 }
 
@@ -942,6 +993,35 @@ const ru: Dictionary = {
 		paymentsColPrice: 'Цена',
 		paymentsProviderClick: 'Клик',
 	},
+	catalog: {
+		categories: {
+			Shoes: 'Обувь',
+			Clothes: 'Одежда',
+			Bags: 'Сумки',
+			Backpacks: 'Рюкзаки',
+			Umbrellas: 'Зонты',
+			All: 'Все категории',
+			Watch: 'Часы',
+		},
+		targetGroups: { Erkak: 'Мужчины', Ayol: 'Женщины', Bola: 'Дети' },
+		shoesPageTitle: 'Обувь',
+		shoesPageDescription: 'Все товары в категории обуви.',
+		shoesGroupLabel: 'Группа',
+		shoesAllFootwear: 'Вся обувь',
+		shoesNoProducts: 'Товары не найдены',
+	},
+	productReviews: {
+		title: 'Отзывы покупателей',
+		placeholder: 'Напишите отзыв…',
+		submit: 'Отправить отзыв',
+		toastSent: 'Отзыв отправлен',
+		toastReplySaved: 'Ответ сохранён',
+		adminReplyPlaceholder: 'Ответ на этот отзыв…',
+		replySubmit: 'Сохранить ответ',
+		emptyList: 'Пока нет отзывов.',
+		adminBadge: 'Админ',
+		adminReplyPrefix: 'Ответ администратора:',
+	},
 }
 
 const uz: Dictionary = {
@@ -1269,6 +1349,35 @@ const uz: Dictionary = {
 		paymentsColStatus: 'Holat',
 		paymentsColPrice: 'Narx',
 		paymentsProviderClick: 'Click',
+	},
+	catalog: {
+		categories: {
+			Shoes: 'Oyoq kiyim',
+			Clothes: 'Kiyim',
+			Bags: 'Sumkalar',
+			Backpacks: 'Ryukzaklar',
+			Umbrellas: 'Zontiklar',
+			All: 'Barcha kategoriyalar',
+			Watch: 'Soatlar',
+		},
+		targetGroups: { Erkak: 'Erkaklar', Ayol: 'Ayollar', Bola: 'Bolalar' },
+		shoesPageTitle: 'Oyoq kiyim',
+		shoesPageDescription: 'Oyoq kiyim kategoriyasidagi barcha mahsulotlar.',
+		shoesGroupLabel: 'Guruh',
+		shoesAllFootwear: 'Barcha oyoq kiyimlar',
+		shoesNoProducts: 'Mahsulot topilmadi',
+	},
+	productReviews: {
+		title: 'Mijozlar sharhlari',
+		placeholder: 'Sharhingizni yozing…',
+		submit: 'Sharh yuborish',
+		toastSent: 'Sharh yuborildi',
+		toastReplySaved: 'Javob saqlandi',
+		adminReplyPlaceholder: 'Sharhga javob yozing…',
+		replySubmit: 'Javobni saqlash',
+		emptyList: 'Hozircha sharh yo‘q.',
+		adminBadge: 'Admin',
+		adminReplyPrefix: 'Admin javobi:',
 	},
 }
 

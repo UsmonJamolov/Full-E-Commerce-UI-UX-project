@@ -76,7 +76,9 @@ function SignInForm() {
     setIsLoading(true);
     try {
       const res = await login({
-        login: loginValue.trim(),
+        login: loginValue.includes("@")
+          ? loginValue.trim()
+          : normalizePhoneDigits(loginValue.trim()),
         password,
       });
 
@@ -131,10 +133,7 @@ function SignInForm() {
             placeholder={t.loginPlaceholder}
             className="h-12"
             value={loginValue}
-            onChange={(e) => {
-              const v = e.target.value;
-              setLoginValue(v.includes("@") ? v : normalizePhoneDigits(v));
-            }}
+            onChange={(e) => setLoginValue(e.target.value)}
           />
         </div>
         <div className="space-y-2">

@@ -27,7 +27,14 @@ import { ReturnActionType } from '@/types'
 import { getServerSession } from 'next-auth'
 import { revalidatePath } from 'next/cache'
 
-type AdminCategory = { _id: string; name: string; isDefault?: boolean }
+type AdminCategory = {
+	_id: string
+	name: string
+	nameUz?: string
+	nameRu?: string
+	nameEn?: string
+	isDefault?: boolean
+}
 type AdminReviewItem = {
 	productId: string
 	productTitle: string
@@ -77,7 +84,11 @@ export const updateAdminCategory = actionClient
 		const token = await generateToken(session?.currentUser?._id)
 		const { data } = await axiosClient.put(
 			`/api/admin/categories/${parsedInput.id}`,
-			{ name: parsedInput.name },
+			{
+				nameUz: parsedInput.nameUz,
+				nameRu: parsedInput.nameRu,
+				nameEn: parsedInput.nameEn,
+			},
 			{ headers: { Authorization: `Bearer ${token}` } },
 		)
 		revalidatePath('/admin/products')
@@ -242,10 +253,8 @@ export const uploadFile = actionClient
         key: presigned.key,
       }
     } catch (err) {
-      return {
-        url: "",
-        key: "",
-      }
+      console.error('uploadFile', err)
+      throw new Error('File upload failed')
     }
   })
 

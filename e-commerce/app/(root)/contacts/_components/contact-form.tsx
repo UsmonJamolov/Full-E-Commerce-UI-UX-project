@@ -143,11 +143,8 @@ export default function ContactForm({ copy, supportEmail }: { copy: Copy; suppor
 					className='inline-flex h-auto min-h-11 w-full max-w-full shrink-0 flex-wrap items-center justify-center gap-2 whitespace-normal rounded-xl bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 px-5 py-2.5 text-sm font-semibold leading-snug text-white shadow-md hover:opacity-[0.96] sm:w-auto sm:min-w-[12rem] sm:max-w-[min(100%,18rem)]'
 				>
 					<Send className='h-4 w-4 shrink-0' aria-hidden />
-					<span className='text-center'>{sending ? '…' : copy.submit}</span>
+					<span className='text-center'>{copy.submit}</span>
 				</Button>
-				<p className='min-w-0 flex-1 text-xs leading-relaxed text-muted-foreground sm:max-w-[20rem] sm:pt-1 sm:text-right'>
-					{copy.formNote}
-				</p>
 			</div>
 		</form>
 	)

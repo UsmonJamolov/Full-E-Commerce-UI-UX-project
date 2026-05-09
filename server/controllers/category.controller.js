@@ -35,6 +35,9 @@ async function ensureDefaultCategories() {
 	await categoryModel.insertMany(
 		missing.map((name) => ({
 			name,
+			nameUz: name,
+			nameRu: name,
+			nameEn: name,
 			isDefault: true,
 		})),
 	)
@@ -61,15 +64,20 @@ class CategoryController {
 	async createCategory(req, res, next) {
 		try {
 			await ensureDefaultCategories()
-			const name = (req.body.name || '').trim()
-			if (!name) return res.status(400).json({ failure: 'Kategoriya nomi kerak' })
+			const nameUz = (req.body.nameUz || req.body.name || '').trim()
+			const nameRu = (req.body.nameRu || req.body.name || '').trim()
+			const nameEn = (req.body.nameEn || req.body.name || '').trim()
+			if (!nameUz || !nameRu || !nameEn) {
+				return res.status(400).json({ failure: 'Kategoriya nomi 3 tilda kerak (uz/ru/en)' })
+			}
+			const name = nameEn
 
 			const exists = await categoryModel.findOne({
 				name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
 			})
 			if (exists) return res.json({ failure: 'Bu nomdagi kategoriya allaqachon bor' })
 
-			const doc = await categoryModel.create({ name, isDefault: false })
+			const doc = await categoryModel.create({ name, nameUz, nameRu, nameEn, isDefault: false })
 			return res.json({ status: 201, category: doc })
 		} catch (error) {
 			if (error.code === 11000) {
@@ -82,8 +90,13 @@ class CategoryController {
 	async updateCategory(req, res, next) {
 		try {
 			const { id } = req.params
-			const name = (req.body.name || '').trim()
-			if (!name) return res.status(400).json({ failure: 'Kategoriya nomi kerak' })
+			const nameUz = (req.body.nameUz || req.body.name || '').trim()
+			const nameRu = (req.body.nameRu || req.body.name || '').trim()
+			const nameEn = (req.body.nameEn || req.body.name || '').trim()
+			if (!nameUz || !nameRu || !nameEn) {
+				return res.status(400).json({ failure: 'Kategoriya nomi 3 tilda kerak (uz/ru/en)' })
+			}
+			const name = nameEn
 
 			const doc = await categoryModel.findById(id)
 			if (!doc) return res.json({ failure: 'Kategoriya topilmadi' })
@@ -96,6 +109,9 @@ class CategoryController {
 
 			const oldName = doc.name
 			doc.name = name
+			doc.nameUz = nameUz
+			doc.nameRu = nameRu
+			doc.nameEn = nameEn
 			await doc.save()
 
 			if (oldName !== name) {

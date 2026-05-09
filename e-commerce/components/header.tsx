@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 import HeaderSearchPanel from './shared/header-search-panel'
-import HeaderMobileNav from './shared/header-mobile-nav'
 import HeaderUserAction from './shared/header-user-action'
 import LanguageSwitcher from './shared/language-switcher'
 
@@ -42,12 +41,6 @@ export default function Header({ locale, searchItems, locationLabel, currentUser
       <div className='border-b bg-white/95 backdrop-blur'>
         <div className='mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:px-4'>
           <div className='flex min-w-0 items-center gap-2 md:gap-8'>
-            <HeaderMobileNav
-              menuTitle={dict.header.menu}
-              locationLabel={locationLabel}
-              locationAria={dict.header.locationAria}
-              links={[]}
-            />
             <Link
               href='/'
               className='truncate bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 bg-clip-text text-xl font-extrabold tracking-[0.08em] text-transparent sm:text-2xl md:text-3xl md:tracking-[0.12em]'
@@ -77,7 +70,12 @@ export default function Header({ locale, searchItems, locationLabel, currentUser
               )}
             </div>
 
-            <HeaderSearchPanel items={searchItems} searchPanel={dict.searchPanel} locale={locale} />
+            <HeaderSearchPanel
+              items={searchItems}
+              searchPanel={dict.searchPanel}
+              catalog={dict.catalog}
+              locale={locale}
+            />
 
             <HeaderUserAction currentUser={currentUser} signInLabel={dict.header.signIn} />
           </div>
