@@ -1,7 +1,8 @@
 'use client'
 
-import { createProduct, updateProduct, uploadFile} from "@/actions/admin.aciton";
-import {Uploader} from "@/components/Uploader";
+import { createProduct, updateProduct } from "@/actions/admin.aciton";
+import { Uploader } from "@/components/Uploader";
+import { uploadProductImageClient } from "@/lib/client-upload-image";
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -74,27 +75,17 @@ const AddProduct = () => {
 		let imageUrl = values.image
 		let imageKey = values.imageKey
 
-		// 🔥 AGAR yangi file tanlangan bo‘lsa → upload qilamiz
+		// Yangi fayl: brauzerdan to‘g‘ridan-to‘g‘ri API ga (server action orqali emas — mobil/katta fayllar uchun)
 		if (selectedFile) {
-		const uploaded = await uploadFile({
-			file: selectedFile,
-			fileName: selectedFile.name,
-			fileType: selectedFile.type,
-			fileSize: selectedFile.size,
-		})
-
-		if (uploaded?.serverError) {
-			toast.error(typeof uploaded.serverError === 'string' ? uploaded.serverError : 'Image upload failed')
-			return
-		}
-
-		if (!uploaded?.data?.url) {
-			toast.error('Image upload failed')
-			return
-		}
-
-		imageUrl = uploaded.data.url
-		imageKey = uploaded.data.key
+			try {
+				const uploaded = await uploadProductImageClient(selectedFile)
+				imageUrl = uploaded.url
+				imageKey = uploaded.key
+			} catch (e) {
+				const msg = e instanceof Error ? e.message : a.productFormGenericError
+				toast.error(msg)
+				return
+			}
 		}
 
 		// 🔥 AGAR create bo‘lsa → image majburiy

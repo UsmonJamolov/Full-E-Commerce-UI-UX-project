@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  experimental: {
+    serverActions: {
+      /** Boshqa actionlar katta body yuborsa (masalan, fayl) — mobil fotosuratlar */
+      bodySizeLimit: "20mb",
+    },
+  },
   images: {
      remotePatterns: [
       {
