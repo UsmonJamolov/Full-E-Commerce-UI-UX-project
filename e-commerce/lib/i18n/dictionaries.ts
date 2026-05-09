@@ -352,6 +352,9 @@ export type Dictionary = {
 		toastReplySaved: string
 		adminReplyPlaceholder: string
 		replySubmit: string
+		/** Admin: javob maydoni yashirin, shu tugma bosilganda ochiladi */
+		replyToggle: string
+		replyCancel: string
 		emptyList: string
 		adminBadge: string
 		adminReplyPrefix: string
@@ -754,6 +757,8 @@ const en: Dictionary = {
 		toastReplySaved: 'Reply saved',
 		adminReplyPlaceholder: 'Reply to this review…',
 		replySubmit: 'Save reply',
+		replyToggle: 'Reply',
+		replyCancel: 'Cancel',
 		emptyList: 'No reviews yet.',
 		adminBadge: 'Admin',
 		adminReplyPrefix: 'Admin reply:',
@@ -1157,6 +1162,8 @@ const ru: Dictionary = {
 		toastReplySaved: 'Ответ сохранён',
 		adminReplyPlaceholder: 'Ответ на этот отзыв…',
 		replySubmit: 'Сохранить ответ',
+		replyToggle: 'Ответить',
+		replyCancel: 'Отмена',
 		emptyList: 'Пока нет отзывов.',
 		adminBadge: 'Админ',
 		adminReplyPrefix: 'Ответ администратора:',
@@ -1560,6 +1567,8 @@ const uz: Dictionary = {
 		toastReplySaved: 'Javob saqlandi',
 		adminReplyPlaceholder: 'Sharhga javob yozing…',
 		replySubmit: 'Javobni saqlash',
+		replyToggle: 'Javob berish',
+		replyCancel: 'Bekor qilish',
 		emptyList: 'Hozircha sharh yo‘q.',
 		adminBadge: 'Admin',
 		adminReplyPrefix: 'Admin javobi:',

@@ -23,10 +23,11 @@ const ReviewSection = ({ productId, reviews }: Props) => {
 	const [rating, setRating] = useState(5)
 	const [comment, setComment] = useState('')
 	const [replyByReview, setReplyByReview] = useState<Record<string, string>>({})
+	const [openReplyId, setOpenReplyId] = useState<string | null>(null)
 	const { isLoading, setIsLoading, onError } = useAction()
 	const { data: session } = useSession()
 	const router = useRouter()
-	const isAdmin = session?.currentUser?.role === 'admin'
+	const isAdmin = String(session?.currentUser?.role ?? session?.user?.role ?? '').toLowerCase() === 'admin'
 
 	async function onSubmit(e: FormEvent) {
 		e.preventDefault()
@@ -64,6 +65,7 @@ const ReviewSection = ({ productId, reviews }: Props) => {
 			}
 			toast.success(pr.toastReplySaved)
 			setReplyByReview(prev => ({ ...prev, [review._id]: '' }))
+			setOpenReplyId(null)
 			router.refresh()
 		} finally {
 			setIsLoading(false)
@@ -126,18 +128,43 @@ const ReviewSection = ({ productId, reviews }: Props) => {
 						)}
 						{isAdmin && (
 							<div className='mt-3 space-y-2'>
-								<Textarea
-									value={replyByReview[item._id] ?? item.adminReply ?? ''}
-									onChange={e => setReplyByReview(prev => ({ ...prev, [item._id]: e.target.value }))}
-									placeholder={pr.adminReplyPlaceholder}
-								/>
-								<Button
-									type='button'
-									disabled={isLoading || !(replyByReview[item._id] || item.adminReply || '').trim()}
-									onClick={() => onReplySubmit(item)}
-								>
-									{pr.replySubmit}
-								</Button>
+								{openReplyId === item._id ? (
+									<>
+										<Textarea
+											value={replyByReview[item._id] ?? item.adminReply ?? ''}
+											onChange={e => setReplyByReview(prev => ({ ...prev, [item._id]: e.target.value }))}
+											placeholder={pr.adminReplyPlaceholder}
+										/>
+										<div className='flex flex-wrap gap-2'>
+											<Button
+												type='button'
+												disabled={isLoading || !(replyByReview[item._id] ?? item.adminReply ?? '').trim()}
+												onClick={() => onReplySubmit(item)}
+											>
+												{pr.replySubmit}
+											</Button>
+											<Button
+												type='button'
+												variant='outline'
+												disabled={isLoading}
+												onClick={() => {
+													setOpenReplyId(null)
+													setReplyByReview(prev => {
+														const next = { ...prev }
+														delete next[item._id]
+														return next
+													})
+												}}
+											>
+												{pr.replyCancel}
+											</Button>
+										</div>
+									</>
+								) : (
+									<Button type='button' variant='secondary' onClick={() => setOpenReplyId(item._id)}>
+										{pr.replyToggle}
+									</Button>
+								)}
 							</div>
 						)}
 					</div>
