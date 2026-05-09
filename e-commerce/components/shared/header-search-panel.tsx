@@ -142,7 +142,7 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, l
 		if (!hasFilters) {
 			return [...items]
 				.sort((a, b) => (b.ratingAverage || 0) - (a.ratingAverage || 0))
-				.slice(0, 12)
+				.slice(0, 8)
 		}
 		const term = query.trim().toLowerCase()
 		return items.filter(item => {
@@ -160,7 +160,7 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, l
 		})
 	}, [items, query, selectedCategory, hasFilters])
 
-	const visibleItems = useMemo(() => shownItems.slice(0, 12), [shownItems])
+	const visibleItems = useMemo(() => shownItems.slice(0, 8), [shownItems])
 
 	const onPopularClick = (word: string) => {
 		setQuery(word)
@@ -271,35 +271,39 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, l
 									</div>
 								</div>
 
-								<div className='grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4'>
+								<div className='grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-8 lg:grid-cols-4 lg:gap-x-5'>
 									{visibleItems.map(item => (
 										<Link
 											key={item._id}
 											href={`/product/${item._id}`}
-											className='group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card/80 p-1.5 shadow-sm transition hover:border-primary/35 hover:shadow-md'
+											className='group flex flex-col bg-white'
 											onClick={recordIfQuery}
 										>
-											<div className='relative mb-1.5 aspect-[4/5] w-full max-h-[118px] overflow-hidden rounded-md bg-muted/50 sm:max-h-[128px]'>
+											<div className='relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-100'>
 												<Image
 													src={item.image}
 													alt={item.title}
 													fill
-													className='object-cover transition duration-300 group-hover:scale-[1.03]'
-													sizes='(max-width:640px) 42vw, (max-width:1024px) 22vw, 160px'
+													className='object-cover transition duration-500 ease-out group-hover:scale-[1.02]'
+													sizes='(max-width:640px) 44vw, (max-width:1024px) 28vw, 200px'
 												/>
-												<span className='pointer-events-none absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white backdrop-blur-[2px]'>
-													<Heart className='h-3 w-3' aria-hidden />
-												</span>
+												<Heart
+													className='pointer-events-none absolute right-2.5 top-2.5 h-5 w-5 fill-none text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.65)]'
+													strokeWidth={1.65}
+													aria-hidden
+												/>
 											</div>
-											<p className='line-clamp-2 min-h-8 text-[11px] font-medium leading-snug text-foreground sm:min-h-9 sm:text-xs'>
-												{item.title}
-											</p>
-											<p className='mt-0.5 text-[11px] font-semibold tabular-nums text-primary sm:text-xs'>
-												₽ {formatPrice(item.price)}
-											</p>
-											<p className='line-clamp-1 text-[10px] text-muted-foreground'>
-												{categoryFromCatalog(catalog, item.category)}
-											</p>
+											<div className='mt-3 space-y-1'>
+												<p className='line-clamp-2 text-[11px] font-normal uppercase leading-snug tracking-wide text-neutral-900 sm:text-xs'>
+													{item.title}
+												</p>
+												<p className='text-sm font-bold tabular-nums text-neutral-900'>
+													₽ {formatPrice(item.price)}
+												</p>
+												<p className='text-[10px] font-medium uppercase tracking-widest text-neutral-400'>
+													{item.isNew ? copy.productNewBadge : categoryFromCatalog(catalog, item.category)}
+												</p>
+											</div>
 										</Link>
 									))}
 									{hasFilters && visibleItems.length === 0 && (

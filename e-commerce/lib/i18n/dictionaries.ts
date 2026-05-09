@@ -238,6 +238,8 @@ export type Dictionary = {
 		categoryKids: string
 		noResults: string
 		viewAllResults: string
+		/** Mahsulot kartasidagi «yangi» yorlig‘i */
+		productNewBadge: string
 	}
 	dashboard: {
 		sidebarTitle: string
@@ -635,6 +637,7 @@ const en: Dictionary = {
 		categoryKids: 'Kids',
 		noResults: 'No products found.',
 		viewAllResults: 'View all results',
+		productNewBadge: 'NEW',
 	},
 	dashboard: {
 		sidebarTitle: 'Dashboard',
@@ -1040,6 +1043,7 @@ const ru: Dictionary = {
 		categoryKids: 'Дети',
 		noResults: 'Товары не найдены.',
 		viewAllResults: 'Все результаты',
+		productNewBadge: 'НОВИНКА',
 	},
 	dashboard: {
 		sidebarTitle: 'Кабинет',
@@ -1445,6 +1449,7 @@ const uz: Dictionary = {
 		categoryKids: 'Bola',
 		noResults: 'Mahsulot topilmadi.',
 		viewAllResults: 'Barcha natijalarni ko‘rish',
+		productNewBadge: 'YANGI',
 	},
 	dashboard: {
 		sidebarTitle: 'Kabinet',
