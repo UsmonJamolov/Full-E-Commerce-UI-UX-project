@@ -142,7 +142,7 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, l
 		if (!hasFilters) {
 			return [...items]
 				.sort((a, b) => (b.ratingAverage || 0) - (a.ratingAverage || 0))
-				.slice(0, 8)
+				.slice(0, 12)
 		}
 		const term = query.trim().toLowerCase()
 		return items.filter(item => {
@@ -160,7 +160,7 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, l
 		})
 	}, [items, query, selectedCategory, hasFilters])
 
-	const visibleItems = useMemo(() => shownItems.slice(0, 8), [shownItems])
+	const visibleItems = useMemo(() => shownItems.slice(0, 12), [shownItems])
 
 	const onPopularClick = (word: string) => {
 		setQuery(word)
@@ -271,21 +271,33 @@ export default function HeaderSearchPanel({ items, searchPanel: copy, catalog, l
 									</div>
 								</div>
 
-								<div className='grid grid-cols-2 gap-3 sm:gap-4'>
+								<div className='grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4'>
 									{visibleItems.map(item => (
 										<Link
 											key={item._id}
 											href={`/product/${item._id}`}
-											className='space-y-1'
+											className='group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card/80 p-1.5 shadow-sm transition hover:border-primary/35 hover:shadow-md'
 											onClick={recordIfQuery}
 										>
-											<div className='relative aspect-square overflow-hidden rounded bg-secondary'>
-												<Image src={item.image} alt={item.title} fill className='object-cover' sizes='(max-width:768px) 45vw, 200px' />
-												<Heart className='absolute right-2 top-2 h-4 w-4 text-white' />
+											<div className='relative mb-1.5 aspect-[4/5] w-full max-h-[118px] overflow-hidden rounded-md bg-muted/50 sm:max-h-[128px]'>
+												<Image
+													src={item.image}
+													alt={item.title}
+													fill
+													className='object-cover transition duration-300 group-hover:scale-[1.03]'
+													sizes='(max-width:640px) 42vw, (max-width:1024px) 22vw, 160px'
+												/>
+												<span className='pointer-events-none absolute right-1 top-1 rounded-full bg-black/45 p-1 text-white backdrop-blur-[2px]'>
+													<Heart className='h-3 w-3' aria-hidden />
+												</span>
 											</div>
-											<p className='line-clamp-2 text-xs font-medium sm:text-sm'>{item.title}</p>
-											<p className='text-[11px] font-semibold sm:text-xs'>₽ {formatPrice(item.price)}</p>
-											<p className='line-clamp-1 text-[10px] text-muted-foreground sm:text-[11px]'>
+											<p className='line-clamp-2 min-h-8 text-[11px] font-medium leading-snug text-foreground sm:min-h-9 sm:text-xs'>
+												{item.title}
+											</p>
+											<p className='mt-0.5 text-[11px] font-semibold tabular-nums text-primary sm:text-xs'>
+												₽ {formatPrice(item.price)}
+											</p>
+											<p className='line-clamp-1 text-[10px] text-muted-foreground'>
 												{categoryFromCatalog(catalog, item.category)}
 											</p>
 										</Link>
