@@ -124,11 +124,11 @@ const ProductCard: FC<Props> = ({ product, layout = 'carousel' }) => {
 						</div>
 						<div
 							className={cn(
-								'relative overflow-hidden rounded-md bg-secondary',
+								'relative overflow-hidden rounded-md',
 								isGrid ? 'mx-0 aspect-square w-full' : 'mx-auto aspect-square w-full',
 							)}
 						>
-							<Image src={imageSrc} alt={product.title} fill className='object-contain object-center p-2' sizes='(max-width: 768px) 68vw, 260px' />
+							<Image src={imageSrc} alt={product.title} fill className='object-cover object-center' />
 						</div>
 						{product.cta && (
 							<Button

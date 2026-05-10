@@ -42,15 +42,8 @@ const Page = async ({ params }: Props) => {
 	return (
 		<div>
 			<div className='grid min-h-[72vh] grid-cols-1 items-center gap-4 py-6 md:grid-cols-3'>
-				<div className='bg-secondary relative col-span-2 flex aspect-square w-full items-center justify-center overflow-hidden rounded-md md:aspect-auto md:h-[70vh] md:min-h-[420px]'>
-					<Image
-						src={product.image}
-						fill
-						className='object-contain object-center p-4 md:p-8'
-						alt={product.title}
-						sizes='(max-width: 768px) 100vw, 66vw'
-						priority
-					/>
+				<div className='bg-secondary relative col-span-2 aspect-square w-full overflow-hidden rounded-md md:aspect-auto md:h-[70vh]'>
+					<Image src={product.image} fill className='object-cover object-center' alt={product.title} />
 				</div>
 				<div className='flex flex-col space-y-1 self-center'>
 					<h1 className='font-bold text-4xl'>{product.title}</h1>
