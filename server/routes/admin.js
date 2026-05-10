@@ -1,4 +1,5 @@
 const adminController = require('../controllers/admin.controller')
+const authController = require('../controllers/auth.controller')
 const categoryController = require('../controllers/category.controller')
 const purchaseController = require('../controllers/purchase.controller')
 const buyNowController = require('../controllers/buy-now.controller')
@@ -14,6 +15,8 @@ const uploadProductImageMulter = multer({
 	storage: multer.memoryStorage(),
 	limits: { fileSize: 50 * 1024 * 1024 },
 })
+
+router.post('/delegated-admin', authController.createDelegatedAdmin.bind(authController))
 
 router.get('/categories', categoryController.getCategories)
 router.post('/categories', categoryController.createCategory)

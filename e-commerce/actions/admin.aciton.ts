@@ -7,6 +7,7 @@ import { actionClient } from '@/lib/safe-action'
 import {
 	categoryNameSchema,
 	categoryUpdateSchema,
+	delegatedAdminRegisterSchema,
 	adminDeleteReviewSchema,
 	adminUpdateReviewSchema,
 	idSchema,
@@ -263,6 +264,33 @@ export const uploadFile = actionClient
       throw new Error(msg)
     }
   })
+
+export const createDelegatedAdmin = actionClient
+	.schema(delegatedAdminRegisterSchema)
+	.action<ReturnActionType>(async ({ parsedInput }) => {
+		const session = await getServerSession(authOptions)
+		const userId = session?.currentUser?._id
+		const role = session?.currentUser?.role
+		if (!userId || String(role).toLowerCase() !== 'admin' || !session.currentUser?.managesAdmins) {
+			throw new Error('Ruxsat yo‘q')
+		}
+		const token = await generateToken(userId)
+		const { confirmPassword: _omit, ...payload } = parsedInput
+		try {
+			const { data } = await axiosClient.post(
+				'/api/admin/delegated-admin',
+				{ name: payload.name, login: payload.login, password: payload.password },
+				{ headers: { Authorization: `Bearer ${token}` } },
+			)
+			return JSON.parse(JSON.stringify(data)) as ReturnActionType
+		} catch (e: unknown) {
+			const d = (e as { response?: { data?: unknown } })?.response?.data
+			if (d && typeof d === 'object') {
+				return JSON.parse(JSON.stringify(d)) as ReturnActionType
+			}
+			return { success: false, message: 'Server error' } as unknown as ReturnActionType
+		}
+	})
 
 export const createProduct = actionClient.schema(productSchema).action<ReturnActionType>(async ({ parsedInput }) => {
 	try {

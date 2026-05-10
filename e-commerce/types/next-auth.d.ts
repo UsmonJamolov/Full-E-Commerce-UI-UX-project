@@ -60,6 +60,8 @@ declare module "next-auth" {
       isDeleted?: boolean;
       createdAt?: string;
       updatedAt?: string;
+      /** admin-sign-up orqali yaratilgan asosiy admin. */
+      managesAdmins?: boolean;
     };
   }
 

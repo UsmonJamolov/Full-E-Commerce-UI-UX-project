@@ -85,6 +85,8 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
         };
 
+        const managesAdmins = user.role === "admin" && !user.adminCreatedBy;
+
         session.currentUser = {
           _id: user._id,
           phone: user.phone,
@@ -96,6 +98,7 @@ export const authOptions: NextAuthOptions = {
           isDeleted: user.isDeleted,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
+          managesAdmins,
         };
 
         console.log("SESSION CALLBACK RESULT:", session);

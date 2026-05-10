@@ -335,6 +335,13 @@ export type Dictionary = {
 		productFormUpdated: string
 		productFormValidationFailed: string
 		productFormGenericError: string
+		adminsNavLabel: string
+		createAdminTitle: string
+		createAdminLead: string
+		createAdminSubmit: string
+		createAdminSuccess: string
+		createAdminNamePh: string
+		createAdminLoginPh: string
 	}
 	/** Katalogdagi `category` / `targetGroup` qiymatlari (API ingliz/o‘zbek kalitlari). */
 	catalog: {
@@ -734,6 +741,14 @@ const en: Dictionary = {
 		productFormUpdated: 'Product updated',
 		productFormValidationFailed: 'Validation failed',
 		productFormGenericError: 'Something went wrong',
+		adminsNavLabel: 'Admins',
+		createAdminTitle: 'Create admin',
+		createAdminLead:
+			'Creates an admin who can use the panel but cannot create other admins. Only an account registered via the admin signup page can use this screen.',
+		createAdminSubmit: 'Create admin',
+		createAdminSuccess: 'Admin account created. They can sign in with the same email or phone and password.',
+		createAdminNamePh: 'Full name',
+		createAdminLoginPh: 'Email or phone',
 	},
 	catalog: {
 		categories: {
@@ -1140,6 +1155,14 @@ const ru: Dictionary = {
 		productFormUpdated: 'Товар обновлён',
 		productFormValidationFailed: 'Проверьте поля формы',
 		productFormGenericError: 'Что-то пошло не так',
+		adminsNavLabel: 'Админы',
+		createAdminTitle: 'Создать администратора',
+		createAdminLead:
+			'Новый администратор сможет работать в панели, но не сможет создавать других админов. Эту страницу видит только главный админ, зарегистрированный через /admin-sign-up.',
+		createAdminSubmit: 'Создать',
+		createAdminSuccess: 'Аккаунт создан. Вход — с тем же email или телефоном и паролем.',
+		createAdminNamePh: 'Имя',
+		createAdminLoginPh: 'Email или телефон',
 	},
 	catalog: {
 		categories: {
@@ -1546,6 +1569,14 @@ const uz: Dictionary = {
 		productFormUpdated: 'Mahsulot yangilandi',
 		productFormValidationFailed: 'Formani tekshiring',
 		productFormGenericError: 'Xatolik yuz berdi',
+		adminsNavLabel: 'Adminlar',
+		createAdminTitle: 'Yangi admin',
+		createAdminLead:
+			'Yaratilgan admin paneldan foydalanadi, lekin boshqa admin yarata olmaydi. Bu sahifani faqat /admin-sign-up orqali ro‘yxatdan o‘tgan asosiy admin ko‘radi.',
+		createAdminSubmit: 'Yaratish',
+		createAdminSuccess: 'Akkaunt yaratildi. Kirish — xuddi shu email yoki telefon va parol bilan.',
+		createAdminNamePh: 'Ism',
+		createAdminLoginPh: 'Email yoki telefon',
 	},
 	catalog: {
 		categories: {

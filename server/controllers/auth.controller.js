@@ -155,6 +155,7 @@ async registerWithRole(req, res, role = 'user', requireAdminKey = false) {
           emailUser.isDeleted = false;
           emailUser.deletedAt = undefined;
           emailUser.role = role;
+          if (role === 'admin' && requireAdminKey) emailUser.adminCreatedBy = null;
           await emailUser.save();
           const userObj = emailUser.toObject();
           delete userObj.password;
@@ -188,6 +189,7 @@ async registerWithRole(req, res, role = 'user', requireAdminKey = false) {
           existingUser.isDeleted = false;
           existingUser.deletedAt = undefined;
           existingUser.role = role;
+          if (role === 'admin' && requireAdminKey) existingUser.adminCreatedBy = null;
           await existingUser.save();
           const userObj = existingUser.toObject();
           delete userObj.password;
@@ -244,6 +246,126 @@ async register(req, res) {
 
 async registerAdmin(req, res) {
   return this.registerWithRole(req, res, 'admin', true);
+}
+
+/** Faqat admin-sign-up orqali yaratilgan admin (adminCreatedBy yo‘q) chaqira oladi. */
+async createDelegatedAdmin(req, res, next) {
+  try {
+    const creator = req.user
+    if (!creator || creator.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Ruxsat yo‘q' })
+    }
+    if (creator.adminCreatedBy) {
+      return res.status(403).json({
+        success: false,
+        message: 'Faqat asosiy admin boshqa admin yarata oladi',
+      })
+    }
+
+    const { name, login, password, phone } = req.body
+    const rawLogin = login ?? phone
+    if (!name || !String(name).trim() || !rawLogin || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ism, email yoki telefon va parol kerak',
+      })
+    }
+
+    const pwCheck = validateRegistrationPassword(password)
+    if (!pwCheck.ok) {
+      return res.status(400).json({ success: false, message: pwCheck.message })
+    }
+
+    const trimmed = String(rawLogin).trim()
+    const userPayload = {
+      name: String(name).trim(),
+      password: await bcrypt.hash(password, 10),
+      role: 'admin',
+      adminCreatedBy: creator._id,
+    }
+
+    if (trimmed.includes('@')) {
+      const email = trimmed.toLowerCase()
+      const emailUser = await User.findOne({ email })
+      if (emailUser) {
+        if (emailUser.isDeleted) {
+          emailUser.name = String(name).trim()
+          emailUser.password = await bcrypt.hash(password, 10)
+          emailUser.isDeleted = false
+          emailUser.deletedAt = undefined
+          emailUser.role = 'admin'
+          emailUser.adminCreatedBy = creator._id
+          await emailUser.save()
+          const userObj = emailUser.toObject()
+          delete userObj.password
+          userObj.favorites = await getFavoriteProductIds(emailUser._id)
+          return res.status(200).json({
+            success: true,
+            message: 'Admin tiklandi',
+            user: userObj,
+          })
+        }
+        return res.status(400).json({ success: false, message: 'Email band' })
+      }
+      userPayload.email = email
+    } else {
+      const digits = trimmed.replace(/\D/g, '')
+      if (digits.length < 9) {
+        return res.status(400).json({
+          success: false,
+          message: 'Telefon raqam noto‘g‘ri',
+        })
+      }
+      const fullPhone = '+' + digits
+      const existingUser = await User.findOne({ phone: fullPhone })
+      if (existingUser) {
+        if (existingUser.isDeleted) {
+          existingUser.name = String(name).trim()
+          existingUser.password = await bcrypt.hash(password, 10)
+          existingUser.isDeleted = false
+          existingUser.deletedAt = undefined
+          existingUser.role = 'admin'
+          existingUser.adminCreatedBy = creator._id
+          await existingUser.save()
+          const userObj = existingUser.toObject()
+          delete userObj.password
+          userObj.favorites = await getFavoriteProductIds(existingUser._id)
+          return res.status(200).json({
+            success: true,
+            message: 'Admin tiklandi',
+            user: userObj,
+          })
+        }
+        return res.status(400).json({ success: false, message: 'User mavjud' })
+      }
+      userPayload.phone = fullPhone
+    }
+
+    let newUser
+    try {
+      newUser = await User.create(userPayload)
+    } catch (err) {
+      if (err && err.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email yoki telefon allaqachon ro‘yxatdan o‘tgan',
+        })
+      }
+      throw err
+    }
+
+    const userObj = newUser.toObject()
+    delete userObj.password
+    userObj.favorites = await getFavoriteProductIds(newUser._id)
+
+    return res.status(201).json({
+      success: true,
+      message: 'Admin yaratildi',
+      user: userObj,
+    })
+  } catch (error) {
+    next(error)
+  }
 }
 }
 

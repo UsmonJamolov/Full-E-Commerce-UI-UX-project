@@ -3,13 +3,17 @@
 import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { adminSidebar } from '@/lib/constants'
+import { adminPrimaryNavItem, adminSidebar } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 const Sidebar = () => {
 	const pathname = usePathname()
+	const { data: session } = useSession()
+	const showAdminsNav = session?.currentUser?.managesAdmins === true
+	const AdminsNavIcon = adminPrimaryNavItem.icon
 	const locale = useMemo<'ru' | 'en' | 'uz'>(() => {
 		if (typeof document === 'undefined') return 'ru'
 		const matched = document.cookie.match(/(?:^|;\s*)locale=(ru|en|uz)/)
@@ -35,6 +39,18 @@ const Sidebar = () => {
 						</Link>
 					</Button>
 				))}
+				{showAdminsNav && (
+					<Button
+						asChild
+						variant={pathname === adminPrimaryNavItem.route ? 'secondary' : 'ghost'}
+						className={cn('flex justify-start', pathname === adminPrimaryNavItem.route && 'font-bold')}
+					>
+						<Link href={adminPrimaryNavItem.route}>
+							<AdminsNavIcon />
+							<span>{adminPrimaryNavItem.name[locale]}</span>
+						</Link>
+					</Button>
+				)}
 			</div>
 		</div>
 	)

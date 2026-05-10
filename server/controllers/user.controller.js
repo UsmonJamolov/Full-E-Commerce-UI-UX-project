@@ -13,7 +13,7 @@ class UserController {
     
     async getProducts(req, res, next) {
         try {
-            const { searchQuery, filter, category, targetGroup, page, pageSize } = req.query
+            const { searchQuery, filter, category, targetGroup, page, pageSize, excludeCategory } = req.query
 			const skipAmount = (+page - 1) * +pageSize
 			const query = {}
 
@@ -22,9 +22,14 @@ class UserController {
 				query.$or = [{ title: { $regex: new RegExp(escapedSearchQuery, 'i') } }]
 			}
 
-			if (category === 'All') query.category = { $exists: true }
-			else if (category !== 'All') {
-				if (category) query.category = category
+			const exCat = excludeCategory && String(excludeCategory).trim() ? String(excludeCategory).trim() : null
+			const catRaw = category != null ? String(category) : ''
+			if (catRaw === 'All') {
+				query.category = exCat ? { $exists: true, $ne: exCat } : { $exists: true }
+			} else if (catRaw && catRaw !== 'All') {
+				query.category = catRaw
+			} else if (exCat) {
+				query.category = { $ne: exCat }
 			}
 			if (targetGroup) query.targetGroup = targetGroup
 

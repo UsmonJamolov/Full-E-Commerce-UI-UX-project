@@ -8,6 +8,7 @@ import {
 	ShoppingCart,
 	Sparkles,
 	User,
+	UserPlus,
 	type LucideIcon,
 } from 'lucide-react'
 
@@ -62,6 +63,13 @@ export const dashboardSidebar: {
 	{ route: '/dashboard/watch-list', icon: Heart, navKey: 'watchList' },
 	{ route: '/dashboard/settings', icon: Settings2, navKey: 'settings' },
 ]
+
+/** Faqat admin-sign-up adminlari ko‘radi (boshqa adminlarni boshqarish). */
+export const adminPrimaryNavItem = {
+	name: { ru: 'Админы', en: 'Admins', uz: 'Adminlar' },
+	icon: UserPlus,
+	route: '/admin/admins',
+} as const
 
 export const adminSidebar = [
 	{

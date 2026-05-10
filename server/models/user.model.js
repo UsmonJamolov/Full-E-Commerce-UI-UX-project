@@ -18,6 +18,8 @@ const userSchema = new Schema(
       unique: true,
     },
     role: { type: String, required: true, default: 'user' },
+    /** Agar set bo‘lsa — admin panel orqali yaratilgan; boshqa adminlarni boshqara olmaydi. */
+    adminCreatedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     avatar: {
       type: String,
     },

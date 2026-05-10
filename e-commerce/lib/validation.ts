@@ -71,6 +71,9 @@ export const adminRegisterSchema = registerSchema.extend({
 	adminKey: z.string().min(1, 'Admin kalitni kiriting'),
 })
 
+/** Panel orqali yangi admin — kalit talab qilinmaydi. */
+export const delegatedAdminRegisterSchema = registerSchema
+
 export const fullNameSchema = z.object({
 	fullName: z.string().min(3, { message: 'Full name must be at least 3 characters' }),
 })
@@ -192,6 +195,8 @@ export const searchParamsSchema = z.object({
 	filter: z.string().optional(),
 	category: z.string().optional(),
 	targetGroup: z.string().optional(),
+	/** Masalan asosiy sahifada "Explore" — Shoes chiqarilmasin */
+	excludeCategory: z.string().optional(),
 	page: z.string().default('1'),
 	pageSize: z.string().default('6'),
 })

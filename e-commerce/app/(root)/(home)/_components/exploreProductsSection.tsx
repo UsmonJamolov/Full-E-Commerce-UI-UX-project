@@ -18,8 +18,9 @@ const ExploreProductsSection = async ({
 		searchQuery: '',
 		filter: 'newest',
 		category: '',
+		excludeCategory: 'Shoes',
 		page: '1',
-		pageSize: '40',
+		pageSize: '24',
 	})
 	const products = (res?.data?.products || []).slice(0, 8)
 
