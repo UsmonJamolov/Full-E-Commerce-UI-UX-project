@@ -5,6 +5,7 @@ import { useI18n } from '@/components/providers/i18n-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -26,6 +27,7 @@ export default function CreateDelegatedAdminForm() {
 	const [password, setPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
+	const router = useRouter()
 
 	const handleSubmit = async () => {
 		if (password !== confirmPassword) {
@@ -59,6 +61,7 @@ export default function CreateDelegatedAdminForm() {
 			setLogin('')
 			setPassword('')
 			setConfirmPassword('')
+			router.refresh()
 		} catch {
 			toast.error(t.toastRegisterFailed)
 		} finally {

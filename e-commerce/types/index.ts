@@ -154,6 +154,8 @@ export interface IPurchaseItem {
 	_id: string
 	name: string
 	status: 'pending' | 'approved'
+	image?: string
+	imageKey?: string
 	createdAt: string
 	updatedAt: string
 }

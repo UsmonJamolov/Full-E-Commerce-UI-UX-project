@@ -149,6 +149,8 @@ export const categoryUpdateSchema = z.object({
 
 export const purchaseItemSchema = z.object({
 	name: z.string().min(2, 'Tovar nomi kamida 2 harf bo‘lsin').max(120),
+	image: z.string().optional(),
+	imageKey: z.string().optional(),
 })
 
 export const purchaseItemStatusSchema = z.object({
@@ -158,6 +160,8 @@ export const purchaseItemStatusSchema = z.object({
 export const updatePurchaseItemSchema = z.object({
 	id: z.string(),
 	name: z.string().min(2, 'Tovar nomi kamida 2 harf bo‘lsin').max(120),
+	image: z.string().optional(),
+	imageKey: z.string().optional(),
 })
 
 export const productReviewSchema = z.object({

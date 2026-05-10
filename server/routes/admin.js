@@ -17,6 +17,8 @@ const uploadProductImageMulter = multer({
 })
 
 router.post('/delegated-admin', authController.createDelegatedAdmin.bind(authController))
+router.get('/delegated-admins', authController.listDelegatedAdmins.bind(authController))
+router.delete('/delegated-admins/:id', authController.deleteDelegatedAdmin.bind(authController))
 
 router.get('/categories', categoryController.getCategories)
 router.post('/categories', categoryController.createCategory)

@@ -106,7 +106,17 @@ export const deleteAdminCategory = actionClient.schema(idSchema).action(async ({
 	return JSON.parse(JSON.stringify(data))
 })
 
-type PurchaseItemsResponse = { items: Array<{ _id: string; name: string; status: 'pending' | 'approved'; createdAt: string; updatedAt: string }> }
+type PurchaseItemsResponse = {
+	items: Array<{
+		_id: string
+		name: string
+		status: 'pending' | 'approved'
+		image?: string
+		imageKey?: string
+		createdAt: string
+		updatedAt: string
+	}>
+}
 
 export const getPurchaseItems = actionClient
 	.schema(purchaseItemStatusSchema)
@@ -150,9 +160,10 @@ export const updatePurchaseItem = actionClient
 	.action(async ({ parsedInput }) => {
 		const session = await getServerSession(authOptions)
 		const token = await generateToken(session?.currentUser?._id)
+		const { id, ...body } = parsedInput
 		const { data } = await axiosClient.put(
-			`/api/admin/purchase-items/${parsedInput.id}`,
-			{ name: parsedInput.name },
+			`/api/admin/purchase-items/${id}`,
+			body,
 			{ headers: { Authorization: `Bearer ${token}` } },
 		)
 		revalidatePath('/admin/orders')
@@ -282,6 +293,8 @@ export const createDelegatedAdmin = actionClient
 				{ name: payload.name, login: payload.login, password: payload.password },
 				{ headers: { Authorization: `Bearer ${token}` } },
 			)
+			const ok = (data as { success?: boolean })?.success === true
+			if (ok) revalidatePath('/admin/admins')
 			return JSON.parse(JSON.stringify(data)) as ReturnActionType
 		} catch (e: unknown) {
 			const d = (e as { response?: { data?: unknown } })?.response?.data
@@ -291,6 +304,39 @@ export const createDelegatedAdmin = actionClient
 			return { success: false, message: 'Server error' } as unknown as ReturnActionType
 		}
 	})
+
+export type DelegatedAdminRow = {
+	_id: string
+	name: string
+	email: string | null
+	phone: string | null
+	createdAt: string
+}
+
+export const getDelegatedAdmins = actionClient.action(async () => {
+	const session = await getServerSession(authOptions)
+	if (!session?.currentUser?._id || !session.currentUser.managesAdmins) {
+		return JSON.parse(JSON.stringify({ admins: [] as DelegatedAdminRow[] }))
+	}
+	const token = await generateToken(session.currentUser._id)
+	const { data } = await axiosClient.get('/api/admin/delegated-admins', {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	return JSON.parse(JSON.stringify(data)) as { admins: DelegatedAdminRow[] }
+})
+
+export const deleteDelegatedAdmin = actionClient.schema(idSchema).action(async ({ parsedInput }) => {
+	const session = await getServerSession(authOptions)
+	if (!session?.currentUser?._id || !session.currentUser.managesAdmins) {
+		throw new Error('Ruxsat yo‘q')
+	}
+	const token = await generateToken(session.currentUser._id)
+	const { data } = await axiosClient.delete(`/api/admin/delegated-admins/${parsedInput.id}`, {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	revalidatePath('/admin/admins')
+	return JSON.parse(JSON.stringify(data))
+})
 
 export const createProduct = actionClient.schema(productSchema).action<ReturnActionType>(async ({ parsedInput }) => {
 	try {

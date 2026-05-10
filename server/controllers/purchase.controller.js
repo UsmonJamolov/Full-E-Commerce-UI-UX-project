@@ -31,7 +31,13 @@ class PurchaseController {
 			const name = (req.body.name || '').trim()
 			if (!name) return res.status(400).json({ failure: 'Tovar nomini kiriting' })
 
-			const item = await purchaseItemModel.create({ name, status: 'pending' })
+			const image = typeof req.body.image === 'string' ? req.body.image.trim() : ''
+			const imageKey = typeof req.body.imageKey === 'string' ? req.body.imageKey.trim() : ''
+			const item = await purchaseItemModel.create({
+				name,
+				status: 'pending',
+				...(image ? { image, imageKey } : {}),
+			})
 			return res.json({ status: 201, item })
 		} catch (error) {
 			next(error)
@@ -65,6 +71,11 @@ class PurchaseController {
 			if (!item) return res.json({ failure: 'Tovar topilmadi' })
 
 			item.name = name
+			if (req.body.image !== undefined) {
+				const image = typeof req.body.image === 'string' ? req.body.image.trim() : ''
+				item.image = image
+				item.imageKey = typeof req.body.imageKey === 'string' ? req.body.imageKey.trim() : ''
+			}
 			await item.save()
 
 			return res.json({ status: 200, item })

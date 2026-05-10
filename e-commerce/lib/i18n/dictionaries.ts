@@ -342,6 +342,16 @@ export type Dictionary = {
 		createAdminSuccess: string
 		createAdminNamePh: string
 		createAdminLoginPh: string
+		delegatedAdminsSectionTitle: string
+		delegatedAdminsSectionLead: string
+		delegatedAdminsColName: string
+		delegatedAdminsColContact: string
+		delegatedAdminsColCreated: string
+		delegatedAdminsDeleteBtn: string
+		delegatedAdminsDeleteTitle: string
+		delegatedAdminsDeleteDesc: string
+		delegatedAdminsEmpty: string
+		delegatedAdminRemoved: string
 	}
 	/** Katalogdagi `category` / `targetGroup` qiymatlari (API ingliz/o‘zbek kalitlari). */
 	catalog: {
@@ -749,6 +759,16 @@ const en: Dictionary = {
 		createAdminSuccess: 'Admin account created. They can sign in with the same email or phone and password.',
 		createAdminNamePh: 'Full name',
 		createAdminLoginPh: 'Email or phone',
+		delegatedAdminsSectionTitle: 'Panel-created admins',
+		delegatedAdminsSectionLead: 'These accounts were created from this page. They can be removed from the panel (soft delete).',
+		delegatedAdminsColName: 'Name',
+		delegatedAdminsColContact: 'Email / phone',
+		delegatedAdminsColCreated: 'Created',
+		delegatedAdminsDeleteBtn: 'Remove',
+		delegatedAdminsDeleteTitle: 'Remove this admin?',
+		delegatedAdminsDeleteDesc: 'They will no longer be able to sign in. This can be undone only by restoring the account in the database.',
+		delegatedAdminsEmpty: 'No delegated admins yet.',
+		delegatedAdminRemoved: 'Admin removed',
 	},
 	catalog: {
 		categories: {
@@ -1163,6 +1183,16 @@ const ru: Dictionary = {
 		createAdminSuccess: 'Аккаунт создан. Вход — с тем же email или телефоном и паролем.',
 		createAdminNamePh: 'Имя',
 		createAdminLoginPh: 'Email или телефон',
+		delegatedAdminsSectionTitle: 'Админы, созданные в панели',
+		delegatedAdminsSectionLead: 'Эти аккаунты созданы на этой странице. Их можно удалить из панели (мягкое удаление — вход будет закрыт).',
+		delegatedAdminsColName: 'Имя',
+		delegatedAdminsColContact: 'Email / телефон',
+		delegatedAdminsColCreated: 'Создан',
+		delegatedAdminsDeleteBtn: 'Удалить',
+		delegatedAdminsDeleteTitle: 'Удалить этого администратора?',
+		delegatedAdminsDeleteDesc: 'Он больше не сможет войти в панель.',
+		delegatedAdminsEmpty: 'Пока нет админов, созданных из панели.',
+		delegatedAdminRemoved: 'Администратор удалён',
 	},
 	catalog: {
 		categories: {
@@ -1577,6 +1607,16 @@ const uz: Dictionary = {
 		createAdminSuccess: 'Akkaunt yaratildi. Kirish — xuddi shu email yoki telefon va parol bilan.',
 		createAdminNamePh: 'Ism',
 		createAdminLoginPh: 'Email yoki telefon',
+		delegatedAdminsSectionTitle: 'Panel orqali yaratilgan adminlar',
+		delegatedAdminsSectionLead: 'Bu akkauntlar shu sahifadan yaratilgan. Ularni paneldan olib tashlash mumkin (kirish bloklanadi).',
+		delegatedAdminsColName: 'Ism',
+		delegatedAdminsColContact: 'Email / telefon',
+		delegatedAdminsColCreated: 'Yaratilgan',
+		delegatedAdminsDeleteBtn: 'O‘chirish',
+		delegatedAdminsDeleteTitle: 'Bu admin o‘chirilsinmi?',
+		delegatedAdminsDeleteDesc: 'Endi tizimga kira olmaydi.',
+		delegatedAdminsEmpty: 'Hozircha panel orqali yaratilgan admin yo‘q.',
+		delegatedAdminRemoved: 'Admin o‘chirildi',
 	},
 	catalog: {
 		categories: {

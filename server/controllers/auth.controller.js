@@ -367,6 +367,63 @@ async createDelegatedAdmin(req, res, next) {
     next(error)
   }
 }
+
+  async listDelegatedAdmins(req, res, next) {
+    try {
+      if (req.user.adminCreatedBy) {
+        return res.status(403).json({ success: false, message: 'Ruxsat yo‘q' })
+      }
+      const admins = await User.find(
+        {
+          role: 'admin',
+          adminCreatedBy: { $exists: true, $ne: null },
+          isDeleted: { $ne: true },
+        },
+        { password: 0 },
+      )
+        .sort({ createdAt: -1 })
+        .lean()
+
+      const list = admins.map((u) => ({
+        _id: u._id,
+        name: u.name,
+        email: u.email || null,
+        phone: u.phone || null,
+        createdAt: u.createdAt,
+      }))
+      return res.json({ admins: list })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async deleteDelegatedAdmin(req, res, next) {
+    try {
+      if (req.user.adminCreatedBy) {
+        return res.status(403).json({ success: false, message: 'Ruxsat yo‘q' })
+      }
+      const { id } = req.params
+      if (String(id) === String(req.user._id)) {
+        return res.status(400).json({ success: false, message: 'O‘zingizni o‘chira olmaysiz' })
+      }
+      const target = await User.findById(id)
+      if (!target || target.role !== 'admin') {
+        return res.status(404).json({ success: false, message: 'Topilmadi' })
+      }
+      if (!target.adminCreatedBy) {
+        return res.status(400).json({
+          success: false,
+          message: 'Asosiy adminni bu yerda o‘chirib bo‘lmaydi',
+        })
+      }
+      target.isDeleted = true
+      target.deletedAt = new Date()
+      await target.save()
+      return res.json({ status: 200, success: true })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new AuthController();
